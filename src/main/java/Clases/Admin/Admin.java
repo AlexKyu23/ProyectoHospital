@@ -4,7 +4,7 @@ package Clases.Admin;
 import Clases.Trabajador.Trabajador;
 
 public class Admin extends Trabajador {
-    //hola
+
     public Admin(String id, String nombre, String clave) {
         super(id, nombre, clave);
     }
