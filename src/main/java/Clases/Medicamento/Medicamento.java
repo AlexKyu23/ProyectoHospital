@@ -1,18 +1,18 @@
 package Clases.Medicamento;
 
-import Clases.Receta.Receta;
 
 public class Medicamento {
-
+    private String nombre;
     private String descripcion;
     private int codigo;
-    private Receta receta;
 
 
-    public Medicamento(String descripcion, int codigo, Receta receta) {
+
+    public Medicamento(String nombre, String descripcion, int codigo) {
+        this.nombre = nombre;
         this.descripcion = descripcion;
         this.codigo = codigo;
-        this.receta = receta;
+
     }
 
 
@@ -27,24 +27,17 @@ public class Medicamento {
     public int getCodigo() {
         return codigo;
     }
-
+    public String getNombre() {return nombre;}
+    public void setNombre(String nombre) {this.nombre = nombre;}
     public void setCodigo(int codigo) {
         this.codigo = codigo;
     }
 
-    public Receta getReceta() {
-        return receta;
-    }
-
-    public void setReceta(Receta receta) {
-        this.receta = receta;
-    }
     @Override
     public String toString() {
         return "Medicamento{" +
                 "descripcion='" + descripcion + '\'' +
-                ", codigo=" + codigo +
-                ", receta=" + (receta != null ? receta.toString() : "null") +
-                '}';
+                ", codigo=" + codigo;
+
     }
 }

@@ -3,6 +3,9 @@ package Clases.Admin;
 import Clases.Farmaceuta.FarmaceutaController;
 import Clases.Farmaceuta.FarmaceutaModel;
 import Clases.Farmaceuta.View.FarmaceutaView;
+import Clases.Medicamento.MedicamentoController;
+import Clases.Medicamento.MedicamentoModel;
+import Clases.Medicamento.View.MedicamentoView;
 import Clases.Medico.View.MedicoController;
 import Clases.Medico.View.MedicoModel;
 import Clases.Medico.View.MedicoView;
@@ -41,10 +44,10 @@ public class AdminController {
         view.getTabbedPane().addTab("Pacientes", pacienteView.getMainPanel());
 
         // 🔹 Medicamentos
-       // MedicamentoModel medModel = new MedicamentoModel();
-       // MedicamentoView medView = new MedicamentoView();
-    //    new MedicamentoController(medModel, medView);
-    //    view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
+       MedicamentoModel medModel = new MedicamentoModel();
+       MedicamentoView medView = new MedicamentoView();
+       new MedicamentoController(medModel, medView);
+       view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
 
         // 🔹 Seleccionar por defecto Médicos
         view.getTabbedPane().setSelectedIndex(0);
