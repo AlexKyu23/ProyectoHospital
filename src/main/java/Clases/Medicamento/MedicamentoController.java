@@ -65,6 +65,7 @@ public class MedicamentoController {
             if (existente == null) {
                 Medicamento nuevo = new Medicamento(nombre, descripcion, codigo);
                 model.addMedicamento(nuevo);
+                model.setCurrent(nuevo); // 🔹 notifica que el current cambió
                 JOptionPane.showMessageDialog(null, "Medicamento agregado");
             } else {
                 existente.setNombre(nombre);
@@ -100,6 +101,7 @@ public class MedicamentoController {
         }
 
         if (encontrado != null) {
+            model.setCurrent(encontrado); // 🔹 importante para MVC
             view.getCodigo().setText(String.valueOf(encontrado.getCodigo()));
             view.getNombre().setText(encontrado.getNombre());
             view.getDescripcion().setText(encontrado.getDescripcion());
@@ -107,6 +109,7 @@ public class MedicamentoController {
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró el medicamento");
         }
+
     }
 
     private void limpiarCampos() {

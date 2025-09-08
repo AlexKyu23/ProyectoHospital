@@ -3,20 +3,21 @@ package Clases.Farmaceuta.View;
 import javax.swing.*;
 
 public class FarmaceutaView {
-    private JPanel Farmaceutas;
+    private JPanel farmaceutas;
     private JTextField id;
     private JTextField nombre;
     private JButton guardarButton;
     private JButton borrarButton;
     private JButton limpiarButton;
-    private JPanel Búsqueda;
+    private JPanel busqueda;
     private JTextField nombreBuscar;
     private JButton buscarButton;
     private JButton reporteButton;
-    private JPanel Listado;
+    private JPanel listado;
+    private JPanel todo;
 
     // 🔹 Para integrarlo en AdminView
-    public JPanel getMainPanel() { return Farmaceutas; }
+    public JPanel getMainPanel() { return todo; }
 
     // 🔹 Getters
     public JButton getGuardarButton() { return guardarButton; }
@@ -29,5 +30,5 @@ public class FarmaceutaView {
     public JTextField getNombre() { return nombre; }
     public JTextField getNombreBuscar() { return nombreBuscar; }
 
-    public JPanel getListado() { return Listado; }
+    public JPanel getListado() { return listado; }
 }

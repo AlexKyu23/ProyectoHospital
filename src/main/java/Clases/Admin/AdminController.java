@@ -25,8 +25,8 @@ public class AdminController {
     }
 
     private void inicializarTabs() {
-        // 🔹 Medicos
-        MedicoModel medicoModel = new MedicoModel();
+        //🔹 Medicos
+       MedicoModel medicoModel = new MedicoModel();
         MedicoView medicoView = new MedicoView();
         new MedicoController(medicoModel, medicoView);
         view.getTabbedPane().addTab("Médicos", medicoView.getMainPanel());

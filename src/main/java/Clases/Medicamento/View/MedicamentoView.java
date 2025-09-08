@@ -10,20 +10,24 @@ public class MedicamentoView {
     private JButton guardarButton;
     private JButton borrarButton;
     private JButton limpiarButton;
-    private JPanel Búsqueda;
+    private JPanel Busqueda;
     private JTextField nombreBuscar;
     private JButton buscarButton;
     private JButton reporteButton;
     private JPanel Listado;
+    private JTextField descripcionBuscar;
+    private JTextField codigoBuscar;
+    private JPanel todo;
 
     // 🔹 Getters
-    public JPanel getMainPanel() { return Medicamentos; }
+    public JPanel getMainPanel() { return todo; }
 
     public JTextField getCodigo() { return codigo; }
     public JTextField getNombre() { return nombre; }
     public JTextField getDescripcion() { return descripcion; }
     public JTextField getNombreBuscar() { return nombreBuscar; }
-
+    public JTextField getDescripcionBuscar() { return descripcionBuscar; }
+    public JTextField getCodigoBuscar() { return codigoBuscar; }
     public JButton getGuardarButton() { return guardarButton; }
     public JButton getBorrarButton() { return borrarButton; }
     public JButton getBuscarButton() { return buscarButton; }

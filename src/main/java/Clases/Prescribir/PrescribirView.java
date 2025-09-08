@@ -12,6 +12,7 @@ public class PrescribirView {
     private JButton limpiarButton;
     private JButton descartarMedicamentoButton;
     private JButton detallesButton;
+    private JPanel todo;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here

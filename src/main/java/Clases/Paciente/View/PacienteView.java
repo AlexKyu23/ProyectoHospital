@@ -9,14 +9,23 @@ public class PacienteView {
     private JButton guardarButton;
     private JButton borrarButton;
     private JButton limpiarButton;
-    private JPanel Búsqueda;
+    private JPanel Busqueda;
     private JTextField nombreBuscar;
     private JButton buscarButton;
     private JButton reporteButton;
     private JPanel Listado;
+    private JTextField idBuscar;
+    private JTextField fechaNacimiento;
+    private JTextField numeroTelefono;
+    private JPanel todo;
 
     // 🔹 Para integrarlo en AdminView
-    public JPanel getMainPanel() { return Pacientes; }
+    public JPanel getMainPanel() { return todo; }
+    public JPanel getBusquedaPanel() { return Busqueda; }
+    public JPanel getListadoPanel() { return Listado; }
+    public JTextField getIdBuscar() { return idBuscar; }
+    public JTextField getFechaNacimiento() { return fechaNacimiento; }
+    public JTextField getNumeroTelefono() { return numeroTelefono; }
 
     // 🔹 Getters
     public JTextField getId() { return id; }

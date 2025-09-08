@@ -3,9 +3,8 @@ package Clases.Medico.View;
 import javax.swing.*;
 
 public class MedicoView {
-    private JPanel Medicos;       // panel raíz generado en el UI Designer
+    private JPanel medicos;
     private JTabbedPane tabbedPane1;
-    private JLabel Medico;
     private JTextField id;
     private JTextField especialidad;
     private JTextField nombre;
@@ -14,16 +13,21 @@ public class MedicoView {
     private JTextField nombreBuscar;
     private JButton buscarButton;
     private JButton reporteButton;
-    private JPanel Listado;
-    private JPanel Busqueda;
+    private JPanel listado;
+    private JPanel busqueda;
     private JButton limpiarButton;
+    private JTextField idBuscar;
+    private JPanel todo;
 
     // 🔹 Para integrarlo en AdminView
     public JPanel getMainPanel() {
-        return Medicos;
+        return todo;
     }
 
     // 🔹 Getters para los controles (el Controller necesita acceder)
+    public JTextField getIdBuscar() {
+        return idBuscar;
+    }
     public JTextField getId() { return id; }
     public JTextField getEspecialidad() { return especialidad; }
     public JTextField getNombre() { return nombre; }
@@ -36,4 +40,8 @@ public class MedicoView {
     public JButton getLimpiarButton() { return limpiarButton; }
 
     public JTabbedPane getTabbedPane1() { return tabbedPane1; }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }
