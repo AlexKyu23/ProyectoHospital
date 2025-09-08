@@ -17,4 +17,44 @@ public class PrescribirView {
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
+
+    public JButton getBuscarPacienteButton() {
+        return buscarPacienteButton;
+    }
+
+    public JButton getAgregarMedicamentoButton() {
+        return agregarMedicamentoButton;
+    }
+
+    public JButton getGuardarButton() {
+        return guardarButton;
+    }
+
+    public JButton getLimpiarButton() {
+        return limpiarButton;
+    }
+
+    public JButton getDescartarMedicamentoButton() {
+        return descartarMedicamentoButton;
+    }
+
+    public JButton getDetallesButton() {
+        return detallesButton;
+    }
+
+    public JLabel getNombrePacienteLabel() {
+        return NombrePaciente;
+    }
+
+    public JTable getMedicamentosPreenscritos() {
+        return MedicamentosPreenscritos;
+    }
+
+    public JTextField getTextField1() {
+        return textField1;
+    }
+
+    public JPanel getPanel() {
+        return todo;
+    }
 }
