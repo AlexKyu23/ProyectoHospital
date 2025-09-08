@@ -18,11 +18,14 @@ public class MedicoView {
     private JTextField idBuscar;
     private JButton buscarButton;
     private JButton reporteButton;
+    private JTable tablaMedicos;
+
+
     // 🔹 Para integrarlo en AdminView
     public JPanel getMainPanel() {
         return medicos;
     }
-
+    public JTable getTablaMedicos() {return tablaMedicos;}
     // 🔹 Getters para los controles (el Controller necesita acceder)
     public JTextField getId() { return id; }
     public JTextField getEspecialidad() { return especialidad; }
