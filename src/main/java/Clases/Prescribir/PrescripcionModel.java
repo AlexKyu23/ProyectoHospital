@@ -4,6 +4,7 @@ import Clases.AbstractModel;
 import Clases.Medico.Medico;
 import Clases.Paciente.Paciente;
 import Clases.Medicamento.Medicamento;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ public class PrescripcionModel extends AbstractModel {
     private Paciente paciente;
     private Medico medico;
     private List<Medicamento> medicamentos;
+    private LocalDate fechaRetiro;
+
 
     public PrescripcionModel() {
         this.medicamentos = new ArrayList<>();
@@ -48,4 +51,10 @@ public class PrescripcionModel extends AbstractModel {
     public void limpiarMedicamentos() {
         medicamentos.clear();
     }
+
+    public LocalDate getFechaRetiro() { return fechaRetiro; }
+
+    public void setFechaRetiro(LocalDate fechaRetiro) { this.fechaRetiro = fechaRetiro; }
+
+
 }

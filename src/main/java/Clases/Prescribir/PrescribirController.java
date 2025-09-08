@@ -8,6 +8,11 @@ import Clases.Medico.Medico;
 import Clases.Paciente.Paciente;
 import Clases.Medicamento.Medicamento;
 
+import com.github.lgooddatepicker.components.DatePicker;
+import java.time.LocalDate;
+import javax.swing.JOptionPane;
+
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
@@ -135,22 +140,37 @@ public class PrescribirController {
         model.limpiarMedicamentos();
         view.getNombrePacienteLabel().setText("Paciente:");
         tableModel.setRowCount(0);
-        view.getTextField1().setText("");
+        view.getCalendario().clear();
     }
 
     private void guardarPrescripcion() {
         PrescripcionModel nueva = new PrescripcionModel();
         nueva.setPaciente(model.getPaciente());
         nueva.setMedico(model.getMedico());
+
+        // Guardar los medicamentos
         for (Medicamento med : model.getMedicamentos()) {
             nueva.agregarMedicamento(med);
         }
+
+        // 🔹 Guardar la fecha seleccionada en el DatePicker
+        LocalDate fechaSeleccionada = view.getCalendario().getDate();
+        if (fechaSeleccionada != null) {
+            nueva.setFechaRetiro(fechaSeleccionada);
+        } else {
+            JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar una fecha de retiro");
+            return; // no guardar si no hay fecha
+        }
+
+        // Guardar la prescripción en el repositorio
         RepositorioPrescripciones.agregar(nueva);
 
+        // Mensaje de confirmación
         JOptionPane.showMessageDialog(view.getPanel(),
                 "Prescripción guardada.\nMédico: " + nueva.getMedico().getNombre() +
                         "\nPaciente: " + nueva.getPaciente().getNombre() +
-                        "\nMedicamentos: " + nueva.getMedicamentos().size());
+                        "\nMedicamentos: " + nueva.getMedicamentos().size() +
+                        "\nFecha de retiro: " + fechaSeleccionada);
     }
 
     private void mostrarDetalles() {
@@ -165,6 +185,7 @@ public class PrescribirController {
             PrescripcionModel p = lista.get(i);
             opciones[i] = (i + 1) + ". " + p.getPaciente().getNombre() +
                     " | Médico: " + p.getMedico().getNombre() +
+                    " | Fecha de retiro: " + (p.getFechaRetiro() != null ? p.getFechaRetiro() : "No asignada") +
                     " (" + p.getMedicamentos().size() + " meds)";
         }
 
@@ -186,6 +207,7 @@ public class PrescribirController {
                     "Médico: " + presc.getMedico().getNombre() +
                             "\nPaciente: " + presc.getPaciente().getNombre() +
                             "\nMedicamentos: " + presc.getMedicamentos() +
+                            "\nFecha de retiro: " + (presc.getFechaRetiro() != null ? presc.getFechaRetiro() : "No asignada") +
                             "\n\n¿Desea eliminar esta prescripción?",
                     "Detalles",
                     JOptionPane.YES_NO_OPTION);
@@ -196,4 +218,5 @@ public class PrescribirController {
             }
         }
     }
+
 }

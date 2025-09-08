@@ -1,11 +1,12 @@
 package Clases.Prescribir;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 
 public class PrescribirView {
     private JButton buscarPacienteButton;
     private JButton agregarMedicamentoButton;
-    private JTextField textField1;
     private JLabel NombrePaciente;
     private JTable MedicamentosPreenscritos;
     private JButton guardarButton;
@@ -13,6 +14,7 @@ public class PrescribirView {
     private JButton descartarMedicamentoButton;
     private JButton detallesButton;
     private JPanel todo;
+    private DatePicker Calendario;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
@@ -50,11 +52,11 @@ public class PrescribirView {
         return MedicamentosPreenscritos;
     }
 
-    public JTextField getTextField1() {
-        return textField1;
-    }
-
     public JPanel getPanel() {
         return todo;
+    }
+
+    public DatePicker getCalendario() {
+        return Calendario;
     }
 }
