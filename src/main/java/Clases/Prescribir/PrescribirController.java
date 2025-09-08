@@ -31,13 +31,13 @@ public class PrescribirController {
     private catalogoMedicamentos catalogoMed;
     // private ListaPacientes listaPacientes; // <-- usar cuando tengas definida la clase
 
-    public PrescribirController(PrescribirView view, PrescripcionModel model, Medico medicoEnSesion,
-                                ListaMedicos listaMedicos, catalogoMedicamentos catalogoMed /*, ListaPacientes listaPacientes */) {
+    public PrescribirController(PrescribirView view, PrescripcionModel model/*, Medico medicoEnSesion,
+                                ListaMedicos listaMedicos, catalogoMedicamentos catalogoMed , ListaPacientes listaPacientes */) {
         this.view = view;
         this.model = model;
-        this.medicoEnSesion = medicoEnSesion;
-        this.listaMedicos = listaMedicos;
-        this.catalogoMed = catalogoMed;
+       // this.medicoEnSesion = medicoEnSesion;
+        //this.listaMedicos = listaMedicos;
+       // this.catalogoMed = catalogoMed;
         // this.listaPacientes = listaPacientes;
 
         model.setMedico(medicoEnSesion);

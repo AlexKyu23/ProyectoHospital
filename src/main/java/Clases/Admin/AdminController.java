@@ -12,6 +12,9 @@ import Clases.Medico.View.MedicoView.MedicoView;
 import Clases.Paciente.PacienteController;
 import Clases.Paciente.PacienteModel;
 import Clases.Paciente.View.PacienteView;
+import Clases.Prescribir.PrescribirController;
+import Clases.Prescribir.PrescribirView;
+import Clases.Prescribir.PrescripcionModel;
 
 public class AdminController {
     private AdminModel model;
@@ -48,6 +51,12 @@ public class AdminController {
        MedicamentoView medView = new MedicamentoView();
        new MedicamentoController(medModel, medView);
        view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
+       //Pres
+        PrescripcionModel prescModel = new PrescripcionModel();
+        PrescribirView prescView = new PrescribirView();
+        new PrescribirController(prescView,prescModel);
+        view.getTabbedPane().addTab("Preescribir", prescView.getPanel());
+
 
         // 🔹 Seleccionar por defecto Médicos
         view.getTabbedPane().setSelectedIndex(0);
