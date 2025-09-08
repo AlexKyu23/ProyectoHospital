@@ -22,14 +22,18 @@
             <artifactId>LGoodDatePicker</artifactId>
             <version>11.2.1</version>
         </dependency>
-    </dependencies>
-
-    <dependencies>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>4.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.6</version>
+        </dependency>
     </dependencies>
+
+
 
 </project>
