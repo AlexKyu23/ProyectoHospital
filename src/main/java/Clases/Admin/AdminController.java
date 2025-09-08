@@ -8,7 +8,7 @@ import Clases.Medicamento.MedicamentoModel;
 import Clases.Medicamento.View.MedicamentoView;
 import Clases.Medico.View.MedicoController;
 import Clases.Medico.View.MedicoModel;
-import Clases.Medico.View.MedicoView;
+import Clases.Medico.View.MedicoView.MedicoView;
 import Clases.Paciente.PacienteController;
 import Clases.Paciente.PacienteModel;
 import Clases.Paciente.View.PacienteView;

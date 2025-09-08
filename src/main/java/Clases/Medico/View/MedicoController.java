@@ -3,6 +3,7 @@ package Clases.Medico.View;
 
 
 import Clases.Medico.Medico;
+import Clases.Medico.View.MedicoView.MedicoView;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -45,6 +46,8 @@ public class MedicoController {
             }
         });
     }
+
+
 
     private void guardarMedico() {
         String id = view.getId().getText();
