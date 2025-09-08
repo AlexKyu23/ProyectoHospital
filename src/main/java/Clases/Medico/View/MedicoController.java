@@ -4,8 +4,9 @@ package Clases.Medico.View;
 
 import Clases.Medico.Medico;
 import Clases.Medico.View.MedicoView.MedicoView;
-
+import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,12 +17,24 @@ public class MedicoController {
     public MedicoController(MedicoModel model, MedicoView view) {
         this.model = model;
         this.view = view;
-
+        inicializarTabla();
         // Asignar listeners a los botones
         this.view.getGuardarButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 guardarMedico();
+            }
+        });
+        this.view.getTablaMedicos().getSelectionModel().addListSelectionListener(e -> {
+            int fila = view.getTablaMedicos().getSelectedRow();
+            if (fila >= 0) {
+                String id = view.getTablaMedicos().getValueAt(fila, 0).toString();
+                Medico encontrado = model.findById(id);
+                if (encontrado != null) {
+                    view.getId().setText(encontrado.getId());
+                    view.getNombre().setText(encontrado.getNombre());
+                    view.getEspecialidad().setText(encontrado.getEspecialidad());
+                }
             }
         });
 
@@ -47,6 +60,29 @@ public class MedicoController {
         });
     }
 
+    private void refrescarTabla() {
+        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaMedicos().getModel();
+        tableModel.setRowCount(0); // limpiar
+
+        for (Medico m : model.getMedicos()) {
+            Object[] fila = {m.getId(), m.getNombre(), m.getEspecialidad()};
+            tableModel.addRow(fila);
+        }
+    }
+
+    private void inicializarTabla() {
+
+        String[] columnas = {"ID", "Nombre", "Especialidad"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        view.getTablaMedicos().setModel(tableModel);
+    }
+
+
 
 
     private void guardarMedico() {
@@ -71,6 +107,7 @@ public class MedicoController {
             JOptionPane.showMessageDialog(null, "Médico actualizado");
         }
         limpiarCampos();
+        refrescarTabla();
     }
 
     private void borrarMedico() {
@@ -82,6 +119,7 @@ public class MedicoController {
         model.deleteMedico(id);
         JOptionPane.showMessageDialog(null, "Médico eliminado");
         limpiarCampos();
+        refrescarTabla();
     }
 
     private void buscarMedico() {
