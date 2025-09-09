@@ -15,6 +15,7 @@ public class FarmaceutaView {
     private JButton reporteButton;
     private JPanel listado;
     private JPanel todo;
+    private JTable table1;
 
     // 🔹 Para integrarlo en AdminView
     public JPanel getMainPanel() { return todo; }

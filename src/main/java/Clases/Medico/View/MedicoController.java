@@ -107,7 +107,7 @@ public class MedicoController {
             JOptionPane.showMessageDialog(null, "Médico actualizado");
         }
         limpiarCampos();
-        refrescarTabla();
+
     }
 
     private void borrarMedico() {
@@ -119,7 +119,7 @@ public class MedicoController {
         model.deleteMedico(id);
         JOptionPane.showMessageDialog(null, "Médico eliminado");
         limpiarCampos();
-        refrescarTabla();
+
     }
 
     private void buscarMedico() {
@@ -144,5 +144,6 @@ public class MedicoController {
         view.getNombre().setText("");
         view.getEspecialidad().setText("");
         view.getNombreBuscar().setText("");
+        refrescarTabla();
     }
 }

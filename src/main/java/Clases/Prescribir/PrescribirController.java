@@ -95,13 +95,12 @@ public class PrescribirController {
     private void buscarPaciente() {
         // 🔹 Aquí usarías tu clase de lista de pacientes
         // Ejemplo:
-        // Paciente paciente = listaPacientes.seleccionarPaciente();
         Paciente paciente = null; // <- reemplazar por método real
         String nombre = JOptionPane.showInputDialog("Aquí debe abrir la lista de pacientes para seleccionar uno");
         if (nombre != null && !nombre.trim().isEmpty()) {
-            paciente = new Paciente("id_temp", nombre); // <- temporal, reemplazar por selección real
-            model.setPaciente(paciente);
-            view.getNombrePacienteLabel().setText("Paciente: " + paciente.getNombre());
+           // paciente = new Paciente("id_temp", nombre,"s",); // <- temporal, reemplazar por selección real
+          //  model.setPaciente(paciente);
+         //   view.getNombrePacienteLabel().setText("Paciente: " + paciente.getNombre());
         }
     }
 

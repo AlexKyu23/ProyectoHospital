@@ -1,5 +1,7 @@
 package Clases.Paciente.View;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 
 public class PacienteView {
@@ -15,18 +17,19 @@ public class PacienteView {
     private JButton reporteButton;
     private JPanel Listado;
     private JTextField idBuscar;
-    private JTextField fechaNacimiento;
+    private DatePicker fechaNacimiento;
     private JTextField numeroTelefono;
     private JPanel todo;
+    private JTable tablaPacientes;
 
     // 🔹 Para integrarlo en AdminView
     public JPanel getMainPanel() { return todo; }
     public JPanel getBusquedaPanel() { return Busqueda; }
     public JPanel getListadoPanel() { return Listado; }
     public JTextField getIdBuscar() { return idBuscar; }
-    public JTextField getFechaNacimiento() { return fechaNacimiento; }
+    public DatePicker getFechaNacimiento() { return fechaNacimiento; }
     public JTextField getNumeroTelefono() { return numeroTelefono; }
-
+    public JTable getTablaPacientes() { return tablaPacientes; }
     // 🔹 Getters
     public JTextField getId() { return id; }
     public JTextField getNombre() { return nombre; }
