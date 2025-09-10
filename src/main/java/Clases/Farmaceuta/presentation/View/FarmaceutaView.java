@@ -15,12 +15,13 @@ public class FarmaceutaView {
     private JButton reporteButton;
     private JPanel listado;
     private JPanel todo;
-    private JTable table1;
+    private JTable tablaFarmaceutas;
 
     // 🔹 Para integrarlo en AdminView
     public JPanel getMainPanel() { return todo; }
 
     // 🔹 Getters
+    public JTable getTablaFarmaceutas() { return tablaFarmaceutas; }
     public JButton getGuardarButton() { return guardarButton; }
     public JButton getBorrarButton() { return borrarButton; }
     public JButton getBuscarButton() { return buscarButton; }

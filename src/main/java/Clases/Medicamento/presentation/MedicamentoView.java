@@ -18,10 +18,11 @@ public class MedicamentoView {
     private JTextField descripcionBuscar;
     private JTextField codigoBuscar;
     private JPanel todo;
+    private JTable tablaMedicamentos;
 
     // 🔹 Getters
     public JPanel getMainPanel() { return todo; }
-
+    public JTable getTablaMedicamentos() { return tablaMedicamentos; }
     public JTextField getCodigo() { return codigo; }
     public JTextField getNombre() { return nombre; }
     public JTextField getDescripcion() { return descripcion; }

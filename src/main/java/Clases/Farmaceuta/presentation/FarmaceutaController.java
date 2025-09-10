@@ -1,8 +1,11 @@
 package Clases.Farmaceuta.presentation;
-import Clases.Farmaceuta.presentation.View.FarmaceutaView;
+
 import Clases.Farmaceuta.logic.Farmaceuta;
+import Clases.Farmaceuta.presentation.View.FarmaceutaView;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,38 +17,55 @@ public class FarmaceutaController {
         this.model = model;
         this.view = view;
 
-        // Botón Guardar → agrega o actualiza
-        this.view.getGuardarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarFarmaceuta();
+        inicializarTabla();
+        refrescarTabla();
+
+        view.getTablaFarmaceutas().getSelectionModel().addListSelectionListener(e -> {
+            int fila = view.getTablaFarmaceutas().getSelectedRow();
+            if (fila >= 0) {
+                String id = view.getTablaFarmaceutas().getValueAt(fila, 0).toString();
+                Farmaceuta f = model.findById(id);
+                if (f != null) {
+                    view.getId().setText(f.getId());
+                    view.getNombre().setText(f.getNombre());
+                }
             }
         });
 
-        // Botón Borrar
-        this.view.getBorrarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                borrarFarmaceuta();
-            }
-        });
+        view.getGuardarButton().addActionListener(e -> guardarFarmaceuta());
+        view.getBorrarButton().addActionListener(e -> borrarFarmaceuta());
+        view.getBuscarButton().addActionListener(e -> buscarFarmaceuta());
+        view.getLimpiarButton().addActionListener(e -> limpiarCampos());
+        view.getReporteButton().addActionListener(e -> generarReporte());
+    }
 
-
-        // Botón Buscar
-        this.view.getBuscarButton().addActionListener(new ActionListener() {
+    private void inicializarTabla() {
+        String[] columnas = {"ID", "Nombre"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarFarmaceuta();
+            public boolean isCellEditable(int row, int column) {
+                return false;
             }
-        });
+        };
+        view.getTablaFarmaceutas().setModel(tableModel);
 
-        // Botón Limpiar
-        this.view.getLimpiarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                limpiarCampos();
-            }
-        });
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < view.getTablaFarmaceutas().getColumnCount(); i++) {
+            view.getTablaFarmaceutas().getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        view.getTablaFarmaceutas().setRowHeight(25);
+    }
+
+    private void refrescarTabla() {
+        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaFarmaceutas().getModel();
+        tableModel.setRowCount(0);
+
+        for (Farmaceuta f : model.getFarmaceutas()) {
+            Object[] fila = {f.getId(), f.getNombre()};
+            tableModel.addRow(fila);
+        }
     }
 
     private void guardarFarmaceuta() {
@@ -59,16 +79,16 @@ public class FarmaceutaController {
 
         Farmaceuta existente = model.findById(id);
         if (existente == null) {
-            // nuevo → clave = id por defecto
-            Farmaceuta f = new Farmaceuta(id, nombre, id);
+            Farmaceuta f = new Farmaceuta(id, nombre, id); // clave = id por defecto
             model.addFarmaceuta(f);
             JOptionPane.showMessageDialog(null, "Farmaceuta agregado");
         } else {
-            // actualizar
             existente.setNombre(nombre);
             model.updateFarmaceuta(existente);
             JOptionPane.showMessageDialog(null, "Farmaceuta actualizado");
         }
+
+        limpiarCampos();
     }
 
     private void borrarFarmaceuta() {
@@ -77,8 +97,10 @@ public class FarmaceutaController {
             JOptionPane.showMessageDialog(null, "Debe ingresar un id");
             return;
         }
+
         model.deleteFarmaceuta(id);
         JOptionPane.showMessageDialog(null, "Farmaceuta eliminado");
+        limpiarCampos();
     }
 
     private void buscarFarmaceuta() {
@@ -87,6 +109,7 @@ public class FarmaceutaController {
         if (f == null) {
             f = model.findById(criterio);
         }
+
         if (f != null) {
             view.getId().setText(f.getId());
             view.getNombre().setText(f.getNombre());
@@ -100,17 +123,17 @@ public class FarmaceutaController {
         view.getId().setText("");
         view.getNombre().setText("");
         view.getNombreBuscar().setText("");
+        refrescarTabla();
     }
-    private JPanel panel1;
-    private JPanel Farmaceuta;
-    private JTextField ID;
-    private JTextField Nombre;
-    private JButton guardarButton;
-    private JButton LImpiarButton;
-    private JButton borrarButton;
-    private JTextField NombreB;
-    private JButton buscarButton;
-    private JButton reporteButton;
-    private JPanel Listado;
-    private JTable table1;
+
+    private void generarReporte() {
+        StringBuilder reporte = new StringBuilder("📋 Lista de Farmaceutas:\n\n");
+        for (Farmaceuta f : model.getFarmaceutas()) {
+            reporte.append("ID: ").append(f.getId()).append("\n");
+            reporte.append("Nombre: ").append(f.getNombre()).append("\n");
+            reporte.append("-------------------------\n");
+        }
+
+        JOptionPane.showMessageDialog(null, reporte.toString());
+    }
 }
