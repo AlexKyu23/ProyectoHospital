@@ -15,50 +15,52 @@ import Clases.Paciente.presentation.View.PacienteView;
 import Clases.Prescribir.presentation.PrescribirController;
 import Clases.Prescribir.presentation.PrescribirView;
 import Clases.Prescribir.presentation.PrescripcionModel;
-
 public class AdminController {
     private AdminModel model;
     private AdminView view;
 
-    public AdminController(AdminModel model, AdminView view) {
+    private MedicoModel medicoModel;
+    private FarmaceutaModel farmModel;
+    private PacienteModel pacienteModel;
+    private MedicamentoModel medicamentoModel;
+
+    public AdminController(AdminModel model, AdminView view,
+                           MedicoModel medicoModel,
+                           FarmaceutaModel farmModel,
+                           PacienteModel pacienteModel,
+                           MedicamentoModel medicamentoModel) {
         this.model = model;
         this.view = view;
+        this.medicoModel = medicoModel;
+        this.farmModel = farmModel;
+        this.pacienteModel = pacienteModel;
+        this.medicamentoModel = medicamentoModel;
 
         inicializarTabs();
     }
 
     private void inicializarTabs() {
-        //🔹 Medicos
-       MedicoModel medicoModel = new MedicoModel();
         MedicoView medicoView = new MedicoView();
         new MedicoController(medicoModel, medicoView);
         view.getTabbedPane().addTab("Médicos", medicoView.getMainPanel());
 
-        // 🔹 Farmaceutas
-        FarmaceutaModel farmModel = new FarmaceutaModel();
         FarmaceutaView farmView = new FarmaceutaView();
         new FarmaceutaController(farmModel, farmView);
         view.getTabbedPane().addTab("Farmaceutas", farmView.getMainPanel());
 
-        // 🔹 Pacientes
-        PacienteModel pacienteModel = new PacienteModel();
         PacienteView pacienteView = new PacienteView();
         new PacienteController(pacienteModel, pacienteView);
         view.getTabbedPane().addTab("Pacientes", pacienteView.getMainPanel());
 
-        // 🔹 Medicamentos
-       MedicamentoModel medModel = new MedicamentoModel();
-       MedicamentoView medView = new MedicamentoView();
-       new MedicamentoController(medModel, medView);
-       view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
-       //Pres
+        MedicamentoView medView = new MedicamentoView();
+        new MedicamentoController(medicamentoModel, medView);
+        view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
+
         PrescripcionModel prescModel = new PrescripcionModel();
         PrescribirView prescView = new PrescribirView();
-        new PrescribirController(prescView,prescModel);
-        view.getTabbedPane().addTab("Preescribir", prescView.getPanel());
+        new PrescribirController(prescView, prescModel);
+        view.getTabbedPane().addTab("Prescribir", prescView.getPanel());
 
-
-        // 🔹 Seleccionar por defecto Médicos
         view.getTabbedPane().setSelectedIndex(0);
     }
 }

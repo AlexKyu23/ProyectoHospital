@@ -17,6 +17,8 @@ public class MedicoController {
         this.model = model;
         this.view = view;
         inicializarTabla();
+        refrescarTabla(); // ✅ Esto carga los datos quemados en la tabla
+
         // Asignar listeners a los botones
         this.view.getGuardarButton().addActionListener(new ActionListener() {
             @Override

@@ -18,6 +18,8 @@ public class PacienteController {
         this.model = model;
         this.view = view;
         inicializarTabla();
+        refrescarTabla(); // ✅ Esto carga los datos quemados en la tabla
+
         this.view.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
             int fila = view.getTablaPacientes().getSelectedRow();
             if (fila >= 0) {
