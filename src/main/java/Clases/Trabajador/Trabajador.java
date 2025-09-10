@@ -1,6 +1,6 @@
 package Clases.Trabajador;
 
-import Clases.Persona.Persona;
+import Clases.Persona.logic.Persona;
 
 public class Trabajador extends Persona {
 

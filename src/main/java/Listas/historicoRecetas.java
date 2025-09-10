@@ -1,6 +1,6 @@
 package Listas;
 
-import Clases.Receta.Receta;
+import Clases.Receta.logic.Receta;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package Listas;
 
-import Clases.Medicamento.Medicamento;
+import Clases.Medicamento.logic.Medicamento;
 import java.util.ArrayList;
 import java.util.List;
 

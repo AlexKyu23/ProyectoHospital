@@ -1,6 +1,8 @@
 
-import Clases.Admin.*;
-import Clases.Admin.AdminView;
+import Clases.Admin.presentation.AdminController;
+import Clases.Admin.presentation.AdminModel;
+import Clases.Admin.presentation.AdminView;
+import Clases.Admin.logic.Admin;
 
 public class app {
     public static void main(String[] args) {

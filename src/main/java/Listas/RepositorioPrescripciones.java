@@ -1,6 +1,6 @@
 package Listas;
 
-import Clases.Prescribir.PrescripcionModel;
+import Clases.Prescribir.presentation.PrescripcionModel;
 import java.util.ArrayList;
 import java.util.List;
 

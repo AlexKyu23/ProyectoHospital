@@ -1,6 +1,6 @@
 package Listas;
 
-import Clases.Farmaceuta.Farmaceuta;
+import Clases.Farmaceuta.logic.Farmaceuta;
 
 import java.util.ArrayList;
 import java.util.List;

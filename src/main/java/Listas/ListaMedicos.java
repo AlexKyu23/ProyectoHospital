@@ -1,6 +1,6 @@
 package Listas;
 
-import Clases.Medico.Medico;
+import Clases.Medico.logic.Medico;
 
 import java.util.ArrayList;
 import java.util.List;
