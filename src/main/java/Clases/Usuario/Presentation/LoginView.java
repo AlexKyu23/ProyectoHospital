@@ -1,8 +1,13 @@
 package Clases.Usuario.Presentation;
 
+import Clases.Usuario.logic.Usuario;
+
 import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class LoginView {
+    private  static JPanel panel1;
     private JLabel icon;
     private JPanel login;
     private JTextField id;
@@ -12,10 +17,13 @@ public class LoginView {
     private JButton cancelarButton;
     private JButton cambiarClaveButton;
 
+    public LoginView() {}
+
+    public static JPanel getPanel1() { return panel1; }
     public JTextField getId(){
         return id;
     }
-    public JPasswordField getPassword() {
+    public JPasswordField getClave() {
         return clave;
     }
     public JButton getSalirButton() {
@@ -27,4 +35,7 @@ public class LoginView {
     public JButton getCambiarClaveButton() {
         return cambiarClaveButton;
     }
+
+    //---
+
 }
