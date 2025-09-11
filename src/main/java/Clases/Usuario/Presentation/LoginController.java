@@ -4,6 +4,8 @@ import Clases.Persona.logic.Persona;
 import Clases.Usuario.logic.Sesion;
 import Clases.Usuario.logic.Usuario;
 import Clases.Usuario.logic.Service;
+import Clases.Usuario.Presentation.CambiarClaveView.CambiarClaveView;
+import Clases.Usuario.Presentation.CambiarClaveModel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -28,6 +30,8 @@ public class LoginController {
         }
         Sesion.setUsuario(logged);
     }
+
+    public void salir(){ System.exit(0); }
 
     private void initController() {
         view.getId().addActionListener(new ActionListener() {
@@ -68,7 +72,7 @@ public class LoginController {
         /*
         private void cambiarClave(String id){
 
-            Persona persona = Service.instance().searchPersonaPorID(id);
+            Persona persona = Service.instance().searchPersonaPorID(id);                                //Falta este método
             if (persona == null) {
                 JOptionPane.showMessageDialog(LoginView.getPanel1(), "Usuario no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -76,10 +80,10 @@ public class LoginController {
 
             //Mostrar pantalla para cambiar la clave
 
-            CambiarClaveView changeView = new cambiarClaveView();
-            CambiarClaveModel changeModel = new cambiarClaveModel();          //Revisar
+            CambiarClaveView cambiarView = new CambiarClaveView();
+            CambiarClaveModel cambiarModel = new CambiarClaveModel();          //Revisar
 
-            new CambiarClaveController(cambiarClaveView, cambiarClaveModel, persona);
+            new CambiarClaveController(cambiarView, cambiarModel, persona);
             JFrame cambiarClaveFrame = new JFrame("Cambiar Clave");
             cambiarClaveFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             cambiarClaveFrame.setContentPane((JPanel) cambiarClaveFrame.getContentPane());  //Revisar

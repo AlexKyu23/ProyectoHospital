@@ -11,7 +11,7 @@ public class Service {
     }
 
     public Usuario read(Usuario u) throws Exception {
-        Usuario result = Data.getUsuario();/*.stream()                  //Busca el usuario en la lista, pero no tenemos lista aún
+        Usuario result = Data.getUsuario();/*.stream()                  //Busca el usuario en la lista guardada, pero no tenemos la lista aún
                 .filter(i -> i.getId().equals(e.getId()))
                 .findFirst()
                 .orElse(null);*/

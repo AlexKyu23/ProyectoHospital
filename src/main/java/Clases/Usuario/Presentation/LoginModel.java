@@ -6,7 +6,7 @@ import Clases.Usuario.logic.Usuario;
 import java.beans.PropertyChangeListener;
 
 public class LoginModel extends AbstractModel {
-    private Usuario current;
+    private static Usuario current;
 
     public static String ID = "Id";
     public static String CLAVE = "Clave";
@@ -22,11 +22,11 @@ public class LoginModel extends AbstractModel {
         firePropertyChange(CLAVE);
     }
 
-    public String getID() {
+    public static String getID() {
         return current.getId();
     }
 
-    public String getClave() {
+    public static String getClave() {
         return current.getClave();
     }
 
