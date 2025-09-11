@@ -1,15 +1,26 @@
 package Listas;
 
 import Clases.Paciente.logic.Paciente;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "listaPacientes")
 public class ListaPacientes {
     private List<Paciente> pacientes;
 
     public ListaPacientes() {
         pacientes = new ArrayList<>();
+    }
+
+    @XmlElement(name = "paciente")
+    public List<Paciente> getPacientes() {
+        return pacientes;
+    }
+
+    public void setPacientes(List<Paciente> pacientes) {
+        this.pacientes = pacientes;
     }
 
     // 🔹 Agregar paciente

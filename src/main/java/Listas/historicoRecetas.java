@@ -1,15 +1,26 @@
 package Listas;
 
 import Clases.Receta.logic.Receta;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "historicoRecetas")
 public class historicoRecetas {
     private List<Receta> recetas;
 
     public historicoRecetas() {
         recetas = new ArrayList<>();
+    }
+
+    @XmlElement(name = "receta")
+    public List<Receta> getRecetas() {
+        return recetas;
+    }
+
+    public void setRecetas(List<Receta> recetas) {
+        this.recetas = recetas;
     }
 
 

@@ -1,7 +1,9 @@
 package Clases.Receta.logic;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-
+@XmlRootElement(name = "receta")
 public class Receta {
 
     private boolean confeccionada;
@@ -11,6 +13,7 @@ public class Receta {
     private boolean lista;
     private boolean entregada;
 
+    public Receta() {}
 
     public Receta(boolean confeccionada, /* ? fechaDeConfeccion, ? fechaDeRetiro, */
                   boolean enProceso, boolean lista, boolean entregada) {
@@ -22,7 +25,7 @@ public class Receta {
         this.entregada = entregada;
     }
 
-
+    @XmlElement
     public boolean isConfeccionada() {
         return confeccionada;
     }
@@ -48,7 +51,7 @@ public class Receta {
         this.fechaDeRetiro = fechaDeRetiro;
     }
     */
-
+    @XmlElement
     public boolean isEnProceso() {
         return enProceso;
     }
@@ -56,7 +59,7 @@ public class Receta {
     public void setEnProceso(boolean enProceso) {
         this.enProceso = enProceso;
     }
-
+    @XmlElement
     public boolean isLista() {
         return lista;
     }
@@ -64,7 +67,7 @@ public class Receta {
     public void setLista(boolean lista) {
         this.lista = lista;
     }
-
+    @XmlElement
     public boolean isEntregada() {
         return entregada;
     }

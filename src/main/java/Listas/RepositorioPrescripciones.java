@@ -1,26 +1,26 @@
 package Listas;
 
-import Clases.Prescribir.presentation.PrescripcionModel;
+import Clases.Prescribir.logic.Prescripcion;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RepositorioPrescripciones {
 
     // Lista que guarda todas las prescripciones
-    private static List<PrescripcionModel> prescripciones = new ArrayList<>();
+    private static List<Prescripcion> prescripciones = new ArrayList<>();
 
     // Agregar una prescripción
-    public static void agregar(PrescripcionModel p) {
+    public static void agregar(Prescripcion p) {
         prescripciones.add(p);
     }
 
     // Obtener todas las prescripciones
-    public static List<PrescripcionModel> getPrescripciones() {
+    public static List<Prescripcion> getPrescripciones() {
         return prescripciones;
     }
 
     // Eliminar una prescripción
-    public static void eliminar(PrescripcionModel p) {
+    public static void eliminar(Prescripcion p) {
         prescripciones.remove(p);
     }
 

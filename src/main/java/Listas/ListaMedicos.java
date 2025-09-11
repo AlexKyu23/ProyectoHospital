@@ -1,10 +1,12 @@
 package Listas;
 
 import Clases.Medico.logic.Medico;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "listaMedicos")
 public class ListaMedicos {
     private List<Medico> medicos;
 
@@ -12,6 +14,14 @@ public class ListaMedicos {
         medicos = new ArrayList<>();
     }
 
+    @XmlElement(name = "medico")
+    public List<Medico> getMedicos() {
+        return medicos;
+    }
+
+    public void setMedicos(List<Medico> medicos) {
+        this.medicos = medicos;
+    }
 
     public void inclusion(Medico medico) {
         medicos.add(medico);

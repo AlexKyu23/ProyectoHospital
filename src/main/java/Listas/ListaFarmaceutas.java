@@ -1,15 +1,26 @@
 package Listas;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
-
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement(name = "listaFarmaceutas")
 public class ListaFarmaceutas {
     private List<Farmaceuta> farmaceutas;
 
     public ListaFarmaceutas() {
         farmaceutas = new ArrayList<>();
+    }
+
+    @XmlElement(name = "farmaceuta")
+    public List<Farmaceuta> getFarmaceutas() {
+        return farmaceutas;
+    }
+
+    public void setFarmaceutas(List<Farmaceuta> farmaceutas) {
+        this.farmaceutas = farmaceutas;
     }
 
     // Inclusión
