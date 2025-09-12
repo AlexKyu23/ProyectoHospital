@@ -18,27 +18,20 @@ public class DashboardView {
     private JButton checkButton;
     private JButton doubleCheckButton;
     private JPanel Lista;
-    private JPanel graficoMedicamentos;             //Importante! El gráfico "linechart" va aquí
-    private JPanel graficoRecetas;                  //Importante! El gráfico "pie" va aquí
+    private JPanel graficoMedicamentos;         //Importante! El gráfico "linechart" va aquí private JPanel graficoRecetas;
+    private JPanel graficoRecetas;              // Importante! El gráfico "pie" va aquí
 
-    //---------------------------LineChart (Medicamentos)-----------------------------------
+    public DashboardView() {
+        // Limpia y agrega el gráfico de medicamentos
+        graficoMedicamentos.removeAll();
+        graficoMedicamentos.add(LineChart_AWT.getChartPanel());
+        graficoMedicamentos.revalidate();
+        graficoMedicamentos.repaint();
 
-    LineChart_AWT chartMedicamento = new LineChart_AWT(
-            "Medicamentos" ,
-            "Medicamentos recetados por meses");
-
-    /*chartMedicamento.pack( );                     //No sé si se ocupa
-    chartMedicamento.setVisible( true );            //""
-    graficoMedicamentos.removeAll();
-    graficoMedicamentos.add(chartMedicamento);
-    */
-
-    //--------------------------------PieChart (Recetas)----------------------------------------
-
-    PieChart_AWT chartRecetas = new PieChart_AWT( "Recetas" );
-
-    /*chartRecetas.setSize( 560 , 367 );            //No sé si se ocupa
-    chartRecetas.setVisible( true );                //""
-    graficoRecetas.removeAll();
-    graficoRecetas.add(chartRecetas)*/
+        // Limpia y agrega el gráfico de recetas
+        graficoRecetas.removeAll();
+        graficoRecetas.add(PieChart_AWT.getChartPanel());
+        graficoRecetas.revalidate();
+        graficoRecetas.repaint();
+    }
 }
