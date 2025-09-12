@@ -2,17 +2,22 @@ import Clases.Admin.logic.Admin;
 import Clases.Admin.presentation.AdminController;
 import Clases.Admin.presentation.AdminModel;
 import Clases.Admin.presentation.AdminView;
-import Clases.Farmaceuta.logic.Farmaceuta;
+
 import Clases.Farmaceuta.presentation.FarmaceutaModel;
-import Clases.Medicamento.logic.Medicamento;
-import Clases.Medicamento.presentation.MedicamentoModel;
-import Clases.Medico.logic.Medico;
+import Clases.Farmaceuta.presentation.FarmaceutaController;
+import Clases.Farmaceuta.presentation.View.FarmaceutaView;
+
 import Clases.Medico.presentation.MedicoModel;
-import Clases.Paciente.logic.Paciente;
+import Clases.Medico.presentation.MedicoController;
+import Clases.Medico.presentation.MedicoView;
+
+import Clases.Medicamento.presentation.MedicamentoModel;
+import Clases.Medicamento.presentation.MedicamentoController;
+import Clases.Medicamento.presentation.MedicamentoView;
+
 import Clases.Paciente.presentation.PacienteModel;
-
-
-import java.time.LocalDate;
+import Clases.Paciente.presentation.PacienteController;
+import Clases.Paciente.presentation.View.PacienteView;
 
 public class app {
     public static void main(String[] args) {
@@ -21,33 +26,31 @@ public class app {
         AdminModel adminModel = new AdminModel();
         adminModel.setCurrent(admin);
 
-        // 🔹 Datos quemados
-        PacienteModel pacienteModel = new PacienteModel();
-        pacienteModel.addPaciente(new Paciente("P-001", "Ana López", "8888-1234", LocalDate.of(1990, 3, 12)));
-        pacienteModel.addPaciente(new Paciente("P-002", "Luis Mora", "8999-5678", LocalDate.of(1985, 7, 25)));
-
-        MedicoModel medicoModel = new MedicoModel();
-        medicoModel.addMedico(new Medico("MED-111", "David", "123","Pediatría"));
-        medicoModel.addMedico(new Medico("MED-222", "Miguel", "123","Neurocirugía"));
-
-        MedicamentoModel medicamentoModel = new MedicamentoModel();
-        medicamentoModel.addMedicamento(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
-        medicamentoModel.addMedicamento(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
-
-        FarmaceutaModel farmaceutaModel = new FarmaceutaModel();
-        farmaceutaModel.addFarmaceuta(new Farmaceuta("FARM-01", "Carla Jiménez", "FARM-01"));
-        farmaceutaModel.addFarmaceuta(new Farmaceuta("FARM-02", "José Ramírez", "FARM-02"));
-
-        // 🔹 Vista principal
+        // 🔹 Vistas
         AdminView adminView = new AdminView();
+        MedicoView medicoView = new MedicoView();
+        FarmaceutaView farmaceutaView = new FarmaceutaView();
+        PacienteView pacienteView = new PacienteView();
+        MedicamentoView medicamentoView = new MedicamentoView();
 
-        // 🔹 Controlador con modelos pre-cargados
+        // 🔹 Modelos
+        MedicoModel medicoModel = new MedicoModel();
+        FarmaceutaModel farmaceutaModel = new FarmaceutaModel();
+        PacienteModel pacienteModel = new PacienteModel();
+        MedicamentoModel medicamentoModel = new MedicamentoModel();
+
+        // 🔹 Controladores
+        new MedicoController(medicoModel, medicoView);
+        new FarmaceutaController(farmaceutaModel, farmaceutaView);
+        new PacienteController(pacienteModel, pacienteView);
+        new MedicamentoController(medicamentoModel, medicamentoView);
         new AdminController(adminModel, adminView,
                 medicoModel,
                 farmaceutaModel,
                 pacienteModel,
                 medicamentoModel);
 
+        // 🔹 Mostrar ventana principal
         adminView.setVisible(true);
     }
 }

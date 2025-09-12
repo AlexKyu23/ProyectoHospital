@@ -3,89 +3,103 @@ package Clases.Receta.logic;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @XmlRootElement(name = "receta")
 public class Receta {
+    private String id;
+    private String medicoId;
+    private String pacienteId;
+    private LocalDate fechaConfeccion;
+    private LocalDate fechaRetiro;
+    private EstadoReceta estado;
+    private List<ItemReceta> medicamentos;
 
-    private boolean confeccionada;
-    // private ? fechaDeConfeccion;
-    // private ? fechaDeRetiro;
-    private boolean enProceso;
-    private boolean lista;
-    private boolean entregada;
+    public Receta() {
+        medicamentos = new ArrayList<>();
+        estado = EstadoReceta.CONFECCIONADA;
+    }
+    public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro, EstadoReceta estado) {
+        this();
+        this.id = id;
+        this.medicoId = medicoId;
+        this.pacienteId = pacienteId;
+        this.fechaConfeccion = fechaConfeccion;
+        this.fechaRetiro = fechaRetiro;
+        this.estado = estado;
+    }
 
-    public Receta() {}
-
-    public Receta(boolean confeccionada, /* ? fechaDeConfeccion, ? fechaDeRetiro, */
-                  boolean enProceso, boolean lista, boolean entregada) {
-        this.confeccionada = confeccionada;
-        // this.fechaDeConfeccion = fechaDeConfeccion;
-        // this.fechaDeRetiro = fechaDeRetiro;
-        this.enProceso = enProceso;
-        this.lista = lista;
-        this.entregada = entregada;
+    public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro) {
+        this();
+        this.id = id;
+        this.medicoId = medicoId;
+        this.pacienteId = pacienteId;
+        this.fechaConfeccion = fechaConfeccion;
+        this.fechaRetiro = fechaRetiro;
     }
 
     @XmlElement
-    public boolean isConfeccionada() {
-        return confeccionada;
+    public String getId() {
+        return id;
     }
 
-    public void setConfeccionada(boolean confeccionada) {
-        this.confeccionada = confeccionada;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    /*
-    public ? getFechaDeConfeccion() {
-        return fechaDeConfeccion;
-    }
-
-    public void setFechaDeConfeccion(? fechaDeConfeccion) {
-        this.fechaDeConfeccion = fechaDeConfeccion;
-    }
-
-    public ? getFechaDeRetiro() {
-        return fechaDeRetiro;
-    }
-
-    public void setFechaDeRetiro(? fechaDeRetiro) {
-        this.fechaDeRetiro = fechaDeRetiro;
-    }
-    */
     @XmlElement
-    public boolean isEnProceso() {
-        return enProceso;
+    public String getMedicoId() {
+        return medicoId;
     }
 
-    public void setEnProceso(boolean enProceso) {
-        this.enProceso = enProceso;
+    public void setMedicoId(String medicoId) {
+        this.medicoId = medicoId;
     }
+
     @XmlElement
-    public boolean isLista() {
-        return lista;
+    public String getPacienteId() {
+        return pacienteId;
     }
 
-    public void setLista(boolean lista) {
-        this.lista = lista;
+    public void setPacienteId(String pacienteId) {
+        this.pacienteId = pacienteId;
     }
+
     @XmlElement
-    public boolean isEntregada() {
-        return entregada;
+    public LocalDate getFechaConfeccion() {
+        return fechaConfeccion;
     }
 
-    public void setEntregada(boolean entregada) {
-        this.entregada = entregada;
+    public void setFechaConfeccion(LocalDate fechaConfeccion) {
+        this.fechaConfeccion = fechaConfeccion;
     }
 
-    // 🔹 toString
-    @Override
-    public String toString() {
-        return "Receta{" +
-                "confeccionada=" + confeccionada +
-                // ", fechaDeConfeccion=" + fechaDeConfeccion +
-                // ", fechaDeRetiro=" + fechaDeRetiro +
-                ", enProceso=" + enProceso +
-                ", lista=" + lista +
-                ", entregada=" + entregada +
-                '}';
+    @XmlElement
+    public LocalDate getFechaRetiro() {
+        return fechaRetiro;
+    }
+
+    public void setFechaRetiro(LocalDate fechaRetiro) {
+        this.fechaRetiro = fechaRetiro;
+    }
+
+    @XmlElement
+    public EstadoReceta getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoReceta estado) {
+        this.estado = estado;
+    }
+
+    @XmlElement
+    public List<ItemReceta> getMedicamentos() {
+        return medicamentos;
+    }
+
+    public void setMedicamentos(List<ItemReceta> medicamentos) {
+        this.medicamentos = medicamentos;
     }
 }

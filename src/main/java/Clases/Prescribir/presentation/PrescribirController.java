@@ -1,7 +1,10 @@
 package Clases.Prescribir.presentation;
 
-import Clases.Prescribir.data.PrescripcionesWrapper;
-import Clases.Prescribir.logic.Prescripcion;
+import Clases.Receta.logic.ItemReceta;
+import Clases.Receta.logic.Receta;
+import Clases.Receta.logic.EstadoReceta;
+import Clases.Receta.Data.RecetasWrapper;
+import Clases.Receta.logic.RecetaService;
 import Listas.*;
 import Clases.Medico.logic.Medico;
 import Clases.Paciente.logic.Paciente;
@@ -12,9 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.UUID;
 
 public class PrescribirController {
 
@@ -23,25 +24,23 @@ public class PrescribirController {
     private DefaultTableModel tableModel;
 
     private Medico medicoEnSesion;
-
-    private ListaMedicos listaMedicos;
-    private catalogoMedicamentos catalogoMed;
     private ListaPacientes listaPacientes;
+    private catalogoMedicamentos catalogoMed;
 
     public PrescribirController(PrescribirView view, PrescripcionModel model,
-                                Medico medicoEnSesion, ListaMedicos listaMedicos,
-                                catalogoMedicamentos catalogoMed, ListaPacientes listaPacientes) {
+                                Medico medicoEnSesion,
+                                ListaPacientes listaPacientes,
+                                catalogoMedicamentos catalogoMed) {
 
         this.view = view;
         this.model = model;
         this.medicoEnSesion = medicoEnSesion;
-        this.listaMedicos = listaMedicos;
-        this.catalogoMed = catalogoMed;
         this.listaPacientes = listaPacientes;
+        this.catalogoMed = catalogoMed;
 
         model.setMedico(medicoEnSesion);
 
-        tableModel = new DefaultTableModel(new Object[]{"Medicamento"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"Medicamento", "Cantidad", "Indicaciones", "Duración"}, 0);
         view.getMedicamentosPreenscritos().setModel(tableModel);
 
         initController();
@@ -52,8 +51,7 @@ public class PrescribirController {
         view.getAgregarMedicamentoButton().addActionListener(e -> agregarMedicamento());
         view.getDescartarMedicamentoButton().addActionListener(e -> descartarMedicamento());
         view.getLimpiarButton().addActionListener(e -> limpiarFormulario());
-        view.getGuardarButton().addActionListener(e -> guardarPrescripcion());
-        view.getDetallesButton().addActionListener(e -> mostrarDetalles());
+        view.getGuardarButton().addActionListener(e -> guardarReceta());
     }
 
     private void buscarPaciente() {
@@ -74,8 +72,17 @@ public class PrescribirController {
         if (nombre != null && !nombre.trim().isEmpty()) {
             Medicamento med = catalogoMed.busquedaPorDescripcion(nombre).stream().findFirst().orElse(null);
             if (med != null) {
-                model.agregarMedicamento(med);
-                tableModel.addRow(new Object[]{med.getNombre()});
+                try {
+                    int cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a prescribir:"));
+                    String indicaciones = JOptionPane.showInputDialog("Indicaciones:");
+                    int duracion = Integer.parseInt(JOptionPane.showInputDialog("Duración en días:"));
+
+                    ItemReceta item = new ItemReceta(med.getCodigo(), med.getNombre(), cantidad, indicaciones, duracion);
+                    model.agregarItem(item);
+                    tableModel.addRow(new Object[]{med.getNombre(), cantidad, indicaciones, duracion});
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos");
+                }
             } else {
                 JOptionPane.showMessageDialog(view.getPanel(), "Medicamento no encontrado.");
             }
@@ -86,11 +93,11 @@ public class PrescribirController {
         int row = view.getMedicamentosPreenscritos().getSelectedRow();
         if (row >= 0) {
             String nombreMed = (String) tableModel.getValueAt(row, 0);
-            Medicamento aEliminar = model.getMedicamentos().stream()
-                    .filter(m -> m.getNombre().equals(nombreMed))
+            ItemReceta aEliminar = model.getItems().stream()
+                    .filter(i -> i.getDescripcion().equals(nombreMed))
                     .findFirst().orElse(null);
             if (aEliminar != null) {
-                model.eliminarMedicamento(aEliminar);
+                model.eliminarItem(aEliminar);
                 tableModel.removeRow(row);
             }
         }
@@ -98,13 +105,13 @@ public class PrescribirController {
 
     private void limpiarFormulario() {
         model.setPaciente(null);
-        model.limpiarMedicamentos();
+        model.limpiarItems();
         view.getNombrePacienteLabel().setText("Paciente:");
         tableModel.setRowCount(0);
         view.getCalendario().clear();
     }
 
-    private void guardarPrescripcion() {
+    private void guardarReceta() {
         if (model.getPaciente() == null) {
             JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar un paciente");
             return;
@@ -116,82 +123,34 @@ public class PrescribirController {
             return;
         }
 
-        // Crear objeto Prescripcion
-        Prescripcion presc = new Prescripcion(
-                model.getPaciente(),
-                model.getMedico(),
-                model.getMedicamentos(),
-                LocalDateTime.now(),
-                fechaSeleccionada.atStartOfDay(),
-                "confeccionada"
+        String recetaId = UUID.randomUUID().toString();
+
+        Receta receta = new Receta(
+                recetaId,
+                model.getMedico().getId(),
+                model.getPaciente().getId(),
+                LocalDate.now(),
+                fechaSeleccionada,
+                EstadoReceta.CONFECCIONADA
         );
+        receta.setMedicamentos(model.getItems());
 
-        RepositorioPrescripciones.agregar(presc);
-
-        // Guardar en XML usando XmlPersister con un wrapper
         try {
-            PrescripcionesWrapper wrapper = new PrescripcionesWrapper();
-            wrapper.setPrescripciones(RepositorioPrescripciones.getPrescripciones());
-            XmlPersister.save(wrapper, new File("prescripciones.xml"));
+            RecetaService.instance().create(receta);
+
+            RecetasWrapper wrapper = new RecetasWrapper();
+            wrapper.setRecetas(RecetaService.instance().findAll());
+            XmlPersister.save(wrapper, new File("recetas.xml"));
+
+            JOptionPane.showMessageDialog(view.getPanel(),
+                    "Receta guardada.\nMédico: " + model.getMedico().getNombre() +
+                            "\nPaciente: " + model.getPaciente().getNombre() +
+                            "\nMedicamentos: " + receta.getMedicamentos().size() +
+                            "\nFecha de retiro: " + fechaSeleccionada);
+
+            limpiarFormulario();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(view.getPanel(), "Error guardando la prescripción en XML");
-            return;
-        }
-
-        JOptionPane.showMessageDialog(view.getPanel(),
-                "Prescripción guardada.\nMédico: " + presc.getMedico().getNombre() +
-                        "\nPaciente: " + presc.getPaciente().getNombre() +
-                        "\nMedicamentos: " + presc.getMedicamentos().size() +
-                        "\nFecha de retiro: " + fechaSeleccionada);
-
-        limpiarFormulario();
-    }
-
-    private void mostrarDetalles() {
-        List<Prescripcion> lista = RepositorioPrescripciones.getPrescripciones();
-        if (lista.isEmpty()) {
-            JOptionPane.showMessageDialog(view.getPanel(), "No hay prescripciones guardadas.");
-            return;
-        }
-
-        String[] opciones = new String[lista.size()];
-        for (int i = 0; i < lista.size(); i++) {
-            Prescripcion p = lista.get(i);
-            opciones[i] = (i + 1) + ". " + p.getPaciente().getNombre() +
-                    " | Médico: " + p.getMedico().getNombre() +
-                    " | Fecha de retiro: " + (p.getFechaRetiro() != null ? p.getFechaRetiro() : "No asignada") +
-                    " (" + p.getMedicamentos().size() + " meds)";
-        }
-
-        String seleccion = (String) JOptionPane.showInputDialog(
-                view.getPanel(),
-                "Seleccione una prescripción:",
-                "Detalles de Prescripciones",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                opciones,
-                opciones[0]);
-
-        if (seleccion != null) {
-            int index = Integer.parseInt(seleccion.split("\\.")[0]) - 1;
-            Prescripcion presc = lista.get(index);
-
-            int decision = JOptionPane.showConfirmDialog(
-                    view.getPanel(),
-                    "Médico: " + presc.getMedico().getNombre() +
-                            "\nPaciente: " + presc.getPaciente().getNombre() +
-                            "\nMedicamentos: " + presc.getMedicamentos() +
-                            "\nFecha de retiro: " + (presc.getFechaRetiro() != null ? presc.getFechaRetiro() : "No asignada") +
-                            "\n\n¿Desea eliminar esta prescripción?",
-                    "Detalles",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (decision == JOptionPane.YES_OPTION) {
-                RepositorioPrescripciones.eliminar(presc);
-                JOptionPane.showMessageDialog(view.getPanel(), "Prescripción eliminada.");
-            }
+            JOptionPane.showMessageDialog(view.getPanel(), "Error: " + ex.getMessage());
         }
     }
-
 }
