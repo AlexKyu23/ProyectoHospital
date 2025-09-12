@@ -18,10 +18,4 @@
         <nombre>Administrador</nombre>
         <rol>ADM</rol>
     </usuario>
-    <usuario>
-        <clave>MED-003</clave>
-        <id>MED-003</id>
-        <nombre>Dr. Mouse</nombre>
-        <rol>MED</rol>
-    </usuario>
 </listaUsuarios>

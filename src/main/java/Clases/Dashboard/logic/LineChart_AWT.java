@@ -21,8 +21,8 @@ public class LineChart_AWT {
 
         Map<String, Integer> conteoPorAño = new TreeMap<>();
        for (Medicamento m : catalogo.consulta()) {
-            String año = m.getFechaReceta().substring(0, 4); // Ajusta según formato
-            conteoPorAño.put(año, conteoPorAño.getOrDefault(año, 0) + 1);
+           // String año = m.getFechaReceta().substring(0, 4); // Ajusta según formato
+           // conteoPorAño.put(año, conteoPorAño.getOrDefault(año, 0) + 1);
         }
 
         for (Map.Entry<String, Integer> entry : conteoPorAño.entrySet()) {
