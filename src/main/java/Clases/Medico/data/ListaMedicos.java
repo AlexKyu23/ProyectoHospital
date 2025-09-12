@@ -5,10 +5,16 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 @XmlRootElement(name = "listaMedicos")
 public class ListaMedicos {
     private List<Medico> medicos;
+
+    private static final File ARCHIVO = new File("medicos.xml");
 
     public ListaMedicos() {
         medicos = new ArrayList<>();
@@ -65,5 +71,31 @@ public class ListaMedicos {
     // Borrado por id
     public void borrado(String id) {
         medicos.removeIf(m -> m.getId().equalsIgnoreCase(id));
+    }
+
+    // Guardar lista en XML
+    public void guardar() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(ListaMedicos.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(this, ARCHIVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Cargar lista desde XML si existe
+    public void cargar() {
+        if (ARCHIVO.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(ListaMedicos.class);
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                ListaMedicos cargada = (ListaMedicos) unmarshaller.unmarshal(ARCHIVO);
+                this.medicos = cargada.getMedicos(); // reemplaza la lista actual
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -1,14 +1,21 @@
 package Clases.Medicamento.data;
 
 import Clases.Medicamento.logic.Medicamento;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "catalogoMedicamentos")
 public class catalogoMedicamentos {
     private List<Medicamento> medicamentos;
+
+    private static final File ARCHIVO = new File("medicamentos.xml");
 
     public catalogoMedicamentos() {
         medicamentos = new ArrayList<>();
@@ -72,4 +79,30 @@ public class catalogoMedicamentos {
             System.out.println(m);
         }
     }
+
+    public void guardar() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(catalogoMedicamentos.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(this, ARCHIVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Cargar lista desde XML si existe
+    public void cargar() {
+        if (ARCHIVO.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(catalogoMedicamentos.class);
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                catalogoMedicamentos cargado = (catalogoMedicamentos) unmarshaller.unmarshal(ARCHIVO);
+                this.medicamentos = cargado.getMedicamentos();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

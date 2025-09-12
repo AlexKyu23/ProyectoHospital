@@ -2,8 +2,8 @@ package Clases.Prescribir.logic;
 
 import Clases.Paciente.logic.Paciente;
 import Clases.Medico.logic.Medico;
-import Clases.Medicamento.logic.Medicamento;
 
+import Clases.Receta.logic.ItemReceta;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -16,22 +16,22 @@ public class Prescripcion {
 
     private Paciente paciente;
     private Medico medico;
-    private List<Medicamento> medicamentos;
+    private List<ItemReceta> items;
     private LocalDateTime fechaConfeccion;
     private LocalDateTime fechaRetiro;
     private String estado; // "confeccionada", "enProceso", "lista", "entregada"
 
     // Constructor vacío obligatorio para JAXB
     public Prescripcion() {
-        this.medicamentos = new ArrayList<>();
+        this.items = new ArrayList<>();
     }
 
     // Constructor completo
-    public Prescripcion(Paciente paciente, Medico medico, List<Medicamento> medicamentos,
+    public Prescripcion(Paciente paciente, Medico medico, List<ItemReceta> medicamentos,
                         LocalDateTime fechaConfeccion, LocalDateTime fechaRetiro, String estado) {
         this.paciente = paciente;
         this.medico = medico;
-        this.medicamentos = medicamentos;
+        this.items = medicamentos;
         this.fechaConfeccion = fechaConfeccion;
         this.fechaRetiro = fechaRetiro;
         this.estado = estado;
@@ -57,16 +57,15 @@ public class Prescripcion {
         this.medico = medico;
     }
 
-    @XmlElementWrapper(name = "medicamentos")
-    @XmlElement(name = "medicamento")
-    public List<Medicamento> getMedicamentos() {
-        return medicamentos;
+    @XmlElementWrapper(name = "items")
+    @XmlElement(name = "item")
+    public List<ItemReceta> getItems() {
+        return items;
     }
 
-    public void setMedicamentos(List<Medicamento> medicamentos) {
-        this.medicamentos = medicamentos;
+    public void setItems(List<ItemReceta> items) {
+        this.items = items;
     }
-
     @XmlElement
     public LocalDateTime getFechaConfeccion() {
         return fechaConfeccion;
@@ -100,7 +99,7 @@ public class Prescripcion {
         return "Prescripcion{" +
                 "paciente=" + paciente +
                 ", medico=" + medico +
-                ", medicamentos=" + medicamentos +
+                ", medicamentos=" + items +
                 ", fechaConfeccion=" + fechaConfeccion +
                 ", fechaRetiro=" + fechaRetiro +
                 ", estado='" + estado + '\'' +

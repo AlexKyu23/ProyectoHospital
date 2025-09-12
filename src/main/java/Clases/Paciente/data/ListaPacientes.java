@@ -1,14 +1,21 @@
 package Clases.Paciente.data;
 
 import Clases.Paciente.logic.Paciente;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "listaPacientes")
 public class ListaPacientes {
     private List<Paciente> pacientes;
+
+    private static final File ARCHIVO = new File("pacientes.xml");
 
     public ListaPacientes() {
         pacientes = new ArrayList<>();
@@ -67,4 +74,30 @@ public class ListaPacientes {
     public void borrado(String id) {
         pacientes.removeIf(p -> p.getId().equalsIgnoreCase(id));
     }
+
+    public void guardar() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(ListaPacientes.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(this, ARCHIVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cargar() {
+        if (ARCHIVO.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(ListaPacientes.class);
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                ListaPacientes cargada = (ListaPacientes) unmarshaller.unmarshal(ARCHIVO);
+                this.pacientes = cargada.getPacientes(); // reemplaza la lista actual
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }

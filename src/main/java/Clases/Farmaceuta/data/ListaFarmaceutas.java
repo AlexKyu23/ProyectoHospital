@@ -1,14 +1,20 @@
 package Clases.Farmaceuta.data;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "listaFarmaceutas")
 public class ListaFarmaceutas { //basicamente el data
     private List<Farmaceuta> farmaceutas;
+    private static final File ARCHIVO = new File("farmaceutas.xml");
 
     public ListaFarmaceutas() {
         farmaceutas = new ArrayList<>();
@@ -65,4 +71,30 @@ public class ListaFarmaceutas { //basicamente el data
     public void borrado(String id) {
         farmaceutas.removeIf(f -> f.getId().equalsIgnoreCase(id));
     }
+
+    public void guardar() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(ListaFarmaceutas.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(this, ARCHIVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cargar() {
+        if (ARCHIVO.exists()) {
+            try {
+                JAXBContext context = JAXBContext.newInstance(ListaFarmaceutas.class);
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                ListaFarmaceutas cargada = (ListaFarmaceutas) unmarshaller.unmarshal(ARCHIVO);
+                this.farmaceutas = cargada.getFarmaceutas();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
