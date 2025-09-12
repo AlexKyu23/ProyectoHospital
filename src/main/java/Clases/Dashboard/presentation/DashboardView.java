@@ -2,6 +2,8 @@ package Clases.Dashboard.presentation;
 
 import Clases.Dashboard.logic.LineChart_AWT;
 import Clases.Dashboard.logic.PieChart_AWT;
+import Clases.Medicamento.data.catalogoMedicamentos;
+import Clases.Receta.Data.historicoRecetas;
 
 import javax.swing.*;
 
@@ -21,17 +23,18 @@ public class DashboardView {
     private JPanel graficoMedicamentos;         //Importante! El gráfico "linechart" va aquí private JPanel graficoRecetas;
     private JPanel graficoRecetas;              // Importante! El gráfico "pie" va aquí
 
-    public DashboardView() {
+    public DashboardView(historicoRecetas historicRecetas, catalogoMedicamentos catalogMedicamentos) {
         // Limpia y agrega el gráfico de medicamentos
         graficoMedicamentos.removeAll();
-        graficoMedicamentos.add(LineChart_AWT.getChartPanel());
+        graficoMedicamentos.add(LineChart_AWT.getChartPanel(catalogMedicamentos));
         graficoMedicamentos.revalidate();
         graficoMedicamentos.repaint();
 
         // Limpia y agrega el gráfico de recetas
         graficoRecetas.removeAll();
-        graficoRecetas.add(PieChart_AWT.getChartPanel());
+        graficoRecetas.add(PieChart_AWT.getChartPanel(historicRecetas));
         graficoRecetas.revalidate();
         graficoRecetas.repaint();
     }
+
 }
