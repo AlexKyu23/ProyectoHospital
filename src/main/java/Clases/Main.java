@@ -10,22 +10,32 @@ import Clases.Admin.presentation.AdminController;
 import Clases.Admin.presentation.AdminModel;
 import Clases.Admin.presentation.AdminView;
 
-import Clases.Medico.presentation.MedicoModel;
+import Clases.Medico.logic.Medico;
+import Clases.Prescribir.presentation.PrescribirController;
+import Clases.Prescribir.presentation.PrescribirView;
+import Clases.Prescribir.presentation.PrescripcionModel;
+
+import Clases.Farmaceuta.logic.Farmaceuta;
 import Clases.Farmaceuta.presentation.FarmaceutaModel;
+import Clases.Farmaceuta.presentation.View.FarmaceutaView;
+import Clases.Farmaceuta.presentation.FarmaceutaController;
+
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Medicamento.presentation.MedicamentoModel;
+import Clases.Medico.presentation.MedicoModel;
+import Clases.Admin.presentation.AdminView;
 
-import Clases.Medico.logic.MedicoService;
-import Clases.Farmaceuta.logic.FarmaceutaService;
-import Clases.Paciente.logic.PacienteService;
-import Clases.Medicamento.logic.MedicamentoService;
 import Clases.Usuario.logic.UsuarioService;
 import Clases.Prescribir.data.RepositorioPrescripciones;
+import Clases.DatosIniciales;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
+        // 🔹 Cargar todas las listas desde XML
+        DatosIniciales.cargarTodo();
+
         SwingUtilities.invokeLater(() -> {
             JFrame loginFrame = new JFrame("Login");
             loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,20 +55,21 @@ public class Main {
                     loginFrame.dispose();
 
                     if ("ADM".equalsIgnoreCase(u.getRol())) {
+                        Admin admin = new Admin(u.getId(), u.getNombre(), u.getClave());
+                        AdminModel adminModel = new AdminModel(admin.getId(), admin.getNombre(), admin.getClave());
+                        adminModel.setCurrent(admin);
+
+                        AdminView adminView = new AdminView();
+
                         MedicoModel medicoModel = new MedicoModel();
                         FarmaceutaModel farmaceutaModel = new FarmaceutaModel();
                         PacienteModel pacienteModel = new PacienteModel();
                         MedicamentoModel medicamentoModel = new MedicamentoModel();
 
-                        medicoModel.setList(MedicoService.instance().findAll());
-                        farmaceutaModel.setList(FarmaceutaService.instance().findAll());
-                        pacienteModel.setList(PacienteService.instance().findAll());
-                        medicamentoModel.setList(MedicamentoService.instance().findAll());
-                        RepositorioPrescripciones.cargar();
-
-                        AdminView adminView = new AdminView();
-                        AdminModel adminModel = new AdminModel(u.getId(), u.getNombre(), u.getClave());
-                        adminModel.setCurrent(new Admin(u.getId(), u.getNombre(), u.getClave()));
+                        medicoModel.setList(DatosIniciales.listaMedicos.consulta());
+                        farmaceutaModel.setList(DatosIniciales.listaFarmaceutas.consulta());
+                        pacienteModel.setList(DatosIniciales.listaPacientes.consulta());
+                        medicamentoModel.setList(DatosIniciales.catalogoMed.consulta());
 
                         new AdminController(adminModel, adminView,
                                 medicoModel,
@@ -71,17 +82,73 @@ public class Main {
                         adminView.addWindowListener(new java.awt.event.WindowAdapter() {
                             @Override
                             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                                MedicoService.instance().guardar();
-                                FarmaceutaService.instance().guardar();
-                                PacienteService.instance().guardar();
-                                MedicamentoService.instance().guardar();
                                 UsuarioService.instance().guardar();
                                 RepositorioPrescripciones.guardar();
-                                System.out.println("✅ Guardado completo al cerrar.");
+                                System.out.println("✅ Guardado completo al cerrar (admin).");
                             }
                         });
+
+                    } else if ("MED".equalsIgnoreCase(u.getRol())) {
+                        Medico medico = DatosIniciales.listaMedicos.busquedaPorId(u.getId());
+                        if (medico == null) {
+                            medico = new Medico(u.getId(), u.getNombre(), u.getClave(), "General");
+                        }
+
+                        PrescripcionModel prescModel = new PrescripcionModel();
+                        prescModel.setMedico(medico);
+
+                        PrescribirView prescView = new PrescribirView();
+                        new PrescribirController(prescView, prescModel,
+                                medico,
+                                DatosIniciales.listaPacientes,
+                                DatosIniciales.catalogoMed);
+
+                        JFrame prescFrame = new JFrame("Panel Médico - Prescripción");
+                        prescFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        prescFrame.setSize(800, 600);
+                        prescFrame.setLocationRelativeTo(null);
+                        prescFrame.setContentPane(prescView.getPanel());
+                        prescFrame.setVisible(true);
+
+                        prescFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                            @Override
+                            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                                UsuarioService.instance().guardar();
+                                RepositorioPrescripciones.guardar();
+                                System.out.println("✅ Guardado completo al cerrar (médico).");
+                            }
+                        });
+
+                    } else if ("FAR".equalsIgnoreCase(u.getRol())) {
+                        Farmaceuta farm = DatosIniciales.listaFarmaceutas.busquedaPorId(u.getId());
+                        if (farm == null) {
+                            farm = new Farmaceuta(u.getId(), u.getNombre(), u.getClave());
+                        }
+
+                        FarmaceutaModel farmModel = new FarmaceutaModel();
+                        farmModel.setCurrent(farm);
+
+                        FarmaceutaView despachoView = new FarmaceutaView();
+                        new FarmaceutaController(farmModel, despachoView);
+
+                        JFrame despachoFrame = new JFrame("Panel Farmaceuta - Despacho");
+                        despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                        despachoFrame.setSize(800, 600);
+                        despachoFrame.setLocationRelativeTo(null);
+                        despachoFrame.setContentPane(despachoView.getMainPanel());
+                        despachoFrame.setVisible(true);
+
+                        despachoFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                            @Override
+                            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                                UsuarioService.instance().guardar();
+                                RepositorioPrescripciones.guardar();
+                                System.out.println("✅ Guardado completo al cerrar (farmaceuta).");
+                            }
+                        });
+
                     } else {
-                        JOptionPane.showMessageDialog(null, "Acceso denegado. Solo el administrador puede ingresar aquí.");
+                        JOptionPane.showMessageDialog(null, "Rol no reconocido. Acceso denegado.");
                     }
                 }
             });

@@ -3,18 +3,19 @@ package Clases.Admin.presentation;
 import Clases.Farmaceuta.presentation.FarmaceutaController;
 import Clases.Farmaceuta.presentation.FarmaceutaModel;
 import Clases.Farmaceuta.presentation.View.FarmaceutaView;
+
 import Clases.Medicamento.presentation.MedicamentoController;
 import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medicamento.presentation.MedicamentoView;
+
 import Clases.Medico.presentation.MedicoController;
 import Clases.Medico.presentation.MedicoModel;
 import Clases.Medico.presentation.MedicoView;
+
 import Clases.Paciente.presentation.PacienteController;
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Paciente.presentation.View.PacienteView;
-import Clases.Prescribir.presentation.PrescribirController;
-import Clases.Prescribir.presentation.PrescribirView;
-import Clases.Prescribir.presentation.PrescripcionModel;
+
 public class AdminController {
     private AdminModel model;
     private AdminView view;
@@ -55,11 +56,6 @@ public class AdminController {
         MedicamentoView medView = new MedicamentoView();
         new MedicamentoController(medicamentoModel, medView);
         view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
-
-        PrescripcionModel prescModel = new PrescripcionModel();
-        PrescribirView prescView = new PrescribirView();
-        new PrescribirController(prescView, prescModel);
-        view.getTabbedPane().addTab("Prescribir", prescView.getPanel());
 
         view.getTabbedPane().setSelectedIndex(0);
     }

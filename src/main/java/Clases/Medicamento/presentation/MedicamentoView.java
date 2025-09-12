@@ -31,6 +31,20 @@ public class MedicamentoView extends JPanel implements PropertyChangeListener {
     private JButton reporteButton;
     private JTable tablaMedicamentos;
 
+    public JPanel getBusqueda() {
+        return Busqueda;
+    }
+    public JPanel getListado() {
+        return Listado;
+    }
+    public void setBusqueda(JPanel Busqueda) {
+        this.Busqueda = Busqueda;
+    }
+    public void setListado(JPanel Listado) {
+        this.Listado = Listado;
+    }
+
+
     // 🔹 Integración MVC
     public void setController(MedicamentoController controller) {
         this.controller = controller;

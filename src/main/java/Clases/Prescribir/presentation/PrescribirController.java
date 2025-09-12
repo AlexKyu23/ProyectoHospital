@@ -3,7 +3,11 @@ package Clases.Prescribir.presentation;
 
 // Importación de clases necesarias para lógica de medicamentos, pacientes, recetas y utilidades
 import Clases.Medicamento.data.catalogoMedicamentos;
+import Clases.Medicamento.presentation.MedicamentoModel;
+import Clases.Medicamento.presentation.MedicamentoView;
 import Clases.Paciente.data.ListaPacientes;
+import Clases.Paciente.presentation.PacienteModel;
+import Clases.Paciente.presentation.View.PacienteView;
 import Clases.Receta.logic.ItemReceta;
 import Clases.Receta.logic.Receta;
 import Clases.Receta.logic.EstadoReceta;
@@ -16,7 +20,7 @@ import Clases.Medicamento.logic.Medicamento;
 
 import java.io.File;
 import java.time.LocalDate;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.UUID;
 
@@ -57,9 +61,6 @@ public class PrescribirController {
         initController();
     }
 
-    public PrescribirController(PrescribirView prescView, PrescripcionModel prescModel) {
-    }
-
     // Asocia los botones de la vista con sus respectivas acciones
     private void initController() {
         view.getBuscarPacienteButton().addActionListener(e -> buscarPaciente());
@@ -71,43 +72,73 @@ public class PrescribirController {
 
     // Busca un paciente por nombre y lo asigna al modelo
     private void buscarPaciente() {
-        String nombre = JOptionPane.showInputDialog("Ingrese nombre del paciente:");
-        if (nombre != null && !nombre.trim().isEmpty()) {
-            Paciente paciente = listaPacientes.busquedaPorNombre(nombre);
-            if (paciente != null) {
-                model.setPaciente(paciente);
-                view.getNombrePacienteLabel().setText("Paciente: " + paciente.getNombre());
-            } else {
-                JOptionPane.showMessageDialog(view.getPanel(), "Paciente no encontrado.");
+        PacienteModel selectorModel = new PacienteModel();
+        selectorModel.setList(listaPacientes.consulta());
+
+        PacienteView selectorView = new PacienteView();
+        selectorView.setModel(selectorModel);
+
+        JFrame selectorFrame = new JFrame("Buscar Paciente");
+        selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        selectorFrame.setSize(600, 400);
+        selectorFrame.setLocationRelativeTo(view.getPanel());
+
+        // Usamos solo el panel de búsqueda o listado
+        selectorFrame.setContentPane(selectorView.getBusqueda()); // o getListado()
+        selectorFrame.setVisible(true);
+
+        // Podés agregar un botón "Seleccionar" en ese panel si querés confirmar
+        // O simplemente usar el evento de selección de tabla
+        selectorView.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
+            int fila = selectorView.getTablaPacientes().getSelectedRow();
+            if (fila >= 0 && selectorModel.getList().size() > fila) {
+                Paciente seleccionado = selectorModel.getList().get(fila);
+                model.setPaciente(seleccionado);
+                view.getNombrePacienteLabel().setText("Paciente: " + seleccionado.getNombre());
+                selectorFrame.dispose();
             }
-        }
+        });
     }
 
-    // Agrega un medicamento a la receta actual
+
+
     private void agregarMedicamento() {
-        String nombre = JOptionPane.showInputDialog("Ingrese nombre del medicamento:");
-        if (nombre != null && !nombre.trim().isEmpty()) {
-            Medicamento med = catalogoMed.busquedaPorDescripcion(nombre).stream().findFirst().orElse(null);
-            if (med != null) {
+        MedicamentoModel selectorModel = new MedicamentoModel();
+        selectorModel.setList(catalogoMed.consulta());
+
+        MedicamentoView selectorView = new MedicamentoView();
+        selectorView.setModel(selectorModel);
+
+        JFrame selectorFrame = new JFrame("Buscar Medicamento");
+        selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        selectorFrame.setSize(600, 400);
+        selectorFrame.setLocationRelativeTo(view.getPanel());
+
+        selectorFrame.setContentPane(selectorView.getBusqueda()); // o getListado()
+        selectorFrame.setVisible(true);
+
+        selectorView.getTablaMedicamentos().getSelectionModel().addListSelectionListener(e -> {
+            int fila = selectorView.getTablaMedicamentos().getSelectedRow();
+            if (fila >= 0 && selectorModel.getList().size() > fila) {
+                Medicamento seleccionado = selectorModel.getList().get(fila);
+                selectorFrame.dispose();
+
                 try {
                     int cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a prescribir:"));
                     String indicaciones = JOptionPane.showInputDialog("Indicaciones:");
                     int duracion = Integer.parseInt(JOptionPane.showInputDialog("Duración en días:"));
 
-                    // Se crea el item de receta y se agrega al modelo
-                    ItemReceta item = new ItemReceta(med.getCodigo(), med.getNombre(), cantidad, indicaciones, duracion);
+                    ItemReceta item = new ItemReceta(seleccionado.getCodigo(), seleccionado.getNombre(), cantidad, indicaciones, duracion);
                     model.agregarItem(item);
-
-                    // Se actualiza la tabla visual
-                    tableModel.addRow(new Object[]{med.getNombre(), cantidad, indicaciones, duracion});
+                    tableModel.addRow(new Object[]{seleccionado.getNombre(), cantidad, indicaciones, duracion});
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos");
                 }
-            } else {
-                JOptionPane.showMessageDialog(view.getPanel(), "Medicamento no encontrado.");
             }
-        }
+        });
     }
+
+
 
     // Elimina un medicamento seleccionado de la receta
     private void descartarMedicamento() {
