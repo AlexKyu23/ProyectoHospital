@@ -45,9 +45,6 @@ public class PrescribirController {
 
         model.setMedico(medicoEnSesion);
 
-        System.out.println("🔍 Pacientes disponibles: " + listaPacientes.consulta().size());
-        System.out.println("🔍 Medicamentos disponibles: " + catalogoMed.consulta().size());
-
         tableModel = new DefaultTableModel(new Object[]{"Medicamento", "Cantidad", "Indicaciones", "Duración"}, 0);
         view.getMedicamentosPreenscritos().setModel(tableModel);
 
@@ -64,11 +61,10 @@ public class PrescribirController {
 
     private void buscarPaciente() {
         PacienteModel selectorModel = new PacienteModel();
-        selectorModel.setList(listaPacientes.consulta());
+        selectorModel.setList(listaPacientes.consulta()); // dispara evento LIST
 
         PacienteView selectorView = new PacienteView();
-        selectorView.setModel(selectorModel);
-        selectorView.(); // ← asegura que la tabla se actualice
+        selectorView.setModel(selectorModel); // actualiza tabla automáticamente
 
         JFrame selectorFrame = new JFrame("Buscar Paciente");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -90,11 +86,10 @@ public class PrescribirController {
 
     private void agregarMedicamento() {
         MedicamentoModel selectorModel = new MedicamentoModel();
-        selectorModel.setList(catalogoMed.consulta());
+        selectorModel.setList(catalogoMed.consulta()); // dispara evento LIST
 
         MedicamentoView selectorView = new MedicamentoView();
-        selectorView.setModel(selectorModel);
-        selectorView.actualizarTabla(); // ← asegura que la tabla se actualice
+        selectorView.setModel(selectorModel); // actualiza tabla automáticamente
 
         JFrame selectorFrame = new JFrame("Buscar Medicamento");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -189,3 +184,4 @@ public class PrescribirController {
         }
     }
 }
+
