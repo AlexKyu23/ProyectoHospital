@@ -3,20 +3,42 @@ package Clases.Usuario.Presentation;
 import Clases.AbstractModel;
 import Clases.Usuario.logic.Usuario;
 
+import java.beans.PropertyChangeListener;
+
 public class LoginModel extends AbstractModel {
-    private Usuario usuario;
+    private Usuario current;
+    private boolean autenticado;
+
+    public static final String CURRENT = "current";
+    public static final String AUTENTICADO = "autenticado";
 
     public LoginModel() {
-        this.usuario = new Usuario();
+        current = new Usuario();
+        autenticado = false;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        super.addPropertyChangeListener(listener);
+        firePropertyChange(CURRENT);
+        firePropertyChange(AUTENTICADO);
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-        firePropertyChange("usuario");
+    public Usuario getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Usuario usuario) {
+        this.current = usuario;
+        firePropertyChange(CURRENT);
+    }
+
+    public boolean isAutenticado() {
+        return autenticado;
+    }
+
+    public void setAutenticado(boolean autenticado) {
+        this.autenticado = autenticado;
+        firePropertyChange(AUTENTICADO);
     }
 }
-

@@ -6,20 +6,24 @@ import Clases.Usuario.logic.Usuario;
 import javax.swing.*;
 
 public class CambiarClaveController {
-    private CambiarClaveView view;
     private CambiarClaveModel model;
+    private CambiarClaveView view;
     private Usuario usuario;
 
-    public CambiarClaveController(CambiarClaveView view, CambiarClaveModel model, Usuario usuario) {
-        this.view = view;
+    public CambiarClaveController(CambiarClaveModel model, CambiarClaveView view, Usuario usuario) {
         this.model = model;
+        this.view = view;
         this.usuario = usuario;
 
-        view.addConfirmarListener(e -> guardarClave());
-        view.addCancelarListener(e-> cancelar());
+        // 🔹 Conexión MVC explícita
+        view.setController(this);
+        view.setModel(model);
+
+        // 🔹 Inicializar estado
+        model.setNuevaClave("");
     }
 
-    private void guardarClave() {
+    public void guardarClave() {
         String claveActual = view.getClaveActual();
         String claveNueva = view.getClaveNueva();
         String claveConfirmar = view.getConfirmarClave();
@@ -43,13 +47,11 @@ public class CambiarClaveController {
         model.setNuevaClave(claveNueva);
 
         view.enviarMensaje("Clave correctamente cambiada.", "Clave actualizada", JOptionPane.INFORMATION_MESSAGE);
-
-        view.cerrar();
-
-    }
-
-    private void cancelar() {
         view.cerrar();
     }
 
+    public void cancelar() {
+        view.cerrar();
+    }
 }
+

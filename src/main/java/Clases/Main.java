@@ -17,7 +17,7 @@ public class Main {
             // Instanciar MVC
             LoginView view = new LoginView();
             LoginModel model = new LoginModel();
-            new LoginController(view, model, loginFrame);
+            new LoginController(model, view, loginFrame);
 
             // Mostrar vista
             loginFrame.setContentPane(view.getPanel());

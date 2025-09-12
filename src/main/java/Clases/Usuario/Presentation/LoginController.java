@@ -7,50 +7,59 @@ import Clases.Usuario.logic.Service;
 import javax.swing.*;
 
 public class LoginController {
-    private LoginView view;
     private LoginModel model;
+    private LoginView view;
     private JFrame loginFrame;
 
-    public LoginController(LoginView view, LoginModel model, JFrame loginFrame) {
-        this.view = view;
+    public LoginController(LoginModel model, LoginView view, JFrame loginFrame) {
         this.model = model;
+        this.view = view;
         this.loginFrame = loginFrame;
-        initController();
+
+        // 🔹 Conexión MVC explícita
+        view.setController(this);
+        view.setModel(model);
+
+        // 🔹 Inicializar estado
+        model.setCurrent(new Usuario());
+        model.setAutenticado(false);
     }
 
-    private void initController() {
-        view.getEntrarButton().addActionListener(e -> {
-            try {
-                String id = view.getId().getText();
-                String clave = new String(view.getClave().getPassword());
-                Usuario intento = new Usuario(id, "", clave, "");
-                Usuario logged = Service.instance().read(intento);
+    public void entrar() {
+        String id = view.getId().getText();
+        String clave = new String(view.getClave().getPassword());
 
-                if (!logged.verificarClave(clave)) {
-                    throw new Exception("Clave incorrecta");
-                }
+        if (id.isEmpty() || clave.isEmpty()) {
+            JOptionPane.showMessageDialog(view.getPanel(), "Debe completar todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-                Sesion.setUsuario(logged);
-                JOptionPane.showMessageDialog(view.getPanel(), "Bienvenido " + logged.getNombre());
-                loginFrame.setVisible(false);
+        try {
+            Usuario intento = new Usuario(id, "", clave, "");
+            Usuario logged = Service.instance().read(intento);
 
-                // Aquí podrías redirigir según rol
-                System.out.println("Rol: " + logged.getRol());
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(view.getPanel(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            if (!logged.verificarClave(clave)) {
+                throw new Exception("Clave incorrecta");
             }
-        });
 
-        view.getCancelarButton().addActionListener(e -> {
-            view.getId().setText("");
-            view.getClave().setText("");
-        });
+            Sesion.setUsuario(logged);
+            model.setCurrent(logged);
+            model.setAutenticado(true);
+            loginFrame.setVisible(false);
 
-        view.getCambiarClaveButton().addActionListener(e -> cambiarClave());
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(view.getPanel(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    private void cambiarClave() {
+    public void limpiar() {
+        view.getId().setText("");
+        view.getClave().setText("");
+        model.setCurrent(new Usuario());
+        model.setAutenticado(false);
+    }
+
+    public void cambiarClave() {
         String id = view.getId().getText();
         String claveActual = new String(view.getClave().getPassword());
 

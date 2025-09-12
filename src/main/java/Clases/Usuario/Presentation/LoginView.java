@@ -1,9 +1,16 @@
 package Clases.Usuario.Presentation;
 
-import javax.swing.*;
+import Clases.Usuario.logic.Usuario;
 
-public class LoginView /*implements PropertyChangeListener */{
-    private /*static*/ JPanel panel;
+import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+public class LoginView extends JPanel implements PropertyChangeListener {
+    private LoginController controller;
+    private LoginModel model;
+
+    private JPanel panel;
     private JLabel icon;
     private JPanel login;
     private JTextField id;
@@ -13,72 +20,45 @@ public class LoginView /*implements PropertyChangeListener */{
     private JButton cancelarButton;
     private JButton cambiarClaveButton;
 
-    LoginController loginController;
-    LoginModel loginModel;
-
-    public LoginView() {}
-
-    public /*static*/ JPanel getPanel() { return panel; }
-    public JTextField getId(){
-        return id;
-    }
-    public JPasswordField getClave() {
-        return clave;
-    }
-    public JButton getEntrarButton() {
-        return entrarButton;
-    }
-    public JButton getCancelarButton() {
-        return cancelarButton;
-    }
-    public JButton getCambiarClaveButton() {
-        return cambiarClaveButton;
+    // 🔹 Integración MVC
+    public void setController(LoginController controller) {
+        this.controller = controller;
+        initListeners();
     }
 
+    public void setModel(LoginModel model) {
+        this.model = model;
+        model.addPropertyChangeListener(this);
+    }
 
-    /*
+    private void initListeners() {
+        entrarButton.addActionListener(e -> controller.entrar());
+        cancelarButton.addActionListener(e -> controller.limpiar());
+        cambiarClaveButton.addActionListener(e -> controller.cambiarClave());
+    }
+
     @Override
-    public void propertyChange(PropertyChangeEvent e) {
-        switch (e.getPropertyName()) {
-            case LoginModel.ID:
-                id.setText(LoginModel.getID());
-                break;
-            case LoginModel.CLAVE:
-                clave.setText(LoginModel.getClave());
-                break;
-        }
-    }
-
-    public void init() {
-
-        entrarButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String idText = id.getText();
-                String claveText = clave.getText();
-
-                if(idText.isEmpty() || claveText.isEmpty()) {
-                    JOptionPane.showMessageDialog(panel, "Completar todos los espacios para continuar", "Error", JOptionPane.ERROR_MESSAGE);
-                }else{
-                    loginController.entrar(idText, claveText);
+    public void propertyChange(PropertyChangeEvent evt) {
+        switch (evt.getPropertyName()) {
+            case LoginModel.CURRENT -> {
+                Usuario u = model.getCurrent();
+                id.setText(u.getId());
+                clave.setText(u.getClave());
+            }
+            case LoginModel.AUTENTICADO -> {
+                if (model.isAutenticado()) {
+                    JOptionPane.showMessageDialog(panel, "Bienvenido " + model.getCurrent().getNombre());
                 }
             }
-        })
+        }
+        panel.revalidate();
+    }
 
-        cancelarButton.addActionListener(new ActionListener() {             //salir
-            @Override
-            public void actionPerformed(ActionEvent e){
-                loginController.salir();
-            }
-        });
-
-        cambiarClaveButton.addActionListener(new ActionListener() {         //cambiar clave
-            @Override
-            public void actionPerformed(ActionEvent e){
-                String idText = id.getText();
-                loginController.cambiarClave(idText);
-            }
-        });
-    }*/
-
+    // 🔹 Getters para el controlador
+    public JPanel getPanel() { return panel; }
+    public JTextField getId() { return id; }
+    public JPasswordField getClave() { return clave; }
+    public JButton getEntrarButton() { return entrarButton; }
+    public JButton getCancelarButton() { return cancelarButton; }
+    public JButton getCambiarClaveButton() { return cambiarClaveButton; }
 }

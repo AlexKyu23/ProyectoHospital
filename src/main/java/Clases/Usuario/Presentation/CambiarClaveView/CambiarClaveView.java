@@ -1,56 +1,61 @@
 package Clases.Usuario.Presentation.CambiarClaveView;
 
-import javax.swing.*;
 import Clases.Usuario.Presentation.CambiarClaveController;
+import Clases.Usuario.Presentation.CambiarClaveModel;
 
+import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class CambiarClaveView {
+public class CambiarClaveView extends JPanel implements PropertyChangeListener {
+    private CambiarClaveController controller;
+    private CambiarClaveModel model;
+
     private JPanel cambiarClave;
     private JTextField claveActual;
     private JTextField claveNueva;
     private JTextField confirmarClave;
-    private JPanel botones;
     private JButton confirmarButton;
     private JButton cancelarButton;
+    private JPanel botones;
 
-    private CambiarClaveController claveController;
-
-    public CambiarClaveView() {                                                 //Revisar
-        confirmarButton.setText("Confirmar");
-        cancelarButton.setText("Cancelar");
+    public void setController(CambiarClaveController controller) {
+        this.controller = controller;
+        initListeners();
     }
 
-    public String getClaveActual() {
-        return claveActual.getText();
+    public void setModel(CambiarClaveModel model) {
+        this.model = model;
+        model.addPropertyChangeListener(this);
     }
 
-    public String getClaveNueva() {
-        return claveNueva.getText();
+    private void initListeners() {
+        confirmarButton.addActionListener(e -> controller.guardarClave());
+        cancelarButton.addActionListener(e -> controller.cancelar());
     }
 
-    public String getConfirmarClave() {
-        return confirmarClave.getText();
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (CambiarClaveModel.NUEVA_CLAVE.equals(evt.getPropertyName())) {
+            claveActual.setText("");
+            claveNueva.setText("");
+            confirmarClave.setText("");
+        }
+        cambiarClave.revalidate();
     }
 
-    public JPanel getPanel() {
-        return cambiarClave;
-    }
+    // 🔹 Getters para el controlador
+    public String getClaveActual() { return claveActual.getText(); }
+    public String getClaveNueva() { return claveNueva.getText(); }
+    public String getConfirmarClave() { return confirmarClave.getText(); }
+    public JPanel getPanel() { return cambiarClave; }
 
-    public void addConfirmarListener(ActionListener listener) {
-        confirmarButton.addActionListener(listener);
-    }
-
-    public void addCancelarListener(ActionListener listener) {
-        cancelarButton.addActionListener(listener);
-    }
-
-    public void cerrar(){
+    public void cerrar() {
         SwingUtilities.getWindowAncestor(cambiarClave).dispose();
     }
 
-    public void enviarMensaje(String mensaje, String titulo, int tipo){
-        JOptionPane.showMessageDialog(cambiarClave,mensaje,titulo,tipo);
+    public void enviarMensaje(String mensaje, String titulo, int tipo) {
+        JOptionPane.showMessageDialog(cambiarClave, mensaje, titulo, tipo);
     }
-
 }
