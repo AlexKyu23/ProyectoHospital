@@ -15,19 +15,7 @@ public class LoginController {
         this.view = view;
         this.model = model;
         this.loginFrame = loginFrame;
-        initController(); // ✅ Activar listeners
-    }
-
-    public void login(Usuario usuario) throws Exception {
-        Usuario logged = Service.instance().read(usuario);
-        if (!logged.verificarClave(usuario.getClave())) {
-            throw new Exception("Usuario o clave incorrecto");
-        }
-        Sesion.setUsuario(logged);
-    }
-
-    public void salir() {
-        System.exit(0);
+        initController();
     }
 
     private void initController() {
@@ -36,9 +24,19 @@ public class LoginController {
                 String id = view.getId().getText();
                 String clave = new String(view.getClave().getPassword());
                 Usuario intento = new Usuario(id, "", clave, "");
-                login(intento);
-                JOptionPane.showMessageDialog(view.getPanel(), "Bienvenido " + Sesion.getUsuario().getNombre());
-                loginFrame.setVisible(false); // Ocultar login
+                Usuario logged = Service.instance().read(intento);
+
+                if (!logged.verificarClave(clave)) {
+                    throw new Exception("Clave incorrecta");
+                }
+
+                Sesion.setUsuario(logged);
+                JOptionPane.showMessageDialog(view.getPanel(), "Bienvenido " + logged.getNombre());
+                loginFrame.setVisible(false);
+
+                // Aquí podrías redirigir según rol
+                System.out.println("Rol: " + logged.getRol());
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(view.getPanel(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -48,8 +46,6 @@ public class LoginController {
             view.getId().setText("");
             view.getClave().setText("");
         });
-
-        view.getEntrarButton().addActionListener(e -> salir());
 
         view.getCambiarClaveButton().addActionListener(e -> cambiarClave());
     }

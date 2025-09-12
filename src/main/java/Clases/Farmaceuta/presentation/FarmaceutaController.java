@@ -2,6 +2,7 @@ package Clases.Farmaceuta.presentation;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
 import Clases.Farmaceuta.logic.FarmaceutaService;
+import Clases.Farmaceuta.presentation.FarmaceutaModel;
 import Clases.Farmaceuta.presentation.View.FarmaceutaView;
 
 import javax.swing.*;
@@ -14,105 +15,83 @@ public class FarmaceutaController {
         this.model = model;
         this.view = view;
 
-        inicializarTabla();
-        refrescarTabla();
+        // 🔹 Conexión MVC explícita
+        view.setController(this);
+        view.setModel(model);
 
-        view.getTablaFarmaceutas().getSelectionModel().addListSelectionListener(e -> {
-            int fila = view.getTablaFarmaceutas().getSelectedRow();
-            if (fila >= 0) {
-                Farmaceuta seleccionado = ((FarmaceutaTableModel) view.getTablaFarmaceutas().getModel()).getRowAt(fila);
-                view.getId().setText(seleccionado.getId());
-                view.getNombre().setText(seleccionado.getNombre());
-            }
-        });
-
-        view.getGuardarButton().addActionListener(e -> guardarFarmaceuta());
-        view.getBorrarButton().addActionListener(e -> borrarFarmaceuta());
-        view.getBuscarButton().addActionListener(e -> buscarFarmaceuta());
-        view.getLimpiarButton().addActionListener(e -> limpiarCampos());
-        view.getReporteButton().addActionListener(e -> generarReporte());
+        // 🔹 Inicializar datos
+        model.setList(FarmaceutaService.instance().findAll());
+        model.setCurrent(new Farmaceuta());
     }
 
-    private void inicializarTabla() {
-        int[] columnas = {FarmaceutaTableModel.ID, FarmaceutaTableModel.NOMBRE};
-        FarmaceutaTableModel tableModel = new FarmaceutaTableModel(columnas, FarmaceutaService.instance().findAll());
-        view.getTablaFarmaceutas().setModel(tableModel);
-    }
-
-    private void refrescarTabla() {
-        ((FarmaceutaTableModel) view.getTablaFarmaceutas().getModel()).fireTableDataChanged();
-    }
-
-    private void guardarFarmaceuta() {
+    public void guardar() {
         String id = view.getId().getText();
         String nombre = view.getNombre().getText();
 
         if (id.isEmpty() || nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Debe llenar todos los campos");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Debe llenar todos los campos");
             return;
         }
 
         try {
             Farmaceuta existente = FarmaceutaService.instance().readById(id);
             existente.setNombre(nombre);
-            JOptionPane.showMessageDialog(null, "Farmaceuta actualizado");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta actualizado");
         } catch (Exception e) {
             Farmaceuta nuevo = new Farmaceuta(id, nombre, id);
             try {
                 FarmaceutaService.instance().create(nuevo);
-                JOptionPane.showMessageDialog(null, "Farmaceuta agregado");
+                JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta agregado");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
+                JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage());
             }
         }
 
-        limpiarCampos();
+        model.setList(FarmaceutaService.instance().findAll());
+        model.setCurrent(new Farmaceuta());
     }
 
-    private void borrarFarmaceuta() {
+    public void borrar() {
         String id = view.getId().getText();
         if (id.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar un id");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Debe ingresar un id");
             return;
         }
 
         FarmaceutaService.instance().delete(id);
-        JOptionPane.showMessageDialog(null, "Farmaceuta eliminado");
-        limpiarCampos();
+        JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta eliminado");
+
+        model.setList(FarmaceutaService.instance().findAll());
+        model.setCurrent(new Farmaceuta());
     }
 
-    private void buscarFarmaceuta() {
+    public void buscar() {
         String criterio = view.getNombreBuscar().getText();
         Farmaceuta f = FarmaceutaService.instance().readByNombre(criterio);
-        if (f == null) {
-            f = FarmaceutaService.instance().readById(criterio);
-        }
+        if (f == null) f = FarmaceutaService.instance().readById(criterio);
 
         if (f != null) {
-            view.getId().setText(f.getId());
-            view.getNombre().setText(f.getNombre());
-            JOptionPane.showMessageDialog(null, "Farmaceuta encontrado");
+            model.setCurrent(f);
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta encontrado");
         } else {
-            JOptionPane.showMessageDialog(null, "No se encontró el farmaceuta");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "No se encontró el farmaceuta");
         }
     }
 
-    private void limpiarCampos() {
-        view.getId().setText("");
-        view.getNombre().setText("");
+    public void limpiar() {
+        model.setCurrent(new Farmaceuta());
         view.getNombreBuscar().setText("");
-        refrescarTabla();
     }
 
-    private void generarReporte() {
+    public void reporte() {
         StringBuilder reporte = new StringBuilder("📋 Lista de Farmaceutas:\n\n");
-        for (Farmaceuta f : FarmaceutaService.instance().findAll()) {
+        for (Farmaceuta f : model.getList()) {
             reporte.append("ID: ").append(f.getId()).append("\n");
             reporte.append("Nombre: ").append(f.getNombre()).append("\n");
             reporte.append("-------------------------\n");
         }
 
-        JOptionPane.showMessageDialog(null, reporte.toString());
+        JOptionPane.showMessageDialog(view.getMainPanel(), reporte.toString());
     }
 }
 

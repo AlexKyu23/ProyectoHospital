@@ -4,7 +4,7 @@ public class Usuario {
     private String id;
     private String nombre;
     private String clave;
-    private String rol; // "ADM", "MED", "FAR"
+    private String rol;
 
     public Usuario() {}
 

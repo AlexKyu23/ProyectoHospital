@@ -16,6 +16,4 @@ public class Service {
                 .findFirst()
                 .orElseThrow(() -> new Exception("Usuario no existe"));
     }
-
-
 }

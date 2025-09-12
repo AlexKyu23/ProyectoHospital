@@ -3,36 +3,20 @@ package Clases.Usuario.Presentation;
 import Clases.AbstractModel;
 import Clases.Usuario.logic.Usuario;
 
-import java.beans.PropertyChangeListener;
-
 public class LoginModel extends AbstractModel {
-    private static Usuario current;
+    private Usuario usuario;
 
-    public static String ID = "Id";
-    public static String CLAVE = "Clave";
-
-    public LoginModel(Usuario usuario) {
-        current = usuario;
+    public LoginModel() {
+        this.usuario = new Usuario();
     }
 
-    @Override
-    public void  addPropertyChangeListener(PropertyChangeListener listener) {
-        super.addPropertyChangeListener(listener);
-        firePropertyChange(ID);
-        firePropertyChange(CLAVE);
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public static String getID() {
-        return current.getId();
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+        firePropertyChange("usuario");
     }
-
-    public static String getClave() {
-        return current.getClave();
-    }
-
-    public void setPassword(String clave) {
-        current.setClave(clave);
-        firePropertyChange(CLAVE);
-    }
-
 }
+
