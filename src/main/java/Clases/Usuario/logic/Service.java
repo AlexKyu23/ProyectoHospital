@@ -11,15 +11,11 @@ public class Service {
     }
 
     public Usuario read(Usuario u) throws Exception {
-        Usuario result = Data.getUsuario();/*.stream()                  //Busca el usuario en la lista guardada, pero no tenemos la lista aún
-                .filter(i -> i.getId().equals(e.getId()))
+        return Data.getUsuarios().stream()
+                .filter(i -> i.getId().equalsIgnoreCase(u.getId()))
                 .findFirst()
-                .orElse(null);*/
-        if (result != null) {
-            return result;
-        } else {
-            throw new Exception("Persona no existe");
-        }
+                .orElseThrow(() -> new Exception("Usuario no existe"));
     }
+
 
 }

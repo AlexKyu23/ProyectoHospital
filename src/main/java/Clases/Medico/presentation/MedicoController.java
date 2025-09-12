@@ -1,13 +1,9 @@
-
 package Clases.Medico.presentation;
 
-
 import Clases.Medico.logic.Medico;
+import Clases.Medico.logic.MedicoService;
 
-import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MedicoController {
     private MedicoModel model;
@@ -16,75 +12,36 @@ public class MedicoController {
     public MedicoController(MedicoModel model, MedicoView view) {
         this.model = model;
         this.view = view;
-        inicializarTabla();
-        refrescarTabla(); // ✅ Esto carga los datos quemados en la tabla
 
-        // Asignar listeners a los botones
-        this.view.getGuardarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarMedico();
-            }
-        });
+        inicializarTabla();
+        refrescarTabla();
+
+        this.view.getGuardarButton().addActionListener(e -> guardarMedico());
+
         this.view.getTablaMedicos().getSelectionModel().addListSelectionListener(e -> {
             int fila = view.getTablaMedicos().getSelectedRow();
             if (fila >= 0) {
-                String id = view.getTablaMedicos().getValueAt(fila, 0).toString();
-                Medico encontrado = model.findById(id);
-                if (encontrado != null) {
-                    view.getId().setText(encontrado.getId());
-                    view.getNombre().setText(encontrado.getNombre());
-                    view.getEspecialidad().setText(encontrado.getEspecialidad());
-                }
+                Medico seleccionado = ((MedicoTableModel) view.getTablaMedicos().getModel()).getRowAt(fila);
+                view.getId().setText(seleccionado.getId());
+                view.getNombre().setText(seleccionado.getNombre());
+                view.getEspecialidad().setText(seleccionado.getEspecialidad());
             }
         });
 
-        this.view.getBorrarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                borrarMedico();
-            }
-        });
-
-        this.view.getBuscarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarMedico();
-            }
-        });
-
-        this.view.getLimpiarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                limpiarCampos();
-            }
-        });
-    }
-
-    private void refrescarTabla() {
-        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaMedicos().getModel();
-        tableModel.setRowCount(0); // limpiar
-
-        for (Medico m : model.getMedicos()) {
-            Object[] fila = {m.getId(), m.getNombre(), m.getEspecialidad()};
-            tableModel.addRow(fila);
-        }
+        this.view.getBorrarButton().addActionListener(e -> borrarMedico());
+        this.view.getBuscarButton().addActionListener(e -> buscarMedico());
+        this.view.getLimpiarButton().addActionListener(e -> limpiarCampos());
     }
 
     private void inicializarTabla() {
-
-        String[] columnas = {"ID", "Nombre", "Especialidad"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        int[] columnas = {MedicoTableModel.ID, MedicoTableModel.NOMBRE, MedicoTableModel.ESPECIALIDAD};
+        MedicoTableModel tableModel = new MedicoTableModel(columnas, MedicoService.instance().findAll());
         view.getTablaMedicos().setModel(tableModel);
     }
 
-
-
+    private void refrescarTabla() {
+        ((MedicoTableModel) view.getTablaMedicos().getModel()).fireTableDataChanged();
+    }
 
     private void guardarMedico() {
         String id = view.getId().getText();
@@ -96,19 +53,22 @@ public class MedicoController {
             return;
         }
 
-        Medico existente = model.findById(id);
-        if (existente == null) {
-            // clave = id por defecto
-            Medico nuevo = new Medico(id, nombre, id, especialidad);
-            model.addMedico(nuevo);
-            JOptionPane.showMessageDialog(null, "Médico agregado");
-        } else {
+        try {
+            Medico existente = MedicoService.instance().readById(id);
             existente.setNombre(nombre);
             existente.setEspecialidad(especialidad);
             JOptionPane.showMessageDialog(null, "Médico actualizado");
+        } catch (Exception e) {
+            Medico nuevo = new Medico(id, nombre, id, especialidad);
+            try {
+                MedicoService.instance().create(nuevo);
+                JOptionPane.showMessageDialog(null, "Médico agregado");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
         }
-        limpiarCampos();
 
+        limpiarCampos();
     }
 
     private void borrarMedico() {
@@ -117,17 +77,17 @@ public class MedicoController {
             JOptionPane.showMessageDialog(null, "Debe ingresar un id");
             return;
         }
-        model.deleteMedico(id);
+
+        MedicoService.instance().delete(id);
         JOptionPane.showMessageDialog(null, "Médico eliminado");
         limpiarCampos();
-
     }
 
     private void buscarMedico() {
         String criterio = view.getNombreBuscar().getText();
-        Medico encontrado = model.findById(criterio);
+        Medico encontrado = MedicoService.instance().readById(criterio);
         if (encontrado == null) {
-            encontrado = model.findByNombre(criterio);
+            encontrado = MedicoService.instance().readByNombre(criterio);
         }
 
         if (encontrado != null) {

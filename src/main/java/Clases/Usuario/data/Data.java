@@ -1,15 +1,24 @@
 package Clases.Usuario.data;
 
-import Clases.Medico.logic.Medico;
 import Clases.Usuario.logic.Usuario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Data {
+    private static List<Usuario> usuarios = new ArrayList<>();
 
-    private static Medico medicoPrueba = new Medico("MED-111", "David", "123","Pediatría");
-    private static Usuario usuarioPrueba = new Usuario(medicoPrueba.getId(), medicoPrueba.getNombre(), medicoPrueba.getClave(), "MED");
-
-    public static Usuario getUsuario() {
-        return usuarioPrueba;
+    static {
+        usuarios.add(new Usuario("001", "SuperAdmin", "1234", "ADM"));
+        usuarios.add(new Usuario("MED-111", "David", "123", "MED"));
+        usuarios.add(new Usuario("FARM-01", "Carla Jiménez", "FARM-01", "FAR"));
     }
 
+    public static List<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public static void addUsuario(Usuario u) {
+        usuarios.add(u);
+    }
 }

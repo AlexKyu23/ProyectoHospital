@@ -1,13 +1,9 @@
 package Clases.Medicamento.presentation;
 
 import Clases.Medicamento.logic.Medicamento;
-import Clases.Medicamento.presentation.MedicamentoView;
+import Clases.Medicamento.logic.MedicamentoService;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MedicamentoController {
     private MedicamentoModel model;
@@ -23,14 +19,11 @@ public class MedicamentoController {
         view.getTablaMedicamentos().getSelectionModel().addListSelectionListener(e -> {
             int fila = view.getTablaMedicamentos().getSelectedRow();
             if (fila >= 0) {
-                int codigo = Integer.parseInt(view.getTablaMedicamentos().getValueAt(fila, 0).toString());
-                Medicamento encontrado = model.findByCodigo(codigo);
-                if (encontrado != null) {
-                    model.setCurrent(encontrado);
-                    view.getCodigo().setText(String.valueOf(encontrado.getCodigo()));
-                    view.getNombre().setText(encontrado.getNombre());
-                    view.getDescripcion().setText(encontrado.getDescripcion());
-                }
+                Medicamento seleccionado = ((MedicamentoTableModel) view.getTablaMedicamentos().getModel()).getRowAt(fila);
+                model.setCurrent(seleccionado);
+                view.getCodigo().setText(String.valueOf(seleccionado.getCodigo()));
+                view.getNombre().setText(seleccionado.getNombre());
+                view.getDescripcion().setText(seleccionado.getDescripcion());
             }
         });
 
@@ -42,36 +35,13 @@ public class MedicamentoController {
     }
 
     private void inicializarTabla() {
-        String[] columnas = {"Código", "Nombre", "Descripción"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        int[] columnas = {MedicamentoTableModel.CODIGO, MedicamentoTableModel.NOMBRE, MedicamentoTableModel.DESCRIPCION};
+        MedicamentoTableModel tableModel = new MedicamentoTableModel(columnas, MedicamentoService.instance().findAll());
         view.getTablaMedicamentos().setModel(tableModel);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < view.getTablaMedicamentos().getColumnCount(); i++) {
-            view.getTablaMedicamentos().getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        view.getTablaMedicamentos().setRowHeight(25);
     }
 
     private void refrescarTabla() {
-        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaMedicamentos().getModel();
-        tableModel.setRowCount(0);
-
-        for (Medicamento m : model.getMedicamentos()) {
-            Object[] fila = {
-                    m.getCodigo(),
-                    m.getNombre(),
-                    m.getDescripcion()
-            };
-            tableModel.addRow(fila);
-        }
+        ((MedicamentoTableModel) view.getTablaMedicamentos().getModel()).fireTableDataChanged();
     }
 
     private void guardarMedicamento() {
@@ -85,10 +55,10 @@ public class MedicamentoController {
                 return;
             }
 
-            Medicamento existente = model.findByCodigo(codigo);
+            Medicamento existente = MedicamentoService.instance().readByCodigo(codigo);
             if (existente == null) {
                 Medicamento nuevo = new Medicamento(nombre, descripcion, codigo);
-                model.addMedicamento(nuevo);
+                MedicamentoService.instance().create(nuevo);
                 model.setCurrent(nuevo);
                 JOptionPane.showMessageDialog(null, "Medicamento agregado");
             } else {
@@ -100,13 +70,15 @@ public class MedicamentoController {
             limpiarCampos();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "El código debe ser un número");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }
 
     private void borrarMedicamento() {
         try {
             int codigo = Integer.parseInt(view.getCodigo().getText());
-            model.deleteMedicamento(codigo);
+            MedicamentoService.instance().delete(codigo);
             JOptionPane.showMessageDialog(null, "Medicamento eliminado");
             limpiarCampos();
         } catch (NumberFormatException ex) {
@@ -120,9 +92,9 @@ public class MedicamentoController {
 
         try {
             int codigo = Integer.parseInt(criterio);
-            encontrado = model.findByCodigo(codigo);
+            encontrado = MedicamentoService.instance().readByCodigo(codigo);
         } catch (NumberFormatException e) {
-            encontrado = model.findByNombre(criterio);
+            encontrado = MedicamentoService.instance().readByNombre(criterio);
         }
 
         if (encontrado != null) {
@@ -146,7 +118,7 @@ public class MedicamentoController {
 
     private void generarReporte() {
         StringBuilder reporte = new StringBuilder("📋 Lista de Medicamentos:\n\n");
-        for (Medicamento m : model.getMedicamentos()) {
+        for (Medicamento m : MedicamentoService.instance().findAll()) {
             reporte.append("Código: ").append(m.getCodigo()).append("\n");
             reporte.append("Nombre: ").append(m.getNombre()).append("\n");
             reporte.append("Descripción: ").append(m.getDescripcion()).append("\n");

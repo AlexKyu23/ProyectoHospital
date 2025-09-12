@@ -1,13 +1,10 @@
 package Clases.Farmaceuta.presentation;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
+import Clases.Farmaceuta.logic.FarmaceutaService;
 import Clases.Farmaceuta.presentation.View.FarmaceutaView;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class FarmaceutaController {
     private FarmaceutaModel model;
@@ -23,12 +20,9 @@ public class FarmaceutaController {
         view.getTablaFarmaceutas().getSelectionModel().addListSelectionListener(e -> {
             int fila = view.getTablaFarmaceutas().getSelectedRow();
             if (fila >= 0) {
-                String id = view.getTablaFarmaceutas().getValueAt(fila, 0).toString();
-                Farmaceuta f = model.findById(id);
-                if (f != null) {
-                    view.getId().setText(f.getId());
-                    view.getNombre().setText(f.getNombre());
-                }
+                Farmaceuta seleccionado = ((FarmaceutaTableModel) view.getTablaFarmaceutas().getModel()).getRowAt(fila);
+                view.getId().setText(seleccionado.getId());
+                view.getNombre().setText(seleccionado.getNombre());
             }
         });
 
@@ -40,32 +34,13 @@ public class FarmaceutaController {
     }
 
     private void inicializarTabla() {
-        String[] columnas = {"ID", "Nombre"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        int[] columnas = {FarmaceutaTableModel.ID, FarmaceutaTableModel.NOMBRE};
+        FarmaceutaTableModel tableModel = new FarmaceutaTableModel(columnas, FarmaceutaService.instance().findAll());
         view.getTablaFarmaceutas().setModel(tableModel);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < view.getTablaFarmaceutas().getColumnCount(); i++) {
-            view.getTablaFarmaceutas().getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        view.getTablaFarmaceutas().setRowHeight(25);
     }
 
     private void refrescarTabla() {
-        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaFarmaceutas().getModel();
-        tableModel.setRowCount(0);
-
-        for (Farmaceuta f : model.getFarmaceutas()) {
-            Object[] fila = {f.getId(), f.getNombre()};
-            tableModel.addRow(fila);
-        }
+        ((FarmaceutaTableModel) view.getTablaFarmaceutas().getModel()).fireTableDataChanged();
     }
 
     private void guardarFarmaceuta() {
@@ -77,15 +52,18 @@ public class FarmaceutaController {
             return;
         }
 
-        Farmaceuta existente = model.findById(id);
-        if (existente == null) {
-            Farmaceuta f = new Farmaceuta(id, nombre, id); // clave = id por defecto
-            model.addFarmaceuta(f);
-            JOptionPane.showMessageDialog(null, "Farmaceuta agregado");
-        } else {
+        try {
+            Farmaceuta existente = FarmaceutaService.instance().readById(id);
             existente.setNombre(nombre);
-            model.updateFarmaceuta(existente);
             JOptionPane.showMessageDialog(null, "Farmaceuta actualizado");
+        } catch (Exception e) {
+            Farmaceuta nuevo = new Farmaceuta(id, nombre, id);
+            try {
+                FarmaceutaService.instance().create(nuevo);
+                JOptionPane.showMessageDialog(null, "Farmaceuta agregado");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
         }
 
         limpiarCampos();
@@ -98,16 +76,16 @@ public class FarmaceutaController {
             return;
         }
 
-        model.deleteFarmaceuta(id);
+        FarmaceutaService.instance().delete(id);
         JOptionPane.showMessageDialog(null, "Farmaceuta eliminado");
         limpiarCampos();
     }
 
     private void buscarFarmaceuta() {
         String criterio = view.getNombreBuscar().getText();
-        Farmaceuta f = model.findByNombre(criterio);
+        Farmaceuta f = FarmaceutaService.instance().readByNombre(criterio);
         if (f == null) {
-            f = model.findById(criterio);
+            f = FarmaceutaService.instance().readById(criterio);
         }
 
         if (f != null) {
@@ -128,7 +106,7 @@ public class FarmaceutaController {
 
     private void generarReporte() {
         StringBuilder reporte = new StringBuilder("📋 Lista de Farmaceutas:\n\n");
-        for (Farmaceuta f : model.getFarmaceutas()) {
+        for (Farmaceuta f : FarmaceutaService.instance().findAll()) {
             reporte.append("ID: ").append(f.getId()).append("\n");
             reporte.append("Nombre: ").append(f.getNombre()).append("\n");
             reporte.append("-------------------------\n");
@@ -137,3 +115,4 @@ public class FarmaceutaController {
         JOptionPane.showMessageDialog(null, reporte.toString());
     }
 }
+

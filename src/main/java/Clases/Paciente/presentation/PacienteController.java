@@ -1,13 +1,10 @@
 package Clases.Paciente.presentation;
 
-import Clases.Paciente.presentation.View.PacienteView;
 import Clases.Paciente.logic.Paciente;
+import Clases.Paciente.logic.PacienteService;
+import Clases.Paciente.presentation.View.PacienteView;
 
 import javax.swing.*;
-
-import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 
 public class PacienteController {
@@ -17,50 +14,36 @@ public class PacienteController {
     public PacienteController(PacienteModel model, PacienteView view) {
         this.model = model;
         this.view = view;
-        inicializarTabla();
-        refrescarTabla(); // ✅ Esto carga los datos quemados en la tabla
 
-        this.view.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
+        inicializarTabla();
+        refrescarTabla();
+
+        view.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
             int fila = view.getTablaPacientes().getSelectedRow();
             if (fila >= 0) {
-                String id = view.getTablaPacientes().getValueAt(fila, 0).toString();
-                Paciente encontrado = model.findById(id);
-                if (encontrado != null) {
-                    view.getId().setText(encontrado.getId());
-                    view.getNombre().setText(encontrado.getNombre());
-                    view.getNumeroTelefono().setText(encontrado.getTelefono());
-                    view.getFechaNacimiento().setDate(encontrado.getFechaNacimiento());
-
-                }
-            }
-        });
-        this.view.getGuardarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                guardarPaciente();
+                Paciente seleccionado = ((PacienteTableModel) view.getTablaPacientes().getModel()).getRowAt(fila);
+                model.setCurrent(seleccionado);
+                view.getId().setText(seleccionado.getId());
+                view.getNombre().setText(seleccionado.getNombre());
+                view.getNumeroTelefono().setText(seleccionado.getTelefono());
+                view.getFechaNacimiento().setDate(seleccionado.getFechaNacimiento());
             }
         });
 
-        this.view.getBorrarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                borrarPaciente();
-            }
-        });
+        view.getGuardarButton().addActionListener(e -> guardarPaciente());
+        view.getBorrarButton().addActionListener(e -> borrarPaciente());
+        view.getBuscarButton().addActionListener(e -> buscarPaciente());
+        view.getLimpiarButton().addActionListener(e -> limpiarCampos());
+    }
 
-        this.view.getBuscarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarPaciente();
-            }
-        });
+    private void inicializarTabla() {
+        int[] columnas = {PacienteTableModel.ID, PacienteTableModel.NOMBRE, PacienteTableModel.TELEFONO, PacienteTableModel.FECHA};
+        PacienteTableModel tableModel = new PacienteTableModel(columnas, PacienteService.instance().findAll());
+        view.getTablaPacientes().setModel(tableModel);
+    }
 
-        this.view.getLimpiarButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                limpiarCampos();
-            }
-        });
+    private void refrescarTabla() {
+        ((PacienteTableModel) view.getTablaPacientes().getModel()).fireTableDataChanged();
     }
 
     private void guardarPaciente() {
@@ -68,23 +51,29 @@ public class PacienteController {
         String nombre = view.getNombre().getText();
         String telefono = view.getNumeroTelefono().getText();
         LocalDate fechaNacimiento = view.getFechaNacimiento().getDate();
-        if (id.isEmpty() || nombre.isEmpty()|| telefono.isEmpty() ) {
+
+        if (id.isEmpty() || nombre.isEmpty() || telefono.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debe llenar todos los campos");
             return;
         }
 
-        Paciente existente = model.findById(id);
-        if (existente == null) {
-            Paciente nuevo = new Paciente(id, nombre,telefono,fechaNacimiento); // 🔹 ajusta constructor según tu clase Paciente
-            model.addPaciente(nuevo);
-            JOptionPane.showMessageDialog(null, "Paciente agregado");
-        } else {
+        try {
+            Paciente existente = PacienteService.instance().readById(id);
             existente.setNombre(nombre);
             existente.setTelefono(telefono);
             existente.setFechaNacimiento(fechaNacimiento);
-
             JOptionPane.showMessageDialog(null, "Paciente actualizado");
+        } catch (Exception e) {
+            Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
+            try {
+                PacienteService.instance().create(nuevo);
+                model.setCurrent(nuevo);
+                JOptionPane.showMessageDialog(null, "Paciente agregado");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+            }
         }
+
         limpiarCampos();
     }
 
@@ -94,60 +83,36 @@ public class PacienteController {
             JOptionPane.showMessageDialog(null, "Debe ingresar un id");
             return;
         }
-        model.deletePaciente(id);
+
+        PacienteService.instance().delete(id);
         JOptionPane.showMessageDialog(null, "Paciente eliminado");
         limpiarCampos();
-
     }
 
     private void buscarPaciente() {
         String criterio = view.getNombreBuscar().getText();
-        Paciente encontrado = model.findById(criterio);
+        Paciente encontrado = PacienteService.instance().readById(criterio);
         if (encontrado == null) {
-            encontrado = model.findByNombre(criterio);
+            encontrado = PacienteService.instance().readByNombre(criterio);
         }
 
         if (encontrado != null) {
+            model.setCurrent(encontrado);
             view.getId().setText(encontrado.getId());
             view.getNombre().setText(encontrado.getNombre());
+            view.getNumeroTelefono().setText(encontrado.getTelefono());
+            view.getFechaNacimiento().setDate(encontrado.getFechaNacimiento());
             JOptionPane.showMessageDialog(null, "Paciente encontrado");
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró el paciente");
         }
     }
 
-    private void refrescarTabla() {
-        DefaultTableModel tableModel = (DefaultTableModel) view.getTablaPacientes().getModel();
-        tableModel.setRowCount(0); // limpiar
-
-        for (Paciente p : model.getPacientes()) {
-            Object[] fila = {
-                    p.getId(),               // ID
-                    p.getNombre(),           // Nombre
-                    p.getTelefono(),         // Teléfono
-                    p.getFechaNacimiento()   // Fecha de Nacimiento
-            };
-
-            tableModel.addRow(fila);
-        }
-    }
-    private void inicializarTabla() {
-        String[] columnas = {"ID", "Nombre", "Teléfono", "Fecha de Nacimiento"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        view.getTablaPacientes().setModel(tableModel);
-
-    }
-
     private void limpiarCampos() {
         view.getId().setText("");
         view.getNombre().setText("");
-        view.getFechaNacimiento().clear();
         view.getNumeroTelefono().setText("");
+        view.getFechaNacimiento().clear();
         view.getNombreBuscar().setText("");
         refrescarTabla();
     }

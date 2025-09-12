@@ -1,10 +1,6 @@
 package Clases.Usuario.Presentation;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 public class LoginView /*implements PropertyChangeListener */{
     private /*static*/ JPanel panel;
@@ -29,7 +25,7 @@ public class LoginView /*implements PropertyChangeListener */{
     public JPasswordField getClave() {
         return clave;
     }
-    public JButton getSalirButton() {
+    public JButton getEntrarButton() {
         return entrarButton;
     }
     public JButton getCancelarButton() {
