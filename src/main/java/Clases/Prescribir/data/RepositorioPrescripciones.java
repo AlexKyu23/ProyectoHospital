@@ -11,9 +11,7 @@ import java.util.List;
 
 public class RepositorioPrescripciones {
 
-    // Lista que guarda todas las prescripciones
     private static List<Prescripcion> prescripciones = new ArrayList<>();
-
     private static final File ARCHIVO = new File("prescripciones.xml");
 
     // Agregar una prescripción
@@ -26,61 +24,42 @@ public class RepositorioPrescripciones {
         return prescripciones;
     }
 
-    // Eliminar una prescripción
     public static void eliminar(Prescripcion p) {
         prescripciones.remove(p);
     }
 
-    // Limpiar todas las prescripciones (opcional)
     public static void limpiar() {
         prescripciones.clear();
     }
 
+    // Guardar en XML
     public static void guardar() {
         try {
-            JAXBContext context = JAXBContext.newInstance(RepositorioPrescripciones.class, Prescripcion.class);
+            JAXBContext context = JAXBContext.newInstance(PrescripcionesWrapper.class, Prescripcion.class);
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(new RepositorioWrapper(prescripciones), ARCHIVO);
+
+            PrescripcionesWrapper wrapper = new PrescripcionesWrapper();
+            wrapper.setPrescripciones(prescripciones);
+
+            marshaller.marshal(wrapper, ARCHIVO);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Cargar desde XML
     public static void cargar() {
         if (ARCHIVO.exists()) {
             try {
-                JAXBContext context = JAXBContext.newInstance(RepositorioPrescripciones.class, Prescripcion.class);
+                JAXBContext context = JAXBContext.newInstance(PrescripcionesWrapper.class, Prescripcion.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                RepositorioWrapper wrapper = (RepositorioWrapper) unmarshaller.unmarshal(ARCHIVO);
-                prescripciones = wrapper.getPrescripciones();
+
+                PrescripcionesWrapper wrapper = (PrescripcionesWrapper) unmarshaller.unmarshal(ARCHIVO);
+                prescripciones = wrapper.getPrescripciones() != null ? wrapper.getPrescripciones() : new ArrayList<>();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-
-    // -------------------- Wrapper interno --------------------
-    // Necesario para JAXB porque la lista está dentro de un atributo estático
-    private static class RepositorioWrapper {
-        private List<Prescripcion> prescripciones;
-
-        public RepositorioWrapper() {
-            prescripciones = new ArrayList<>();
-        }
-
-        public RepositorioWrapper(List<Prescripcion> prescripciones) {
-            this.prescripciones = prescripciones;
-        }
-
-        @jakarta.xml.bind.annotation.XmlElement(name = "prescripcion")
-        public List<Prescripcion> getPrescripciones() {
-            return prescripciones;
-        }
-
-        public void setPrescripciones(List<Prescripcion> prescripciones) {
-            this.prescripciones = prescripciones;
-        }
-    }
-
 }

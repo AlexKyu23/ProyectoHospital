@@ -10,6 +10,10 @@ public class Trabajador extends Persona {
         super(id, nombre);
         this.clave = clave;
     }
+    public Trabajador() {
+        super("", "");
+        this.clave = "";
+    }
 
 
     public String getClave() {

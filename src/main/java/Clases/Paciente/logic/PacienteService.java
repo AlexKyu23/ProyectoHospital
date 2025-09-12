@@ -26,6 +26,7 @@ public class PacienteService {
         if (readById(p.getId()) != null)
             throw new Exception("Paciente ya existe");
         lista.inclusion(p);
+        lista.guardar(); // ← Guarda después de agregar
     }
 
     public Paciente readById(String id) {
@@ -38,6 +39,7 @@ public class PacienteService {
 
     public void delete(String id) {
         lista.borrado(id);
+        lista.guardar(); // ← Guarda después de borrar
     }
 
     public List<Paciente> findAll() {
@@ -46,5 +48,6 @@ public class PacienteService {
 
     public void update(Paciente p) {
         lista.modificacion(p);
+        lista.guardar(); // ← Guarda después de modificar
     }
 }
