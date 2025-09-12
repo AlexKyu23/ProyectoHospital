@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+/**
+ * Vista del login. Muestra campos de entrada y botones.
+ */
 public class LoginView extends JPanel implements PropertyChangeListener {
     private LoginController controller;
     private LoginModel model;
@@ -20,7 +23,6 @@ public class LoginView extends JPanel implements PropertyChangeListener {
     private JButton cancelarButton;
     private JButton cambiarClaveButton;
 
-    // 🔹 Integración MVC
     public void setController(LoginController controller) {
         this.controller = controller;
         initListeners();

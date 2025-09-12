@@ -2,6 +2,7 @@ package Clases.Usuario.Presentation;
 
 import Clases.Usuario.Presentation.CambiarClaveView.CambiarClaveView;
 import Clases.Usuario.logic.Usuario;
+import Clases.Usuario.logic.UsuarioService;
 
 import javax.swing.*;
 
@@ -44,6 +45,7 @@ public class CambiarClaveController {
         }
 
         usuario.setClave(claveNueva);
+        UsuarioService.instance().update(usuario); // ← guardar en XML
         model.setNuevaClave(claveNueva);
 
         view.enviarMensaje("Clave correctamente cambiada.", "Clave actualizada", JOptionPane.INFORMATION_MESSAGE);

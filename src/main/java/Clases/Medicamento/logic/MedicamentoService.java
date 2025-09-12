@@ -10,10 +10,14 @@ public class MedicamentoService {
 
     private MedicamentoService() {
         catalogo = new catalogoMedicamentos();
+        catalogo.cargar(); // ← carga desde XML
 
-        // Precarga opcional
-        catalogo.inclusion(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
-        catalogo.inclusion(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
+        // Precarga opcional si el archivo está vacío
+        if (catalogo.consulta().isEmpty()) {
+            catalogo.inclusion(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
+            catalogo.inclusion(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
+            catalogo.guardar(); // ← guarda precarga
+        }
     }
 
     public static MedicamentoService instance() {
@@ -25,6 +29,7 @@ public class MedicamentoService {
         if (readByCodigo(m.getCodigo()) != null)
             throw new Exception("Medicamento ya existe");
         catalogo.inclusion(m);
+        catalogo.guardar(); // ← guarda en XML
     }
 
     public Medicamento readByCodigo(int codigo) {
@@ -44,9 +49,15 @@ public class MedicamentoService {
 
     public void delete(int codigo) {
         catalogo.borrado(codigo);
+        catalogo.guardar(); // ← guarda en XML
     }
 
     public void update(Medicamento nuevo) {
         catalogo.modificacion(nuevo.getCodigo(), nuevo);
+        catalogo.guardar(); // ← guarda en XML
     }
+    public void guardar() {
+        catalogo.guardar();
+    }
+
 }

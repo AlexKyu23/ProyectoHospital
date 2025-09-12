@@ -2,10 +2,13 @@ package Clases.Usuario.Presentation;
 
 import Clases.Usuario.logic.Sesion;
 import Clases.Usuario.logic.Usuario;
-import Clases.Usuario.logic.Service;
+import Clases.Usuario.logic.UsuarioService;
 
 import javax.swing.*;
 
+/**
+ * Controlador del login. Maneja autenticación, limpieza de campos y cambio de clave.
+ */
 public class LoginController {
     private LoginModel model;
     private LoginView view;
@@ -20,7 +23,7 @@ public class LoginController {
         view.setController(this);
         view.setModel(model);
 
-        // 🔹 Inicializar estado
+        // 🔹 Estado inicial
         model.setCurrent(new Usuario());
         model.setAutenticado(false);
     }
@@ -34,22 +37,17 @@ public class LoginController {
             return;
         }
 
-        try {
-            Usuario intento = new Usuario(id, "", clave, "");
-            Usuario logged = Service.instance().read(intento);
-
-            if (!logged.verificarClave(clave)) {
-                throw new Exception("Clave incorrecta");
-            }
-
-            Sesion.setUsuario(logged);
-            model.setCurrent(logged);
-            model.setAutenticado(true);
-            loginFrame.setVisible(false);
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(view.getPanel(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        Usuario u = UsuarioService.instance().readById(id);
+        if (u == null || !u.getClave().equals(clave)) {
+            JOptionPane.showMessageDialog(view.getPanel(), "Credenciales inválidas", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        // 🔹 Usuario autenticado
+        Sesion.setUsuario(u);
+        model.setCurrent(u);
+        model.setAutenticado(true);
+        loginFrame.setVisible(false);
     }
 
     public void limpiar() {
@@ -63,21 +61,17 @@ public class LoginController {
         String id = view.getId().getText();
         String claveActual = new String(view.getClave().getPassword());
 
-        try {
-            Usuario u = Service.instance().read(new Usuario(id, "", claveActual, ""));
-            if (!u.verificarClave(claveActual)) {
-                JOptionPane.showMessageDialog(view.getPanel(), "Clave actual incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        Usuario u = UsuarioService.instance().readById(id);
+        if (u == null || !u.getClave().equals(claveActual)) {
+            JOptionPane.showMessageDialog(view.getPanel(), "Clave actual incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            String nuevaClave = JOptionPane.showInputDialog(view.getPanel(), "Ingrese nueva clave:");
-            if (nuevaClave != null && !nuevaClave.isEmpty()) {
-                u.cambiarClave(nuevaClave);
-                JOptionPane.showMessageDialog(view.getPanel(), "Clave actualizada");
-            }
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(view.getPanel(), "Usuario no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+        String nuevaClave = JOptionPane.showInputDialog(view.getPanel(), "Ingrese nueva clave:");
+        if (nuevaClave != null && !nuevaClave.isEmpty()) {
+            u.setClave(nuevaClave);
+            UsuarioService.instance().update(u);
+            JOptionPane.showMessageDialog(view.getPanel(), "Clave actualizada");
         }
     }
 }

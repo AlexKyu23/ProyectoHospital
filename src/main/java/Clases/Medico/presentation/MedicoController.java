@@ -2,6 +2,8 @@ package Clases.Medico.presentation;
 
 import Clases.Medico.logic.Medico;
 import Clases.Medico.logic.MedicoService;
+import Clases.Usuario.logic.Usuario;
+import Clases.Usuario.logic.UsuarioService;
 
 import javax.swing.*;
 
@@ -36,12 +38,18 @@ public class MedicoController {
             Medico existente = MedicoService.instance().readById(id);
             existente.setNombre(nombre);
             existente.setEspecialidad(especialidad);
+            MedicoService.instance().update(existente);
             JOptionPane.showMessageDialog(view.getMainPanel(), "Médico actualizado");
         } catch (Exception e) {
             Medico nuevo = new Medico(id, nombre, id, especialidad);
             try {
                 MedicoService.instance().create(nuevo);
-                JOptionPane.showMessageDialog(view.getMainPanel(), "Médico agregado");
+
+                // 🔹 Crear usuario automáticamente
+                Usuario u = new Usuario(id, nombre, id, "MED");
+                UsuarioService.instance().create(u);
+
+                JOptionPane.showMessageDialog(view.getMainPanel(), "Médico agregado y acceso creado");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage());
             }
@@ -51,6 +59,7 @@ public class MedicoController {
         model.setCurrent(new Medico());
     }
 
+
     public void borrar() {
         String id = view.getId().getText();
         if (id.isEmpty()) {
@@ -59,11 +68,14 @@ public class MedicoController {
         }
 
         MedicoService.instance().delete(id);
-        JOptionPane.showMessageDialog(view.getMainPanel(), "Médico eliminado");
+        UsuarioService.instance().delete(id); // 🔹 Eliminar acceso del médico
+
+        JOptionPane.showMessageDialog(view.getMainPanel(), "Médico eliminado y acceso revocado");
 
         model.setList(MedicoService.instance().findAll());
         model.setCurrent(new Medico());
     }
+
 
     public void buscar() {
         String criterio = view.getNombreBuscar().getText();

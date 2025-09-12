@@ -1,9 +1,7 @@
 package Clases.Farmaceuta.data;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
+import Clases.Usuario.data.XmlPersister;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
@@ -12,13 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "listaFarmaceutas")
-public class ListaFarmaceutas { //basicamente el data
+public class ListaFarmaceutas {
     private List<Farmaceuta> farmaceutas;
     private static final File ARCHIVO = new File("farmaceutas.xml");
 
     public ListaFarmaceutas() {
         farmaceutas = new ArrayList<>();
-
     }
 
     @XmlElement(name = "farmaceuta")
@@ -30,7 +27,6 @@ public class ListaFarmaceutas { //basicamente el data
         this.farmaceutas = farmaceutas;
     }
 
-    // Inclusión
     public void inclusion(Farmaceuta farmaceuta) {
         farmaceutas.add(farmaceuta);
     }
@@ -39,24 +35,16 @@ public class ListaFarmaceutas { //basicamente el data
         return farmaceutas;
     }
 
-
     public Farmaceuta busquedaPorId(String id) {
-        for (Farmaceuta f : farmaceutas) {
-            if (f.getId().equalsIgnoreCase(id)) {
-                return f;
-            }
-        }
-        return null;
+        return farmaceutas.stream()
+                .filter(f -> f.getId().equalsIgnoreCase(id))
+                .findFirst().orElse(null);
     }
 
-
     public Farmaceuta busquedaPorNombre(String nombre) {
-        for (Farmaceuta f : farmaceutas) {
-            if (f.getNombre().equalsIgnoreCase(nombre)) {
-                return f;
-            }
-        }
-        return null;
+        return farmaceutas.stream()
+                .filter(f -> f.getNombre().equalsIgnoreCase(nombre))
+                .findFirst().orElse(null);
     }
 
     public void modificacion(Farmaceuta farmaceuta) {
@@ -74,10 +62,7 @@ public class ListaFarmaceutas { //basicamente el data
 
     public void guardar() {
         try {
-            JAXBContext context = JAXBContext.newInstance(ListaFarmaceutas.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(this, ARCHIVO);
+            XmlPersister.save(this, ARCHIVO);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,15 +71,11 @@ public class ListaFarmaceutas { //basicamente el data
     public void cargar() {
         if (ARCHIVO.exists()) {
             try {
-                JAXBContext context = JAXBContext.newInstance(ListaFarmaceutas.class);
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                ListaFarmaceutas cargada = (ListaFarmaceutas) unmarshaller.unmarshal(ARCHIVO);
+                ListaFarmaceutas cargada = XmlPersister.load(ListaFarmaceutas.class, ARCHIVO);
                 this.farmaceutas = cargada.getFarmaceutas();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-
-
 }

@@ -4,6 +4,8 @@ import Clases.Farmaceuta.logic.Farmaceuta;
 import Clases.Farmaceuta.logic.FarmaceutaService;
 import Clases.Farmaceuta.presentation.FarmaceutaModel;
 import Clases.Farmaceuta.presentation.View.FarmaceutaView;
+import Clases.Usuario.logic.Usuario;
+import Clases.Usuario.logic.UsuarioService;
 
 import javax.swing.*;
 
@@ -23,7 +25,6 @@ public class FarmaceutaController {
         model.setList(FarmaceutaService.instance().findAll());
         model.setCurrent(new Farmaceuta());
     }
-
     public void guardar() {
         String id = view.getId().getText();
         String nombre = view.getNombre().getText();
@@ -36,12 +37,18 @@ public class FarmaceutaController {
         try {
             Farmaceuta existente = FarmaceutaService.instance().readById(id);
             existente.setNombre(nombre);
+            FarmaceutaService.instance().update(existente);
             JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta actualizado");
         } catch (Exception e) {
             Farmaceuta nuevo = new Farmaceuta(id, nombre, id);
             try {
                 FarmaceutaService.instance().create(nuevo);
-                JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta agregado");
+
+                // 🔹 Crear usuario automáticamente
+                Usuario u = new Usuario(id, nombre, id, "FAR");
+                UsuarioService.instance().create(u);
+
+                JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta agregado y acceso creado");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage());
             }
@@ -51,6 +58,7 @@ public class FarmaceutaController {
         model.setCurrent(new Farmaceuta());
     }
 
+
     public void borrar() {
         String id = view.getId().getText();
         if (id.isEmpty()) {
@@ -59,11 +67,14 @@ public class FarmaceutaController {
         }
 
         FarmaceutaService.instance().delete(id);
-        JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta eliminado");
+        UsuarioService.instance().delete(id); // 🔹 Eliminar acceso del farmaceuta
+
+        JOptionPane.showMessageDialog(view.getMainPanel(), "Farmaceuta eliminado y acceso revocado");
 
         model.setList(FarmaceutaService.instance().findAll());
         model.setCurrent(new Farmaceuta());
     }
+
 
     public void buscar() {
         String criterio = view.getNombreBuscar().getText();

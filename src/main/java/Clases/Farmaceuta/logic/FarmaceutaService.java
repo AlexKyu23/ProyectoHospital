@@ -1,8 +1,6 @@
 package Clases.Farmaceuta.logic;
 
-
 import Clases.Farmaceuta.data.ListaFarmaceutas;
-
 import java.util.List;
 
 public class FarmaceutaService {
@@ -16,25 +14,39 @@ public class FarmaceutaService {
 
     private FarmaceutaService() {
         lista = new ListaFarmaceutas();
-        // Podés cargar desde XML aquí si querés persistencia
-        lista.inclusion(new Farmaceuta("FAR-001", "Carla Jiménez", "FAR-001"));
-        lista.inclusion(new Farmaceuta("FAR-002", "Luis Mora", "FAR-002"));
+        System.out.println("⏳ Cargando farmaceutas desde XML...");
+        lista.cargar();
+
+        if (lista.consulta().isEmpty()) {
+            System.out.println("⚠️ Lista de farmaceutas vacía. Precargando...");
+            lista.inclusion(new Farmaceuta("FAR-001", "Carla Jiménez", "FAR-001"));
+            lista.inclusion(new Farmaceuta("FAR-002", "Luis Mora", "FAR-002"));
+            lista.guardar();
+            System.out.println("✅ Precarga de farmaceutas guardada.");
+        } else {
+            System.out.println("✅ Farmaceutas cargados: " + lista.consulta().size());
+        }
     }
 
     public List<Farmaceuta> findAll() {
-        return lista.consulta();
+        List<Farmaceuta> actual = lista.consulta();
+        System.out.println("📋 Consulta de farmaceutas: " + actual.size());
+        return actual;
     }
 
     public void create(Farmaceuta f) throws Exception {
-        if (lista.busquedaPorId(f.getId()) != null) {
+        if (lista.busquedaPorId(f.getId()) != null)
             throw new Exception("Ya existe un farmaceuta con ese ID");
-        }
-        f.setClave(f.getId()); // clave = id al crear
+        f.setClave(f.getId());
         lista.inclusion(f);
+        lista.guardar();
+        System.out.println("🆕 Farmaceuta creado: " + f.getNombre() + " (" + f.getId() + ")");
     }
 
     public void delete(String id) {
         lista.borrado(id);
+        lista.guardar();
+        System.out.println("🗑️ Farmaceuta eliminado: " + id);
     }
 
     public Farmaceuta readById(String id) {
@@ -47,5 +59,11 @@ public class FarmaceutaService {
 
     public void update(Farmaceuta f) {
         lista.modificacion(f);
+        lista.guardar();
+        System.out.println("✏️ Farmaceuta actualizado: " + f.getNombre() + " (" + f.getId() + ")");
     }
+    public void guardar() {
+        lista.guardar();
+    }
+
 }

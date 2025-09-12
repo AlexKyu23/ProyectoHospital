@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<catalogoMedicamentos/>
+<catalogoMedicamentos>
+    <medicamento>
+        <codigo>101</codigo>
+        <descripcion>Analgésico y antipirético</descripcion>
+        <nombre>Paracetamol</nombre>
+    </medicamento>
+    <medicamento>
+        <codigo>102</codigo>
+        <descripcion>Antibiótico de amplio espectro</descripcion>
+        <nombre>Amoxicilina</nombre>
+    </medicamento>
+</catalogoMedicamentos>

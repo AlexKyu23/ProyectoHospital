@@ -5,6 +5,9 @@ import Clases.Usuario.logic.Usuario;
 
 import java.beans.PropertyChangeListener;
 
+/**
+ * Modelo del login. Guarda el usuario actual y si está autenticado.
+ */
 public class LoginModel extends AbstractModel {
     private Usuario current;
     private boolean autenticado;

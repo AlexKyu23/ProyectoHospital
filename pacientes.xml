@@ -1,2 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<listaPacientes/>
+<listaPacientes>
+    <paciente>
+        <fechaNacimiento>1990-05-12</fechaNacimiento>
+        <id>PAC-001</id>
+        <nombre>Laura</nombre>
+        <telefono>8888-1111</telefono>
+    </paciente>
+    <paciente>
+        <fechaNacimiento>1985-08-23</fechaNacimiento>
+        <id>PAC-002</id>
+        <nombre>Carlos</nombre>
+        <telefono>8888-2222</telefono>
+    </paciente>
+</listaPacientes>

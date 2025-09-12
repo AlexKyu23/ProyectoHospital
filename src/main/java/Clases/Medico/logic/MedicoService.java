@@ -1,7 +1,6 @@
 package Clases.Medico.logic;
 
 import Clases.Medico.data.ListaMedicos;
-
 import java.util.List;
 
 public class MedicoService {
@@ -10,10 +9,18 @@ public class MedicoService {
 
     private MedicoService() {
         lista = new ListaMedicos();
+        System.out.println("⏳ Cargando médicos desde XML...");
+        lista.cargar();
 
-        // Precarga opcional
-        lista.inclusion(new Medico("MED-001", "Dr. Salas", "MED-001", "Cardiología"));
-        lista.inclusion(new Medico("MED-002", "Dra. Vargas", "MED-002", "Pediatría"));
+        if (lista.consulta().isEmpty()) {
+            System.out.println("⚠️ Lista de médicos vacía. Precargando...");
+            lista.inclusion(new Medico("MED-001", "Dr. Salas", "MED-001", "Cardiología"));
+            lista.inclusion(new Medico("MED-002", "Dra. Vargas", "MED-002", "Pediatría"));
+            lista.guardar();
+            System.out.println("✅ Precarga de médicos guardada.");
+        } else {
+            System.out.println("✅ Médicos cargados: " + lista.consulta().size());
+        }
     }
 
     public static MedicoService instance() {
@@ -24,8 +31,10 @@ public class MedicoService {
     public void create(Medico m) throws Exception {
         if (readById(m.getId()) != null)
             throw new Exception("Médico ya existe");
-        m.setClave(m.getId()); // clave = id al crear
+        m.setClave(m.getId());
         lista.inclusion(m);
+        lista.guardar();
+        System.out.println("🆕 Médico creado: " + m.getNombre() + " (" + m.getId() + ")");
     }
 
     public Medico readById(String id) {
@@ -38,13 +47,23 @@ public class MedicoService {
 
     public void delete(String id) {
         lista.borrado(id);
+        lista.guardar();
+        System.out.println("🗑️ Médico eliminado: " + id);
     }
 
     public List<Medico> findAll() {
-        return lista.consulta();
+        List<Medico> actual = lista.consulta();
+        System.out.println("📋 Consulta de médicos: " + actual.size());
+        return actual;
     }
 
     public void update(Medico m) {
         lista.modificacion(m);
+        lista.guardar();
+        System.out.println("✏️ Médico actualizado: " + m.getNombre() + " (" + m.getId() + ")");
     }
+    public void guardar() {
+        lista.guardar();
+    }
+
 }

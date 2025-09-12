@@ -1,5 +1,8 @@
 package Clases.Usuario.logic;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name = "usuario")
 public class Usuario {
     private String id;
     private String nombre;
@@ -15,9 +18,16 @@ public class Usuario {
         this.rol = rol;
     }
 
+    @XmlElement
     public String getId() { return id; }
+
+    @XmlElement
     public String getNombre() { return nombre; }
+
+    @XmlElement
     public String getClave() { return clave; }
+
+    @XmlElement
     public String getRol() { return rol; }
 
     public void setId(String id) { this.id = id; }

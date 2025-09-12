@@ -1,2 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<listaMedicos/>
+<listaMedicos>
+    <medico>
+        <clave>MED-001</clave>
+        <especialidad>Cardiología</especialidad>
+        <id>MED-001</id>
+        <nombre>Dr. Salas</nombre>
+    </medico>
+    <medico>
+        <clave>MED-002</clave>
+        <especialidad>Pediatría</especialidad>
+        <id>MED-002</id>
+        <nombre>Dra. Vargas</nombre>
+    </medico>
+    <medico>
+        <clave>MED-003</clave>
+        <especialidad>Ratas</especialidad>
+        <id>MED-003</id>
+        <nombre>Dr. Mouse</nombre>
+    </medico>
+</listaMedicos>
