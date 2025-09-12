@@ -1,17 +1,19 @@
 package Clases.Receta.logic;
 
-import Clases.Receta.Data.RecetaData;
+import Clases.Receta.Data.historicoRecetas;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class RecetaService {
     private static RecetaService instance;
-    private RecetaData data;
+    private historicoRecetas historico;
 
     private RecetaService() {
-        data = new RecetaData();
+        historico = new historicoRecetas();
+
+        // Precarga opcional
+        // historico.inclusion(new Receta(...));
     }
 
     public static RecetaService instance() {
@@ -22,24 +24,24 @@ public class RecetaService {
     public void create(Receta r) throws Exception {
         if (readById(r.getId()) != null)
             throw new Exception("Receta ya existe");
-        data.getRecetas().add(r);
+        historico.inclusion(r);
     }
 
     public Receta readById(String id) {
-        return data.getRecetas().stream()
+        return historico.consulta().stream()
                 .filter(r -> r.getId().equalsIgnoreCase(id))
                 .findFirst()
                 .orElse(null);
     }
 
     public List<Receta> findByPaciente(String pacienteId) {
-        return data.getRecetas().stream()
+        return historico.consulta().stream()
                 .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
                 .collect(Collectors.toList());
     }
 
     public List<Receta> findAll() {
-        return data.getRecetas();
+        return historico.consulta();
     }
 
     public void cambiarEstado(String recetaId, EstadoReceta nuevoEstado) {

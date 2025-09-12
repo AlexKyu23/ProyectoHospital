@@ -1,15 +1,19 @@
 package Clases.Medicamento.logic;
 
-import Clases.Medicamento.data.MedicamentoData;
+import Clases.Medicamento.data.catalogoMedicamentos;
 
 import java.util.List;
 
 public class MedicamentoService {
     private static MedicamentoService instance;
-    private MedicamentoData data;
+    private catalogoMedicamentos catalogo;
 
     private MedicamentoService() {
-        data = new MedicamentoData();
+        catalogo = new catalogoMedicamentos();
+
+        // Precarga opcional
+        catalogo.inclusion(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
+        catalogo.inclusion(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
     }
 
     public static MedicamentoService instance() {
@@ -20,28 +24,29 @@ public class MedicamentoService {
     public void create(Medicamento m) throws Exception {
         if (readByCodigo(m.getCodigo()) != null)
             throw new Exception("Medicamento ya existe");
-        data.getMedicamentos().add(m);
+        catalogo.inclusion(m);
     }
 
     public Medicamento readByCodigo(int codigo) {
-        return data.getMedicamentos().stream()
-                .filter(m -> m.getCodigo() == codigo)
-                .findFirst()
-                .orElse(null);
+        return catalogo.busquedaPorCodigo(codigo);
     }
 
     public Medicamento readByNombre(String nombre) {
-        return data.getMedicamentos().stream()
-                .filter(m -> m.getNombre().equalsIgnoreCase(nombre))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public void delete(int codigo) {
-        data.getMedicamentos().removeIf(m -> m.getCodigo() == codigo);
+        for (Medicamento m : catalogo.consulta()) {
+            if (m.getNombre().equalsIgnoreCase(nombre)) return m;
+        }
+        return null;
     }
 
     public List<Medicamento> findAll() {
-        return data.getMedicamentos();
+        return catalogo.consulta();
+    }
+
+    public void delete(int codigo) {
+        catalogo.borrado(codigo);
+    }
+
+    public void update(Medicamento nuevo) {
+        catalogo.modificacion(nuevo.getCodigo(), nuevo);
     }
 }

@@ -1,15 +1,19 @@
 package Clases.Medico.logic;
 
-import Clases.Medico.data.MedicoData;
+import Clases.Medico.data.ListaMedicos;
 
 import java.util.List;
 
 public class MedicoService {
     private static MedicoService instance;
-    private MedicoData data;
+    private ListaMedicos lista;
 
     private MedicoService() {
-        data = new MedicoData();
+        lista = new ListaMedicos();
+
+        // Precarga opcional
+        lista.inclusion(new Medico("MED-001", "Dr. Salas", "MED-001", "Cardiología"));
+        lista.inclusion(new Medico("MED-002", "Dra. Vargas", "MED-002", "Pediatría"));
     }
 
     public static MedicoService instance() {
@@ -20,28 +24,27 @@ public class MedicoService {
     public void create(Medico m) throws Exception {
         if (readById(m.getId()) != null)
             throw new Exception("Médico ya existe");
-        data.getMedicos().add(m);
+        m.setClave(m.getId()); // clave = id al crear
+        lista.inclusion(m);
     }
 
     public Medico readById(String id) {
-        return data.getMedicos().stream()
-                .filter(m -> m.getId().equalsIgnoreCase(id))
-                .findFirst()
-                .orElse(null);
+        return lista.busquedaPorId(id);
     }
 
     public Medico readByNombre(String nombre) {
-        return data.getMedicos().stream()
-                .filter(m -> m.getNombre().equalsIgnoreCase(nombre))
-                .findFirst()
-                .orElse(null);
+        return lista.busquedaPorNombre(nombre);
     }
 
     public void delete(String id) {
-        data.getMedicos().removeIf(m -> m.getId().equalsIgnoreCase(id));
+        lista.borrado(id);
     }
 
     public List<Medico> findAll() {
-        return data.getMedicos();
+        return lista.consulta();
+    }
+
+    public void update(Medico m) {
+        lista.modificacion(m);
     }
 }

@@ -1,4 +1,4 @@
-package Listas;
+package Clases.Paciente.data;
 
 import Clases.Paciente.logic.Paciente;
 import jakarta.xml.bind.annotation.XmlElement;
