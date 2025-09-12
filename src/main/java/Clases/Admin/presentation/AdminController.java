@@ -56,10 +56,10 @@ public class AdminController {
         new MedicamentoController(medicamentoModel, medView);
         view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
 
-       // PrescripcionModel prescModel = new PrescripcionModel();
-       // PrescribirView prescView = new PrescribirView();
-       // new PrescribirController(prescView, prescModel);
-       // view.getTabbedPane().addTab("Prescribir", prescView.getPanel());
+        PrescripcionModel prescModel = new PrescripcionModel();
+        PrescribirView prescView = new PrescribirView();
+        new PrescribirController(prescView, prescModel);
+        view.getTabbedPane().addTab("Prescribir", prescView.getPanel());
 
         view.getTabbedPane().setSelectedIndex(0);
     }

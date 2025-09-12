@@ -12,6 +12,9 @@ public class MedicoView extends JPanel implements PropertyChangeListener {
     private MedicoModel model;
 
     private JPanel medicos;
+    private JPanel medico;
+    private JPanel busqueda;
+    private JPanel listado;
     private JTextField id;
     private JTextField especialidad;
     private JTextField nombre;
@@ -22,6 +25,7 @@ public class MedicoView extends JPanel implements PropertyChangeListener {
     private JButton buscarButton;
     private JButton reporteButton;
     private JTable tablaMedicos;
+    private JTextField idBuscar;
 
     // 🔹 Integración MVC
     public void setController(MedicoController controller) {

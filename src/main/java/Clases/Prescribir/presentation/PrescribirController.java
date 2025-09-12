@@ -57,6 +57,9 @@ public class PrescribirController {
         initController();
     }
 
+    public PrescribirController(PrescribirView prescView, PrescripcionModel prescModel) {
+    }
+
     // Asocia los botones de la vista con sus respectivas acciones
     private void initController() {
         view.getBuscarPacienteButton().addActionListener(e -> buscarPaciente());
