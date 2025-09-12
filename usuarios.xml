@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<listaUsuarios>
+    <usuario>
+        <clave>1234</clave>
+        <id>med01</id>
+        <nombre>Dr. House</nombre>
+        <rol>MED</rol>
+    </usuario>
+    <usuario>
+        <clave>5678</clave>
+        <id>far01</id>
+        <nombre>Farmacia Ana</nombre>
+        <rol>FAR</rol>
+    </usuario>
+    <usuario>
+        <clave>admin</clave>
+        <id>adm01</id>
+        <nombre>Administrador</nombre>
+        <rol>ADM</rol>
+    </usuario>
+    <usuario>
+        <clave>MED-003</clave>
+        <id>MED-003</id>
+        <nombre>Dr. Mouse</nombre>
+        <rol>MED</rol>
+    </usuario>
+</listaUsuarios>
