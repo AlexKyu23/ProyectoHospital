@@ -1,8 +1,13 @@
 package Clases.Admin.presentation;
 
 import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class AdminView extends JFrame {
+public class AdminView extends JFrame implements PropertyChangeListener {
+    private AdminController controller;
+    private AdminModel model;
+
     private JTabbedPane tabbedPane;
     private JPanel mainPanel;
 
@@ -20,6 +25,25 @@ public class AdminView extends JFrame {
         setContentPane(mainPanel);
     }
 
+    // 🔹 Integración MVC
+    public void setController(AdminController controller) {
+        this.controller = controller;
+    }
+
+    public void setModel(AdminModel model) {
+        this.model = model;
+        model.addPropertyChangeListener(this);
+    }
+
+    // 🔹 Actualización visual
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (AdminModel.CURRENT.equals(evt.getPropertyName())) {
+            // Aquí podrías actualizar algún encabezado o estado del panel si lo deseas
+        }
+    }
+
+    // 🔹 Getter para el controlador
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
     }

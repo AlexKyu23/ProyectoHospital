@@ -23,7 +23,7 @@ public class app {
     public static void main(String[] args) {
         // 🔹 Admin
         Admin admin = new Admin("001", "SuperAdmin", "1234");
-        AdminModel adminModel = new AdminModel();
+        AdminModel adminModel = new AdminModel("001", "SuperAdmin", "1234");
         adminModel.setCurrent(admin);
 
         // 🔹 Vistas

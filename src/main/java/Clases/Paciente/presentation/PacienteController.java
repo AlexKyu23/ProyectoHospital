@@ -15,45 +15,23 @@ public class PacienteController {
         this.model = model;
         this.view = view;
 
-        inicializarTabla();
-        refrescarTabla();
+        // 🔹 Conexión MVC explícita
+        view.setController(this);
+        view.setModel(model);
 
-        view.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
-            int fila = view.getTablaPacientes().getSelectedRow();
-            if (fila >= 0) {
-                Paciente seleccionado = ((PacienteTableModel) view.getTablaPacientes().getModel()).getRowAt(fila);
-                model.setCurrent(seleccionado);
-                view.getId().setText(seleccionado.getId());
-                view.getNombre().setText(seleccionado.getNombre());
-                view.getNumeroTelefono().setText(seleccionado.getTelefono());
-                view.getFechaNacimiento().setDate(seleccionado.getFechaNacimiento());
-            }
-        });
-
-        view.getGuardarButton().addActionListener(e -> guardarPaciente());
-        view.getBorrarButton().addActionListener(e -> borrarPaciente());
-        view.getBuscarButton().addActionListener(e -> buscarPaciente());
-        view.getLimpiarButton().addActionListener(e -> limpiarCampos());
+        // 🔹 Inicializar datos
+        model.setList(PacienteService.instance().findAll());
+        model.setCurrent(new Paciente());
     }
 
-    private void inicializarTabla() {
-        int[] columnas = {PacienteTableModel.ID, PacienteTableModel.NOMBRE, PacienteTableModel.TELEFONO, PacienteTableModel.FECHA};
-        PacienteTableModel tableModel = new PacienteTableModel(columnas, PacienteService.instance().findAll());
-        view.getTablaPacientes().setModel(tableModel);
-    }
-
-    private void refrescarTabla() {
-        ((PacienteTableModel) view.getTablaPacientes().getModel()).fireTableDataChanged();
-    }
-
-    private void guardarPaciente() {
+    public void guardar() {
         String id = view.getId().getText();
         String nombre = view.getNombre().getText();
         String telefono = view.getNumeroTelefono().getText();
         LocalDate fechaNacimiento = view.getFechaNacimiento().getDate();
 
         if (id.isEmpty() || nombre.isEmpty() || telefono.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Debe llenar todos los campos");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Debe llenar todos los campos");
             return;
         }
 
@@ -62,58 +40,64 @@ public class PacienteController {
             existente.setNombre(nombre);
             existente.setTelefono(telefono);
             existente.setFechaNacimiento(fechaNacimiento);
-            JOptionPane.showMessageDialog(null, "Paciente actualizado");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente actualizado");
         } catch (Exception e) {
             Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
             try {
                 PacienteService.instance().create(nuevo);
-                model.setCurrent(nuevo);
-                JOptionPane.showMessageDialog(null, "Paciente agregado");
+                JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente agregado");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
+                JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage());
             }
         }
 
-        limpiarCampos();
+        model.setList(PacienteService.instance().findAll());
+        model.setCurrent(new Paciente());
     }
 
-    private void borrarPaciente() {
+    public void borrar() {
         String id = view.getId().getText();
         if (id.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar un id");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Debe ingresar un id");
             return;
         }
 
         PacienteService.instance().delete(id);
-        JOptionPane.showMessageDialog(null, "Paciente eliminado");
-        limpiarCampos();
+        JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente eliminado");
+
+        model.setList(PacienteService.instance().findAll());
+        model.setCurrent(new Paciente());
     }
 
-    private void buscarPaciente() {
+    public void buscar() {
         String criterio = view.getNombreBuscar().getText();
-        Paciente encontrado = PacienteService.instance().readById(criterio);
-        if (encontrado == null) {
-            encontrado = PacienteService.instance().readByNombre(criterio);
-        }
+        Paciente p = PacienteService.instance().readByNombre(criterio);
+        if (p == null) p = PacienteService.instance().readById(criterio);
 
-        if (encontrado != null) {
-            model.setCurrent(encontrado);
-            view.getId().setText(encontrado.getId());
-            view.getNombre().setText(encontrado.getNombre());
-            view.getNumeroTelefono().setText(encontrado.getTelefono());
-            view.getFechaNacimiento().setDate(encontrado.getFechaNacimiento());
-            JOptionPane.showMessageDialog(null, "Paciente encontrado");
+        if (p != null) {
+            model.setCurrent(p);
+            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente encontrado");
         } else {
-            JOptionPane.showMessageDialog(null, "No se encontró el paciente");
+            JOptionPane.showMessageDialog(view.getMainPanel(), "No se encontró el paciente");
         }
     }
 
-    private void limpiarCampos() {
-        view.getId().setText("");
-        view.getNombre().setText("");
-        view.getNumeroTelefono().setText("");
-        view.getFechaNacimiento().clear();
+    public void limpiar() {
+        model.setCurrent(new Paciente());
         view.getNombreBuscar().setText("");
-        refrescarTabla();
+    }
+
+    public void reporte() {
+        StringBuilder reporte = new StringBuilder("📋 Lista de Pacientes:\n\n");
+        for (Paciente p : model.getList()) {
+            reporte.append("ID: ").append(p.getId()).append("\n");
+            reporte.append("Nombre: ").append(p.getNombre()).append("\n");
+            reporte.append("Teléfono: ").append(p.getTelefono()).append("\n");
+            reporte.append("Fecha de Nacimiento: ").append(p.getFechaNacimiento()).append("\n");
+            reporte.append("-------------------------\n");
+        }
+
+        JOptionPane.showMessageDialog(view.getMainPanel(), reporte.toString());
     }
 }
+
