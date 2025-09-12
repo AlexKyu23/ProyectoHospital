@@ -1,5 +1,9 @@
+// Controlador principal del módulo de prescripción de recetas
 package Clases.Prescribir.presentation;
 
+// Importación de clases necesarias para lógica de medicamentos, pacientes, recetas y utilidades
+import Clases.Medicamento.data.catalogoMedicamentos;
+import Clases.Paciente.data.ListaPacientes;
 import Clases.Receta.logic.ItemReceta;
 import Clases.Receta.logic.Receta;
 import Clases.Receta.logic.EstadoReceta;
@@ -12,21 +16,25 @@ import Clases.Medicamento.logic.Medicamento;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.util.UUID;
 
 public class PrescribirController {
 
+    // Referencias al modelo y vista del módulo
     private PrescribirView view;
     private PrescripcionModel model;
+
+    // Modelo de tabla para mostrar medicamentos preescritos
     private DefaultTableModel tableModel;
 
+    // Datos de sesión y listas necesarias para prescripción
     private Medico medicoEnSesion;
     private ListaPacientes listaPacientes;
     private catalogoMedicamentos catalogoMed;
 
+    // Constructor del controlador, recibe vista, modelo, médico en sesión y listas de pacientes y medicamentos
     public PrescribirController(PrescribirView view, PrescripcionModel model,
                                 Medico medicoEnSesion,
                                 ListaPacientes listaPacientes,
@@ -38,14 +46,18 @@ public class PrescribirController {
         this.listaPacientes = listaPacientes;
         this.catalogoMed = catalogoMed;
 
+        // Se asigna el médico al modelo
         model.setMedico(medicoEnSesion);
 
+        // Se configura la tabla de medicamentos en la vista
         tableModel = new DefaultTableModel(new Object[]{"Medicamento", "Cantidad", "Indicaciones", "Duración"}, 0);
         view.getMedicamentosPreenscritos().setModel(tableModel);
 
+        // Se inicializan los listeners de los botones
         initController();
     }
 
+    // Asocia los botones de la vista con sus respectivas acciones
     private void initController() {
         view.getBuscarPacienteButton().addActionListener(e -> buscarPaciente());
         view.getAgregarMedicamentoButton().addActionListener(e -> agregarMedicamento());
@@ -54,6 +66,7 @@ public class PrescribirController {
         view.getGuardarButton().addActionListener(e -> guardarReceta());
     }
 
+    // Busca un paciente por nombre y lo asigna al modelo
     private void buscarPaciente() {
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del paciente:");
         if (nombre != null && !nombre.trim().isEmpty()) {
@@ -67,6 +80,7 @@ public class PrescribirController {
         }
     }
 
+    // Agrega un medicamento a la receta actual
     private void agregarMedicamento() {
         String nombre = JOptionPane.showInputDialog("Ingrese nombre del medicamento:");
         if (nombre != null && !nombre.trim().isEmpty()) {
@@ -77,8 +91,11 @@ public class PrescribirController {
                     String indicaciones = JOptionPane.showInputDialog("Indicaciones:");
                     int duracion = Integer.parseInt(JOptionPane.showInputDialog("Duración en días:"));
 
+                    // Se crea el item de receta y se agrega al modelo
                     ItemReceta item = new ItemReceta(med.getCodigo(), med.getNombre(), cantidad, indicaciones, duracion);
                     model.agregarItem(item);
+
+                    // Se actualiza la tabla visual
                     tableModel.addRow(new Object[]{med.getNombre(), cantidad, indicaciones, duracion});
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos");
@@ -89,6 +106,7 @@ public class PrescribirController {
         }
     }
 
+    // Elimina un medicamento seleccionado de la receta
     private void descartarMedicamento() {
         int row = view.getMedicamentosPreenscritos().getSelectedRow();
         if (row >= 0) {
@@ -103,6 +121,7 @@ public class PrescribirController {
         }
     }
 
+    // Limpia el formulario de prescripción
     private void limpiarFormulario() {
         model.setPaciente(null);
         model.limpiarItems();
@@ -111,20 +130,25 @@ public class PrescribirController {
         view.getCalendario().clear();
     }
 
+    // Guarda la receta en el sistema y en archivo XML
     private void guardarReceta() {
+        // Validación de paciente
         if (model.getPaciente() == null) {
             JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar un paciente");
             return;
         }
 
+        // Validación de fecha de retiro
         LocalDate fechaSeleccionada = view.getCalendario().getDate();
         if (fechaSeleccionada == null) {
             JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar una fecha de retiro");
             return;
         }
 
+        // Se genera un ID único para la receta
         String recetaId = UUID.randomUUID().toString();
 
+        // Se crea la receta con los datos actuales
         Receta receta = new Receta(
                 recetaId,
                 model.getMedico().getId(),
@@ -136,21 +160,26 @@ public class PrescribirController {
         receta.setMedicamentos(model.getItems());
 
         try {
+            // Se guarda la receta en el servicio
             RecetaService.instance().create(receta);
 
+            // Se guarda en archivo XML
             RecetasWrapper wrapper = new RecetasWrapper();
             wrapper.setRecetas(RecetaService.instance().findAll());
             XmlPersister.save(wrapper, new File("recetas.xml"));
 
+            // Se muestra confirmación al usuario
             JOptionPane.showMessageDialog(view.getPanel(),
                     "Receta guardada.\nMédico: " + model.getMedico().getNombre() +
                             "\nPaciente: " + model.getPaciente().getNombre() +
                             "\nMedicamentos: " + receta.getMedicamentos().size() +
                             "\nFecha de retiro: " + fechaSeleccionada);
 
+            // Se limpia el formulario para nueva receta
             limpiarFormulario();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(view.getPanel(), "Error: " + ex.getMessage());
         }
     }
 }
+

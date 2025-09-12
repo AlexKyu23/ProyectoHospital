@@ -1,4 +1,4 @@
-package Listas;
+package Clases.Prescribir.data;
 
 import Clases.Prescribir.logic.Prescripcion;
 import java.util.ArrayList;

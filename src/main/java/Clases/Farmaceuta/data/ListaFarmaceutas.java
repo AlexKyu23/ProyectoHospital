@@ -12,6 +12,7 @@ public class ListaFarmaceutas { //basicamente el data
 
     public ListaFarmaceutas() {
         farmaceutas = new ArrayList<>();
+
     }
 
     @XmlElement(name = "farmaceuta")

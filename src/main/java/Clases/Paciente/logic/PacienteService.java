@@ -1,15 +1,20 @@
 package Clases.Paciente.logic;
 
-import Clases.Paciente.data.PacienteData;
+import Clases.Paciente.data.ListaPacientes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class PacienteService {
     private static PacienteService instance;
-    private PacienteData data;
+    private ListaPacientes lista;
 
     private PacienteService() {
-        data = new PacienteData();
+        lista = new ListaPacientes();
+
+        // Precarga opcional
+        lista.inclusion(new Paciente("PAC-001", "Laura", "8888-1111", LocalDate.of(1990, 5, 12)));
+        lista.inclusion(new Paciente("PAC-002", "Carlos", "8888-2222", LocalDate.of(1985, 8, 23)));
     }
 
     public static PacienteService instance() {
@@ -20,28 +25,26 @@ public class PacienteService {
     public void create(Paciente p) throws Exception {
         if (readById(p.getId()) != null)
             throw new Exception("Paciente ya existe");
-        data.getPacientes().add(p);
+        lista.inclusion(p);
     }
 
     public Paciente readById(String id) {
-        return data.getPacientes().stream()
-                .filter(p -> p.getId().equalsIgnoreCase(id))
-                .findFirst()
-                .orElse(null);
+        return lista.busquedaPorId(id);
     }
 
     public Paciente readByNombre(String nombre) {
-        return data.getPacientes().stream()
-                .filter(p -> p.getNombre().equalsIgnoreCase(nombre))
-                .findFirst()
-                .orElse(null);
+        return lista.busquedaPorNombre(nombre);
     }
 
     public void delete(String id) {
-        data.getPacientes().removeIf(p -> p.getId().equalsIgnoreCase(id));
+        lista.borrado(id);
     }
 
     public List<Paciente> findAll() {
-        return data.getPacientes();
+        return lista.consulta();
+    }
+
+    public void update(Paciente p) {
+        lista.modificacion(p);
     }
 }

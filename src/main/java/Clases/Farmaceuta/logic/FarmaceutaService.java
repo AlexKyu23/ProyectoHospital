@@ -17,6 +17,8 @@ public class FarmaceutaService {
     private FarmaceutaService() {
         lista = new ListaFarmaceutas();
         // Podés cargar desde XML aquí si querés persistencia
+        lista.inclusion(new Farmaceuta("FAR-001", "Carla Jiménez", "FAR-001"));
+        lista.inclusion(new Farmaceuta("FAR-002", "Luis Mora", "FAR-002"));
     }
 
     public List<Farmaceuta> findAll() {
