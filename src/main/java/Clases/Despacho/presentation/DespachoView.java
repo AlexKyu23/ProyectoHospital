@@ -8,6 +8,15 @@ public class DespachoView extends JFrame {
     private JButton iniciarBtn;
     private JButton alistarBtn;
     private JButton entregarBtn;
+    private JPanel despachoEnProceso;
+    private JPanel despachoLista;
+    private JPanel despachoEntregada;
+    private JTextField idPaciente1;
+    private JTextField idPaciente3;
+    private JTable tablaIniciar;
+    private JTextField idPaciente2;
+    private JTable tablaAlistar;
+    private JTable tablaRecetaLista;
 
     public DespachoView() {
         setTitle("Despacho de Recetas");
