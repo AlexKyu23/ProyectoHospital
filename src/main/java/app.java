@@ -28,6 +28,8 @@ import Clases.Prescribir.presentation.PrescribirController;
 import Clases.Prescribir.presentation.PrescribirView;
 import Clases.Prescribir.presentation.PrescripcionModel;
 
+import Clases.AcercaDe.presentation.AcercaDeView;
+
 import Clases.Paciente.data.ListaPacientes;
 import Clases.Medicamento.data.catalogoMedicamentos;
 import Clases.Medico.data.ListaMedicos;

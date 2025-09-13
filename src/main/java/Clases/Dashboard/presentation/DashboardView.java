@@ -22,6 +22,7 @@ public class DashboardView {
     private JPanel Lista;
     private JPanel graficoMedicamentos;         //Importante! El gráfico "linechart" va aquí private JPanel graficoRecetas;
     private JPanel graficoRecetas;              // Importante! El gráfico "pie" va aquí
+    private JPanel dashboard;
 
     public DashboardView(historicoRecetas historicRecetas, catalogoMedicamentos catalogMedicamentos) {
         // Limpia y agrega el gráfico de medicamentos
@@ -35,6 +36,10 @@ public class DashboardView {
         graficoRecetas.add(PieChart_AWT.getChartPanel(historicRecetas));
         graficoRecetas.revalidate();
         graficoRecetas.repaint();
+    }
+
+    public JPanel getDashboard() {
+        return dashboard;
     }
 
 }
