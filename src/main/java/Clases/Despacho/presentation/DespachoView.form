@@ -37,14 +37,6 @@
             </constraints>
             <properties/>
           </component>
-          <component id="52824" class="javax.swing.JTable" binding="tablaIniciar">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="50"/>
-              </grid>
-            </constraints>
-            <properties/>
-          </component>
           <component id="b442f" class="javax.swing.JButton" binding="iniciarBtn">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -53,6 +45,19 @@
               <text value="Procesar"/>
             </properties>
           </component>
+          <scrollpane id="9caeb">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="92b6c" class="javax.swing.JTable" binding="procesarTabla">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
         </children>
       </grid>
       <grid id="c9d8" binding="despachoLista" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -84,14 +89,6 @@
             </constraints>
             <properties/>
           </component>
-          <component id="290c2" class="javax.swing.JTable" binding="tablaAlistar">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="50"/>
-              </grid>
-            </constraints>
-            <properties/>
-          </component>
           <component id="de66d" class="javax.swing.JButton" binding="alistarBtn">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -100,6 +97,19 @@
               <text value="Lista"/>
             </properties>
           </component>
+          <scrollpane id="d3074">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="772db" class="javax.swing.JTable" binding="alistarTabla">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
         </children>
       </grid>
       <grid id="b2094" binding="despachoEntregada" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -131,14 +141,6 @@
             </constraints>
             <properties/>
           </component>
-          <component id="3c9e" class="javax.swing.JTable" binding="tablaRecetaLista">
-            <constraints>
-              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="50"/>
-              </grid>
-            </constraints>
-            <properties/>
-          </component>
           <component id="beeca" class="javax.swing.JButton" binding="entregarBtn">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -147,6 +149,19 @@
               <text value="Entregar"/>
             </properties>
           </component>
+          <scrollpane id="81aea">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="2c905" class="javax.swing.JTable" binding="entregarTabla">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
         </children>
       </grid>
       <component id="fcc38" class="javax.swing.JLabel">

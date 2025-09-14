@@ -18,6 +18,9 @@ public class DespachoView extends JFrame {
     private JTable tablaAlistar;
     private JTable tablaRecetaLista;
     private JPanel despacho;
+    private JTable alistarTabla;
+    private JTable procesarTabla;
+    private JTable entregarTabla;
 
     public DespachoView() {
         setTitle("Despacho de Recetas");
