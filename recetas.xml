@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<recetas>
+    <receta>
+        <estado>CONFECCIONADA</estado>
+        <fechaConfeccion/>
+        <fechaRetiro/>
+        <id>92f27bd5-bcda-4e7e-80e3-7c4fe7775600</id>
+        <medicamentos>
+            <cantidad>1</cantidad>
+            <descripcion>Amoxicilina</descripcion>
+            <duracionDias>1</duracionDias>
+            <indicaciones>Tomar en la noche</indicaciones>
+            <medicamentoCodigo>102</medicamentoCodigo>
+        </medicamentos>
+        <medicoId>med01</medicoId>
+        <pacienteId>PAC-001</pacienteId>
+    </receta>
+</recetas>
