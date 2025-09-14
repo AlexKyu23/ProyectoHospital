@@ -17,12 +17,12 @@ public class Receta {
     private EstadoReceta estado;
     private List<ItemReceta> medicamentos;
 
-    public Receta() {
+    public Receta(String r1, String p1, LocalDate now, EstadoReceta confeccionada) {
         medicamentos = new ArrayList<>();
         estado = EstadoReceta.CONFECCIONADA;
     }
     public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro, EstadoReceta estado) {
-        this();
+        this("R1", "P1", LocalDate.now(), EstadoReceta.CONFECCIONADA);
         this.id = id;
         this.medicoId = medicoId;
         this.pacienteId = pacienteId;
@@ -32,7 +32,7 @@ public class Receta {
     }
 
     public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro) {
-        this();
+        this("R1", "P1", LocalDate.now(), EstadoReceta.CONFECCIONADA);
         this.id = id;
         this.medicoId = medicoId;
         this.pacienteId = pacienteId;

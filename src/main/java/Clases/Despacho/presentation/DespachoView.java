@@ -37,6 +37,18 @@ public class DespachoView extends JFrame {
 
         add(new JScrollPane(tabla), BorderLayout.CENTER);
         add(botones, BorderLayout.SOUTH);
+
+        tablaIniciar = new JTable();
+        tablaAlistar = new JTable();
+        tablaRecetaLista = new JTable();
+
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.add("Nuevas", new JScrollPane(tablaIniciar));
+        tabs.add("En Proceso", new JScrollPane(tablaAlistar));
+        tabs.add("Listas", new JScrollPane(tablaRecetaLista));
+
+        add(tabs, BorderLayout.CENTER);
+
     }
 
     public JTable getTabla() { return tabla; }
@@ -44,4 +56,11 @@ public class DespachoView extends JFrame {
     public JButton getAlistarBtn() { return alistarBtn; }
     public JButton getEntregarBtn() { return entregarBtn; }
     public JPanel getDespacho() { return despacho; }
+    public JTable getTablaIniciar() { return tablaIniciar; }
+    public JTable getTablaAlistar() { return tablaAlistar; }
+    public JTable getTablaRecetaLista() { return tablaRecetaLista; }
+
+
+
+
 }
