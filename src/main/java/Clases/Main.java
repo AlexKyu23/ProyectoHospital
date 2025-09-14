@@ -24,6 +24,8 @@ import Clases.Paciente.presentation.PacienteModel;
 import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medico.presentation.MedicoModel;
 import Clases.Admin.presentation.AdminView;
+import Clases.Receta.Data.historicoRecetas;
+import Clases.Medicamento.data.catalogoMedicamentos;
 
 import Clases.Usuario.logic.UsuarioService;
 import Clases.Prescribir.data.RepositorioPrescripciones;
@@ -35,6 +37,8 @@ public class Main {
     public static void main(String[] args) {
         // 🔹 Cargar todas las listas desde XML
         DatosIniciales.cargarTodo();
+        historicoRecetas recetas = DatosIniciales.gethistoricoRecetas();
+        catalogoMedicamentos medicamentos = DatosIniciales.getCatalogoMed();
 
         SwingUtilities.invokeLater(() -> {
             JFrame loginFrame = new JFrame("Login");
@@ -75,7 +79,7 @@ public class Main {
                                 medicoModel,
                                 farmaceutaModel,
                                 pacienteModel,
-                                medicamentoModel);
+                                medicamentoModel, recetas, medicamentos);
 
                         adminView.setVisible(true);
 

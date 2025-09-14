@@ -17,7 +17,9 @@ import Clases.Paciente.presentation.PacienteModel;
 import Clases.Paciente.presentation.View.PacienteView;
 
 import Clases.Dashboard.presentation.DashboardView;
+import Clases.Receta.Data.historicoRecetas;
 import Clases.AcercaDe.presentation.AcercaDeView;
+import Clases.Medicamento.data.catalogoMedicamentos;
 
 public class AdminController {
     private AdminModel model;
@@ -32,7 +34,9 @@ public class AdminController {
                            MedicoModel medicoModel,
                            FarmaceutaModel farmModel,
                            PacienteModel pacienteModel,
-                           MedicamentoModel medicamentoModel) {
+                           MedicamentoModel medicamentoModel,
+                           historicoRecetas histRecetas,
+                           catalogoMedicamentos medicamentos) {
         this.model = model;
         this.view = view;
         this.medicoModel = medicoModel;
@@ -40,10 +44,10 @@ public class AdminController {
         this.pacienteModel = pacienteModel;
         this.medicamentoModel = medicamentoModel;
 
-        inicializarTabs();
+        inicializarTabs(histRecetas, medicamentos);
     }
 
-    private void inicializarTabs() {
+    private void inicializarTabs(historicoRecetas histRecetas, catalogoMedicamentos medicamentos) {
         MedicoView medicoView = new MedicoView();
         new MedicoController(medicoModel, medicoView);
         view.getTabbedPane().addTab("Médicos", medicoView.getMainPanel());
@@ -60,8 +64,8 @@ public class AdminController {
         new MedicamentoController(medicamentoModel, medView);
         view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
 
-        //DashboardView dashboardView = new DashboardView();
-        //view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
+        DashboardView dashboardView = new DashboardView(histRecetas ,medicamentos);
+        view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
 
         AcercaDeView acercaDeView = new AcercaDeView();
         view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());

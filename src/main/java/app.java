@@ -37,10 +37,12 @@ import Clases.Farmaceuta.data.ListaFarmaceutas;
 import Clases.Usuario.data.ListaUsuarios;
 import Clases.Prescribir.data.RepositorioPrescripciones;
 import Clases.Usuario.logic.UsuarioService;
+import Clases.Receta.Data.historicoRecetas;
 
 import javax.swing.*;
 
 public class app {
+
     public static void main(String[] args) {
         // 🔹 Crear instancia de Admin
         Admin admin = new Admin("001", "SuperAdmin", "1234");
@@ -82,7 +84,7 @@ public class app {
                 medicoModel,
                 farmaceutaModel,
                 pacienteModel,
-                medicamentoModel);
+                medicamentoModel, new historicoRecetas(), new catalogoMedicamentos());
 
         // 🔹 Mostrar ventana principal
         adminView.setVisible(true);
@@ -104,7 +106,7 @@ public class app {
             }
 
 
-    });
+        });
     }
 }
 

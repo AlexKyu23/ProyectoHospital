@@ -2,6 +2,8 @@ package Clases.Usuario.logic;
 
 import Clases.Usuario.data.ListaUsuarios;
 
+import Listas.XmlPersister;
+
 public class UsuarioService {
     private static UsuarioService instance;
     private ListaUsuarios lista;

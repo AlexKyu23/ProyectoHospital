@@ -10,6 +10,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class XmlPersister {
+    private String path;
+    private static XmlPersister theInstance;
+
+    public XmlPersister(String p) {
+        path = p;
+    }
+
+    public static XmlPersister instance(){
+        if (theInstance == null) {
+            theInstance = new XmlPersister("data.xml");
+        }
+        return theInstance;
+    }
 
     public static <T> void save(T object, File file) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(object.getClass());
