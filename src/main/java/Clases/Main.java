@@ -20,6 +20,10 @@ import Clases.Farmaceuta.presentation.FarmaceutaModel;
 import Clases.Farmaceuta.presentation.View.FarmaceutaView;
 import Clases.Farmaceuta.presentation.FarmaceutaController;
 
+import Clases.Despacho.presentation.DespachoModel;
+import Clases.Despacho.presentation.DespachoView;
+import Clases.Despacho.presentation.DespachoController;
+
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medico.presentation.MedicoModel;
@@ -129,17 +133,17 @@ public class Main {
                             farm = new Farmaceuta(u.getId(), u.getNombre(), u.getClave());
                         }
 
-                        FarmaceutaModel farmModel = new FarmaceutaModel();
-                        farmModel.setCurrent(farm);
+                        DespachoModel despachoModel = new DespachoModel();
+                        despachoModel.setFarmaceuta(farm);
 
-                        FarmaceutaView despachoView = new FarmaceutaView();
-                        new FarmaceutaController(farmModel, despachoView);
+                        DespachoView despachoView = new DespachoView();
+                        new DespachoController(despachoModel, despachoView);
 
                         JFrame despachoFrame = new JFrame("Panel Farmaceuta - Despacho");
                         despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         despachoFrame.setSize(800, 600);
                         despachoFrame.setLocationRelativeTo(null);
-                        despachoFrame.setContentPane(despachoView.getMainPanel());
+                        despachoFrame.setContentPane(despachoView.getDespacho());
                         despachoFrame.setVisible(true);
 
                         despachoFrame.addWindowListener(new java.awt.event.WindowAdapter() {

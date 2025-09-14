@@ -23,6 +23,8 @@ public class LoginView extends JPanel implements PropertyChangeListener {
     private JButton cancelarButton;
     private JButton cambiarClaveButton;
 
+    public LoginView() {}
+
     public void setController(LoginController controller) {
         this.controller = controller;
         initListeners();

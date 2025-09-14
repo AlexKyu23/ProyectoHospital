@@ -17,6 +17,7 @@ public class DespachoView extends JFrame {
     private JTextField idPaciente2;
     private JTable tablaAlistar;
     private JTable tablaRecetaLista;
+    private JPanel despacho;
 
     public DespachoView() {
         setTitle("Despacho de Recetas");
@@ -42,4 +43,5 @@ public class DespachoView extends JFrame {
     public JButton getIniciarBtn() { return iniciarBtn; }
     public JButton getAlistarBtn() { return alistarBtn; }
     public JButton getEntregarBtn() { return entregarBtn; }
+    public JPanel getDespacho() { return despacho; }
 }
