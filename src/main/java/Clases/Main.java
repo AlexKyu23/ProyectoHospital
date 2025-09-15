@@ -31,6 +31,9 @@ import Clases.Receta.Data.RepositorioRecetas;
 import Clases.Medicamento.data.catalogoMedicamentos;
 
 import Clases.Dashboard.presentation.DashboardView;
+import Clases.Receta.Presentation.RecetaModel;
+import Clases.Receta.Presentation.RecetaView;
+import Clases.Receta.Presentation.RecetaHistorialController;
 
 import Clases.Usuario.logic.UsuarioService;
 import Clases.DatosIniciales;
@@ -39,7 +42,6 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        // 🔹 Cargar todas las listas desde XML
         DatosIniciales.cargarTodo();
         RepositorioRecetas recetas = DatosIniciales.getRepositorioRecetas();
         catalogoMedicamentos medicamentos = DatosIniciales.getCatalogoMed();
@@ -61,6 +63,8 @@ public class Main {
                 if (LoginModel.AUTENTICADO.equals(evt.getPropertyName()) && model.isAutenticado()) {
                     Usuario u = model.getCurrent();
                     loginFrame.dispose();
+
+
 
                     if ("ADM".equalsIgnoreCase(u.getRol())) {
                         Admin admin = new Admin(u.getId(), u.getNombre(), u.getClave());
@@ -107,7 +111,6 @@ public class Main {
                         PrescripcionModel prescModel = new PrescripcionModel();
                         prescModel.setMedico(medico);
 
-                        // Crear modelos para pacientes y medicamentos, similar a admin
                         PacienteModel pacienteModel = new PacienteModel();
                         pacienteModel.setList(DatosIniciales.listaPacientes.consulta());
 
@@ -120,15 +123,21 @@ public class Main {
                                 pacienteModel,
                                 medicamentoModel);
 
+                        // 🔹 Histórico de Recetas como tab
+                        RecetaModel recetaModelMed = new RecetaModel();
+                        RecetaView recetaViewMed = new RecetaView();
+                        new RecetaHistorialController(recetaModelMed, recetaViewMed);
+
+                        // 🔹 Crear el contenedor de tabs como en farmacéutico
+                        JTabbedPane tabbedPane = new JTabbedPane();
+                        tabbedPane.addTab("Prescripción", prescView.getPanel());
+                        tabbedPane.addTab("Histórico de Recetas", recetaViewMed.getPanel());
+                        tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
+
                         JFrame prescFrame = new JFrame("Panel Médico");
                         prescFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         prescFrame.setSize(800, 600);
                         prescFrame.setLocationRelativeTo(null);
-
-                        JTabbedPane tabbedPane = new JTabbedPane();
-                        tabbedPane.addTab("Prescripción", prescView.getPanel());
-                        tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
-
                         prescFrame.setContentPane(tabbedPane);
                         prescFrame.setVisible(true);
 
@@ -141,40 +150,51 @@ public class Main {
                             }
                         });
 
-                    } else if ("FAR".equalsIgnoreCase(u.getRol())) {
-                        Farmaceuta farm = DatosIniciales.listaFarmaceutas.busquedaPorId(u.getId());
-                        if (farm == null) {
-                            farm = new Farmaceuta(u.getId(), u.getNombre(), u.getClave());
+
+
+
+
+                }  else if ("FAR".equalsIgnoreCase(u.getRol())) {
+                    Farmaceuta farm = DatosIniciales.listaFarmaceutas.busquedaPorId(u.getId());
+                    if (farm == null) {
+                        farm = new Farmaceuta(u.getId(), u.getNombre(), u.getClave());
+                    }
+
+                    DespachoModel despachoModel = new DespachoModel();
+                    despachoModel.setFarmaceuta(farm);
+
+                    DespachoView despachoView = new DespachoView();
+                    new DespachoController(despachoModel, despachoView, recetas);
+
+                    // 🔹 Histórico de Recetas como tab
+                    RecetaModel recetaModelFar = new RecetaModel();
+                    RecetaView recetaViewFar = new RecetaView();
+                    new RecetaHistorialController(recetaModelFar, recetaViewFar);
+
+                    JTabbedPane tabbedPane = new JTabbedPane();
+                    tabbedPane.addTab("Despacho", despachoView.getDespacho());
+                    tabbedPane.addTab("Histórico de Recetas", recetaViewFar.getPanel());
+                    tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
+
+                    JFrame despachoFrame = new JFrame("Panel Farmacéuta");
+                    despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    despachoFrame.setSize(800, 600);
+                    despachoFrame.setLocationRelativeTo(null);
+                    despachoFrame.setContentPane(tabbedPane);
+                    despachoFrame.setVisible(true);
+
+                    despachoFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                        @Override
+                        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                            UsuarioService.instance().guardar();
+                            RepositorioRecetas.guardar();
+                            System.out.println("✅ Guardado completo al cerrar (farmacéuta).");
                         }
+                    });
 
-                        DespachoModel despachoModel = new DespachoModel();
-                        despachoModel.setFarmaceuta(farm);
 
-                        DespachoView despachoView = new DespachoView();
-                        new DespachoController(despachoModel, despachoView, recetas);
 
-                        JFrame despachoFrame = new JFrame("Panel Farmacéuta");
-                        despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        despachoFrame.setSize(800, 600);
-                        despachoFrame.setLocationRelativeTo(null);
-
-                        JTabbedPane tabbedPane = new JTabbedPane();
-                        tabbedPane.addTab("Despacho", despachoView.getDespacho());
-                        tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
-
-                        despachoFrame.setContentPane(tabbedPane);
-                        despachoFrame.setVisible(true);
-
-                        despachoFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-                            @Override
-                            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                                UsuarioService.instance().guardar();
-                                RepositorioRecetas.guardar();
-                                System.out.println("✅ Guardado completo al cerrar (farmacéuta).");
-                            }
-                        });
-
-                    } else {
+            } else {
                         JOptionPane.showMessageDialog(null, "Rol no reconocido. Acceso denegado.");
                     }
                 }
@@ -182,3 +202,4 @@ public class Main {
         });
     }
 }
+

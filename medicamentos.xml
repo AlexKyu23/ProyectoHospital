@@ -10,4 +10,9 @@
         <descripcion>Antibiótico de amplio espectro</descripcion>
         <nombre>Amoxicilina</nombre>
     </medicamento>
+    <medicamento>
+        <codigo>103</codigo>
+        <descripcion>100ml</descripcion>
+        <nombre>ParacetamoPremium</nombre>
+    </medicamento>
 </catalogoMedicamentos>

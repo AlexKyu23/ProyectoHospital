@@ -10,4 +10,9 @@
         <id>FAR-002</id>
         <nombre>Luis Mora</nombre>
     </farmaceuta>
+    <farmaceuta>
+        <clave>FAR-003</clave>
+        <id>FAR-003</id>
+        <nombre>Jose Jose</nombre>
+    </farmaceuta>
 </listaFarmaceutas>

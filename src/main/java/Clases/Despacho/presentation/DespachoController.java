@@ -18,6 +18,7 @@ public class DespachoController {
     private DefaultTableModel tableModelIniciar;
     private DefaultTableModel tableModelAlistar;
     private DefaultTableModel tableModelLista;
+    private DefaultTableModel tableModelEntregada;
 
     public DespachoController(DespachoModel model, DespachoView view, RepositorioRecetas repositorioRecetas) {
         this.model = model;
@@ -25,15 +26,17 @@ public class DespachoController {
         this.service = new DespachoService();
         this.repositorioRecetas = repositorioRecetas;
 
-        // 🔹 Inicialización de modelos de tabla
+        // Inicialización de modelos de tabla
         tableModelIniciar = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
         tableModelAlistar = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
         tableModelLista = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
+        tableModelEntregada = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
 
-        // 🔹 Asociar modelos a las tablas de la vista
+        // Asociar modelos a las tablas de la vista
         view.getTablaIniciar().setModel(tableModelIniciar);
         view.getTablaAlistar().setModel(tableModelAlistar);
         view.getTablaRecetaLista().setModel(tableModelLista);
+        view.getTablaEntregada().setModel(tableModelEntregada);
 
         cargarRecetas();
         initController();
@@ -43,8 +46,9 @@ public class DespachoController {
         tableModelIniciar.setRowCount(0);
         tableModelAlistar.setRowCount(0);
         tableModelLista.setRowCount(0);
+        tableModelEntregada.setRowCount(0);
 
-        // 🔹 Usar recetas reales desde RepositorioRecetas
+        // Usar recetas reales desde RepositorioRecetas
         model.setRecetas(repositorioRecetas.getRecetas());
 
         for (Receta r : model.getRecetas()) {
@@ -59,6 +63,7 @@ public class DespachoController {
                 case CONFECCIONADA -> tableModelIniciar.addRow(fila);
                 case EN_PROCESO -> tableModelAlistar.addRow(fila);
                 case LISTA -> tableModelLista.addRow(fila);
+                case ENTREGADA -> tableModelEntregada.addRow(fila);
             }
         }
     }
@@ -81,9 +86,20 @@ public class DespachoController {
         tableModelIniciar.setRowCount(0);
         tableModelAlistar.setRowCount(0);
         tableModelLista.setRowCount(0);
+        tableModelEntregada.setRowCount(0);
 
-        List<Receta> recetasFiltradas = service.recetasDisponiblesParaDespacho().stream()
+        List<Receta> recetasFiltradas = model.getRecetas().stream()
                 .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
+                .filter(r -> {
+                    if (r.getEstado() == EstadoReceta.CONFECCIONADA) {
+                        LocalDate hoy = LocalDate.now();
+                        LocalDate retiro = r.getFechaRetiro();
+                        return retiro != null &&
+                                !retiro.isBefore(hoy.minusDays(3)) &&
+                                !retiro.isAfter(hoy.plusDays(3));
+                    }
+                    return true; // Mostrar EN_PROCESO, LISTA, ENTREGADA sin filtro de fecha
+                })
                 .toList();
 
         for (Receta r : recetasFiltradas) {
@@ -98,6 +114,7 @@ public class DespachoController {
                 case CONFECCIONADA -> tableModelIniciar.addRow(fila);
                 case EN_PROCESO -> tableModelAlistar.addRow(fila);
                 case LISTA -> tableModelLista.addRow(fila);
+                case ENTREGADA -> tableModelEntregada.addRow(fila);
             }
         }
 
@@ -110,7 +127,7 @@ public class DespachoController {
         JTable selectedTable = null;
         DefaultTableModel selectedModel = null;
 
-        // Verificar de qué tabla viene la selección
+        // Determinar la tabla seleccionada
         if (view.getTablaIniciar().getSelectedRow() >= 0) {
             selectedTable = view.getTablaIniciar();
             selectedModel = tableModelIniciar;
@@ -128,14 +145,22 @@ public class DespachoController {
         }
 
         int row = selectedTable.getSelectedRow();
-        String recetaId = selectedModel.getValueAt(row, 0).toString(); // 🔹 .toString() evita ClassCastException
+        String recetaId = selectedModel.getValueAt(row, 0).toString();
+        Receta receta = repositorioRecetas.buscarPorId(recetaId);
 
-        // 🔹 Validar flujo correcto de estados
+        // Validar flujo correcto de estados
         try {
             switch (accion) {
                 case "proceso" -> {
                     if (selectedModel == tableModelIniciar) {
-                        service.iniciarDespacho(recetaId);
+                        LocalDate hoy = LocalDate.now();
+                        LocalDate retiro = receta.getFechaRetiro();
+                        if (retiro != null && !retiro.isBefore(hoy.minusDays(3)) && !retiro.isAfter(hoy.plusDays(3))) {
+                            service.iniciarDespacho(recetaId);
+                            view.mostrarDetallesReceta(receta, "Procesar");
+                        } else {
+                            JOptionPane.showMessageDialog(view.getDespacho(), "La fecha de retiro no está dentro de ±3 días.");
+                        }
                     } else {
                         JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas CONFECCIONADAS pueden pasar a PROCESO.");
                     }
@@ -143,6 +168,7 @@ public class DespachoController {
                 case "lista" -> {
                     if (selectedModel == tableModelAlistar) {
                         service.alistarMedicamentos(recetaId);
+                        view.mostrarDetallesReceta(receta, "Alistar");
                     } else {
                         JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas EN PROCESO pueden pasar a LISTA.");
                     }
@@ -150,6 +176,7 @@ public class DespachoController {
                 case "entregada" -> {
                     if (selectedModel == tableModelLista) {
                         service.entregarReceta(recetaId);
+                        view.mostrarDetallesReceta(receta, "Entregar");
                     } else {
                         JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas LISTAS pueden ser ENTREGADAS.");
                     }
@@ -159,7 +186,7 @@ public class DespachoController {
             JOptionPane.showMessageDialog(view.getDespacho(), "Error al cambiar estado: " + e.getMessage());
         }
 
-        // 🔹 Refrescar tablas
+        // Refrescar tablas
         cargarRecetas();
     }
 }

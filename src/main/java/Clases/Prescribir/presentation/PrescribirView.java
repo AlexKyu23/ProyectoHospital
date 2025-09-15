@@ -17,6 +17,7 @@ public class PrescribirView {
     private JButton detallesButton;
     private DatePicker Calendario;
 
+
     public PrescribirView() {
         createUIComponents();
     }

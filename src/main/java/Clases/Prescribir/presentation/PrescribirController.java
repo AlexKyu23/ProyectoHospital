@@ -4,6 +4,9 @@ import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medicamento.presentation.MedicamentoView;
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Paciente.presentation.View.PacienteView;
+import Clases.Receta.Presentation.RecetaHistorialController;
+import Clases.Receta.Presentation.RecetaModel;
+import Clases.Receta.Presentation.RecetaView;
 import Clases.Receta.logic.ItemReceta;
 import Clases.Receta.logic.Receta;
 import Clases.Receta.logic.EstadoReceta;
@@ -15,7 +18,6 @@ import Clases.Medicamento.logic.Medicamento;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class PrescribirController {
     private PrescribirView view;
@@ -39,6 +41,7 @@ public class PrescribirController {
         view.getMedicamentosPreenscritos().setModel(tableModel);
 
         initController();
+
     }
 
     private void initController() {
@@ -53,20 +56,13 @@ public class PrescribirController {
         PacienteView selectorView = new PacienteView();
         selectorView.setModel(pacienteModel);
 
-        // Crear un panel combinado para busqueda y listado
-        JPanel combinedPanel = new JPanel();
-        combinedPanel.setLayout(new java.awt.BorderLayout());
-        combinedPanel.add(selectorView.getBusqueda(), java.awt.BorderLayout.NORTH);
-        combinedPanel.add(selectorView.getListado(), java.awt.BorderLayout.CENTER);
-
         JFrame selectorFrame = new JFrame("Buscar Paciente");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         selectorFrame.setSize(600, 400);
         selectorFrame.setLocationRelativeTo(view.getPanel());
-        selectorFrame.setContentPane(combinedPanel);
+        selectorFrame.setContentPane(selectorView.getListado());
         selectorFrame.setVisible(true);
 
-        // Configurar el botón de búsqueda del panel busqueda
         selectorView.getBuscarButton().addActionListener(e -> {
             String nombreBusqueda = selectorView.getNombreBuscar().getText().toLowerCase();
 
@@ -78,7 +74,6 @@ public class PrescribirController {
             selectorView.setModel(filteredModel);
         });
 
-        // Selección de paciente desde la tabla
         selectorView.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
             int fila = selectorView.getTablaPacientes().getSelectedRow();
             if (fila >= 0 && pacienteModel.getList().size() > fila) {
@@ -94,20 +89,13 @@ public class PrescribirController {
         MedicamentoView selectorView = new MedicamentoView();
         selectorView.setModel(medicamentoModel);
 
-        // Crear un panel combinado para busqueda y listado
-        JPanel combinedPanel = new JPanel();
-        combinedPanel.setLayout(new java.awt.BorderLayout());
-        combinedPanel.add(selectorView.getBusqueda(), java.awt.BorderLayout.NORTH);
-        combinedPanel.add(selectorView.getListado(), java.awt.BorderLayout.CENTER);
-
         JFrame selectorFrame = new JFrame("Buscar Medicamento");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         selectorFrame.setSize(600, 400);
         selectorFrame.setLocationRelativeTo(view.getPanel());
-        selectorFrame.setContentPane(combinedPanel);
+        selectorFrame.setContentPane(selectorView.getListado());
         selectorFrame.setVisible(true);
 
-        // Configurar el botón de búsqueda del panel busqueda
         selectorView.getBuscarButton().addActionListener(e -> {
             String nombreBusqueda = selectorView.getNombreBuscar().getText().toLowerCase();
             String codigoBusqueda = selectorView.getCodigoBuscar().getText();
@@ -122,7 +110,6 @@ public class PrescribirController {
             selectorView.setModel(filteredModel);
         });
 
-        // Selección de medicamento desde la tabla
         selectorView.getTablaMedicamentos().getSelectionModel().addListSelectionListener(e -> {
             int fila = selectorView.getTablaMedicamentos().getSelectedRow();
             if (fila >= 0 && medicamentoModel.getList().size() > fila) {
@@ -188,7 +175,10 @@ public class PrescribirController {
             return;
         }
 
-        String recetaId = UUID.randomUUID().toString();
+        // Generar ID secuencial como "R001", "R002", etc.
+        int numRecetas = RecetaService.instance().findAll().size() + 1;
+        String recetaId = "R" + String.format("%03d", numRecetas);
+
         Receta receta = new Receta(
                 recetaId,
                 model.getMedico().getId(),

@@ -18,6 +18,9 @@ import Clases.Paciente.presentation.View.PacienteView;
 
 import Clases.Dashboard.presentation.DashboardView;
 import Clases.Receta.Data.RepositorioRecetas;
+import Clases.Receta.Presentation.RecetaModel;
+import Clases.Receta.Presentation.RecetaView;
+import Clases.Receta.Presentation.RecetaHistorialController;
 import Clases.AcercaDe.presentation.AcercaDeView;
 import Clases.Medicamento.data.catalogoMedicamentos;
 
@@ -44,9 +47,7 @@ public class AdminController {
         this.pacienteModel = pacienteModel;
         this.medicamentoModel = medicamentoModel;
 
-        // Cargar recetas desde el archivo XML al iniciar
         RepositorioRecetas.cargar();
-
         inicializarTabs(repositorioRecetas, medicamentos);
     }
 
@@ -70,8 +71,14 @@ public class AdminController {
         DashboardView dashboardView = new DashboardView(repositorioRecetas, medicamentos);
         view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
 
-       // AcercaDeView acercaDeView = new AcercaDeView();
-       // view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());
+        // 🔹 Histórico de Recetas como tab
+        RecetaModel recetaModel = new RecetaModel();
+        RecetaView recetaView = new RecetaView();
+        new RecetaHistorialController(recetaModel, recetaView);
+        view.getTabbedPane().addTab("Histórico de Recetas", recetaView.getPanel());
+
+        // AcercaDeView acercaDeView = new AcercaDeView();
+        // view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());
 
         view.getTabbedPane().setSelectedIndex(0);
     }

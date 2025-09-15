@@ -13,7 +13,7 @@
         <rol>FAR</rol>
     </usuario>
     <usuario>
-        <clave>admin</clave>
+        <clave>1</clave>
         <id>adm01</id>
         <nombre>Administrador</nombre>
         <rol>ADM</rol>
@@ -23,5 +23,11 @@
         <id>MED-003</id>
         <nombre>Dr. Mouse</nombre>
         <rol>MED</rol>
+    </usuario>
+    <usuario>
+        <clave>FAR-003</clave>
+        <id>FAR-003</id>
+        <nombre>Jose Jose</nombre>
+        <rol>FAR</rol>
     </usuario>
 </listaUsuarios>

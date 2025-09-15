@@ -21,6 +21,15 @@ public class RepositorioRecetas {
         return recetas;
     }
 
+    public static Receta buscarPorId(String id) {
+        for (Receta receta : recetas) {
+            if (receta.getId().equals(id)) {
+                return receta;
+            }
+        }
+        return null; // Retorna null si no se encuentra la receta
+    }
+
     public static void guardar() {
         try {
             JAXBContext context = JAXBContext.newInstance(RecetasWrapper.class, Receta.class, ItemReceta.class);
