@@ -70,8 +70,8 @@ public class AdminController {
         DashboardView dashboardView = new DashboardView(repositorioRecetas, medicamentos);
         view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
 
-        AcercaDeView acercaDeView = new AcercaDeView();
-        view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());
+       // AcercaDeView acercaDeView = new AcercaDeView();
+       // view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());
 
         view.getTabbedPane().setSelectedIndex(0);
     }

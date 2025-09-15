@@ -1,8 +1,8 @@
 package Clases.Dashboard.logic;
 
-import Clases.Medicamento.data.catalogoMedicamentos;
-import Clases.Medicamento.logic.Medicamento;
-
+import Clases.Receta.Data.RepositorioRecetas;
+import Clases.Receta.logic.Receta;
+import Clases.Receta.logic.ItemReceta;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -10,28 +10,37 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
-import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class LineChart_AWT {
 
-    public static JPanel getChartPanel(catalogoMedicamentos catalogo) {
+    public static JPanel getChartPanel(RepositorioRecetas repositorio, String selectedMed, LocalDate start, LocalDate end) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        Map<String, Integer> conteoPorAño = new TreeMap<>();
-       for (Medicamento m : catalogo.consulta()) {
-           // String año = m.getFechaReceta().substring(0, 4); // Ajusta según formato
-           // conteoPorAño.put(año, conteoPorAño.getOrDefault(año, 0) + 1);
+        Map<String, Integer> conteoPorMes = new TreeMap<>();
+        for (Receta r : repositorio.getRecetas()) {
+            LocalDate fecha = r.getFechaConfeccion();
+            if (fecha != null && !fecha.isBefore(start) && !fecha.isAfter(end)) {
+                String mesAno = fecha.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+                for (ItemReceta item : r.getMedicamentos()) {
+                    if (selectedMed == null || "Todos".equals(selectedMed) || item.getDescripcion().equals(selectedMed)) {
+                        int current = conteoPorMes.getOrDefault(mesAno, 0);
+                        conteoPorMes.put(mesAno, current + item.getCantidad());
+                    }
+                }
+            }
         }
 
-        for (Map.Entry<String, Integer> entry : conteoPorAño.entrySet()) {
-            dataset.addValue(entry.getValue(), "Medicamentos", entry.getKey());
+        for (Map.Entry<String, Integer> entry : conteoPorMes.entrySet()) {
+            dataset.addValue(entry.getValue(), "Cantidad", entry.getKey());
         }
 
         JFreeChart chart = ChartFactory.createLineChart(
-                "Medicamentos Recetados por Año",
-                "Año", "Cantidad",
+                "Cantidad de Medicamentos Prescritos por Mes",
+                "Mes", "Cantidad",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true, true, false
@@ -39,26 +48,4 @@ public class LineChart_AWT {
 
         return new ChartPanel(chart);
     }
-
-    /*public static Component getChartPanel() {                                 //Datos quemados para probar
-        JFreeChart lineChart = ChartFactory.createLineChart(
-                "Medicamentos recetados por meses",
-                "Mes", "Cantidad",
-                createDataset(),
-                PlotOrientation.VERTICAL,
-                true, true, false
-        );
-        return new ChartPanel(lineChart);
-    }
-
-    private static DefaultCategoryDataset createDataset() {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(15, "schools", "1970");
-        dataset.addValue(30, "schools", "1980");
-        dataset.addValue(60, "schools", "1990");
-        dataset.addValue(120, "schools", "2000");
-        dataset.addValue(240, "schools", "2010");
-        dataset.addValue(300, "schools", "2014");
-        return dataset;
-    }*/
 }

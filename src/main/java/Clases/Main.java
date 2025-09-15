@@ -30,6 +30,8 @@ import Clases.Medico.presentation.MedicoModel;
 import Clases.Receta.Data.RepositorioRecetas;
 import Clases.Medicamento.data.catalogoMedicamentos;
 
+import Clases.Dashboard.presentation.DashboardView;
+
 import Clases.Usuario.logic.UsuarioService;
 import Clases.DatosIniciales;
 
@@ -118,11 +120,16 @@ public class Main {
                                 pacienteModel,
                                 medicamentoModel);
 
-                        JFrame prescFrame = new JFrame("Panel Médico - Prescripción");
+                        JFrame prescFrame = new JFrame("Panel Médico");
                         prescFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         prescFrame.setSize(800, 600);
                         prescFrame.setLocationRelativeTo(null);
-                        prescFrame.setContentPane(prescView.getPanel());
+
+                        JTabbedPane tabbedPane = new JTabbedPane();
+                        tabbedPane.addTab("Prescripción", prescView.getPanel());
+                        tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
+
+                        prescFrame.setContentPane(tabbedPane);
                         prescFrame.setVisible(true);
 
                         prescFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -146,11 +153,16 @@ public class Main {
                         DespachoView despachoView = new DespachoView();
                         new DespachoController(despachoModel, despachoView, recetas);
 
-                        JFrame despachoFrame = new JFrame("Panel Farmacéuta - Despacho");
+                        JFrame despachoFrame = new JFrame("Panel Farmacéuta");
                         despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         despachoFrame.setSize(800, 600);
                         despachoFrame.setLocationRelativeTo(null);
-                        despachoFrame.setContentPane(despachoView.getDespacho());
+
+                        JTabbedPane tabbedPane = new JTabbedPane();
+                        tabbedPane.addTab("Despacho", despachoView.getDespacho());
+                        tabbedPane.addTab("Dashboard", new DashboardView(recetas, medicamentos).getDashboard());
+
+                        despachoFrame.setContentPane(tabbedPane);
                         despachoFrame.setVisible(true);
 
                         despachoFrame.addWindowListener(new java.awt.event.WindowAdapter() {

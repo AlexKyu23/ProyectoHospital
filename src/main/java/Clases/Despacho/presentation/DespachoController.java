@@ -8,6 +8,7 @@ import Clases.Receta.logic.Receta;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
+import java.util.List;
 
 public class DespachoController {
     private DespachoModel model;
@@ -63,9 +64,46 @@ public class DespachoController {
     }
 
     private void initController() {
+        view.getBuscarButton().addActionListener(e -> buscarPorPaciente());
         view.getIniciarBtn().addActionListener(e -> cambiarEstado("proceso"));
         view.getAlistarBtn().addActionListener(e -> cambiarEstado("lista"));
         view.getEntregarBtn().addActionListener(e -> cambiarEstado("entregada"));
+    }
+
+    private void buscarPorPaciente() {
+        String pacienteId = view.getIdPacienteBuscar().getText().trim();
+        if (pacienteId.isEmpty()) {
+            JOptionPane.showMessageDialog(view.getDespacho(), "Ingrese el ID del paciente");
+            return;
+        }
+
+        // Filtrar recetas por ID de paciente
+        tableModelIniciar.setRowCount(0);
+        tableModelAlistar.setRowCount(0);
+        tableModelLista.setRowCount(0);
+
+        List<Receta> recetasFiltradas = service.recetasDisponiblesParaDespacho().stream()
+                .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
+                .toList();
+
+        for (Receta r : recetasFiltradas) {
+            Object[] fila = {
+                    r.getId(),
+                    r.getPacienteId(),
+                    r.getFechaRetiro(),
+                    r.getEstado()
+            };
+
+            switch (r.getEstado()) {
+                case CONFECCIONADA -> tableModelIniciar.addRow(fila);
+                case EN_PROCESO -> tableModelAlistar.addRow(fila);
+                case LISTA -> tableModelLista.addRow(fila);
+            }
+        }
+
+        if (recetasFiltradas.isEmpty()) {
+            JOptionPane.showMessageDialog(view.getDespacho(), "No se encontraron recetas para este paciente en el rango de fechas válido");
+        }
     }
 
     private void cambiarEstado(String accion) {
@@ -125,4 +163,3 @@ public class DespachoController {
         cargarRecetas();
     }
 }
-

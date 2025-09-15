@@ -11,16 +11,18 @@ public class DespachoView extends JFrame {
     private JPanel despachoEnProceso;
     private JPanel despachoLista;
     private JPanel despachoEntregada;
-    private JTextField idPaciente1;
-    private JTextField idPaciente3;
+    private JTextField idPacienteBuscar;
+    private JButton buscarButton;
     private JTable tablaIniciar;
-    private JTextField idPaciente2;
     private JTable tablaAlistar;
     private JTable tablaRecetaLista;
     private JPanel despacho;
     private JTable alistarTabla;
     private JTable procesarTabla;
     private JTable entregarTabla;
+    private JTextField idPaciente1;
+    private JTextField idPaciente2;
+    private JTextField idPaciente3;
 
     public DespachoView() {
         setTitle("Despacho de Recetas");
@@ -32,13 +34,20 @@ public class DespachoView extends JFrame {
         iniciarBtn = new JButton("Iniciar despacho");
         alistarBtn = new JButton("Alistar medicamentos");
         entregarBtn = new JButton("Entregar receta");
+        idPacienteBuscar = new JTextField(20);
+        buscarButton = new JButton("Buscar por Paciente");
 
         JPanel botones = new JPanel();
         botones.add(iniciarBtn);
         botones.add(alistarBtn);
         botones.add(entregarBtn);
 
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
+        JPanel busquedaPanel = new JPanel();
+        busquedaPanel.add(new JLabel("ID Paciente:"));
+        busquedaPanel.add(idPacienteBuscar);
+        busquedaPanel.add(buscarButton);
+
+        add(busquedaPanel, BorderLayout.NORTH);
         add(botones, BorderLayout.SOUTH);
 
         tablaIniciar = new JTable();
@@ -51,7 +60,6 @@ public class DespachoView extends JFrame {
         tabs.add("Listas", new JScrollPane(tablaRecetaLista));
 
         add(tabs, BorderLayout.CENTER);
-
     }
 
     public JTable getTabla() { return tabla; }
@@ -62,8 +70,6 @@ public class DespachoView extends JFrame {
     public JTable getTablaIniciar() { return tablaIniciar; }
     public JTable getTablaAlistar() { return tablaAlistar; }
     public JTable getTablaRecetaLista() { return tablaRecetaLista; }
-
-
-
-
+    public JTextField getIdPacienteBuscar() { return idPacienteBuscar; }
+    public JButton getBuscarButton() { return buscarButton; }
 }

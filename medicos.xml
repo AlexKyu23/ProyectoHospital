@@ -14,8 +14,8 @@
     </medico>
     <medico>
         <clave>MED-003</clave>
-        <especialidad>ratas</especialidad>
+        <especialidad>Gachas</especialidad>
         <id>MED-003</id>
-        <nombre>Dr. Mouse</nombre>
+        <nombre>Hoyoverse</nombre>
     </medico>
 </listaMedicos>
