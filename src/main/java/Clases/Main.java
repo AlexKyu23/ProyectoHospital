@@ -105,11 +105,18 @@ public class Main {
                         PrescripcionModel prescModel = new PrescripcionModel();
                         prescModel.setMedico(medico);
 
+                        // Crear modelos para pacientes y medicamentos, similar a admin
+                        PacienteModel pacienteModel = new PacienteModel();
+                        pacienteModel.setList(DatosIniciales.listaPacientes.consulta());
+
+                        MedicamentoModel medicamentoModel = new MedicamentoModel();
+                        medicamentoModel.setList(DatosIniciales.catalogoMed.consulta());
+
                         PrescribirView prescView = new PrescribirView();
                         new PrescribirController(prescView, prescModel,
                                 medico,
-                                DatosIniciales.listaPacientes,
-                                DatosIniciales.catalogoMed);
+                                pacienteModel,
+                                medicamentoModel);
 
                         JFrame prescFrame = new JFrame("Panel Médico - Prescripción");
                         prescFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

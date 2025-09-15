@@ -1,9 +1,7 @@
 package Clases.Prescribir.presentation;
 
-import Clases.Medicamento.data.catalogoMedicamentos;
 import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medicamento.presentation.MedicamentoView;
-import Clases.Paciente.data.ListaPacientes;
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Paciente.presentation.View.PacienteView;
 import Clases.Receta.logic.ItemReceta;
@@ -24,17 +22,17 @@ public class PrescribirController {
     private PrescripcionModel model;
     private DefaultTableModel tableModel;
     private Medico medicoEnSesion;
-    private ListaPacientes listaPacientes;
-    private catalogoMedicamentos catalogoMed;
+    private PacienteModel pacienteModel;
+    private MedicamentoModel medicamentoModel;
 
     public PrescribirController(PrescribirView view, PrescripcionModel model,
-                                Medico medicoEnSesion, ListaPacientes listaPacientes,
-                                catalogoMedicamentos catalogoMed) {
+                                Medico medicoEnSesion, PacienteModel pacienteModel,
+                                MedicamentoModel medicamentoModel) {
         this.view = view;
         this.model = model;
         this.medicoEnSesion = medicoEnSesion;
-        this.listaPacientes = listaPacientes;
-        this.catalogoMed = catalogoMed;
+        this.pacienteModel = pacienteModel;
+        this.medicamentoModel = medicamentoModel;
 
         model.setMedico(medicoEnSesion);
         tableModel = new DefaultTableModel(new Object[]{"Medicamento", "Cantidad", "Indicaciones", "Duración"}, 0);
@@ -52,26 +50,39 @@ public class PrescribirController {
     }
 
     private void buscarPaciente() {
-        PacienteModel selectorModel = new PacienteModel();
-        selectorModel.setList(listaPacientes.consulta().stream()
-                .filter(p -> p.getNombre().toLowerCase().contains(view.getNombrePacienteLabel().getText().toLowerCase())
-                        || p.getId().toLowerCase().contains(view.getNombrePacienteLabel().getText().toLowerCase()))
-                .toList()); // Búsqueda aproximada
-
         PacienteView selectorView = new PacienteView();
-        selectorView.setModel(selectorModel);
+        selectorView.setModel(pacienteModel);
+
+        // Crear un panel combinado para busqueda y listado
+        JPanel combinedPanel = new JPanel();
+        combinedPanel.setLayout(new java.awt.BorderLayout());
+        combinedPanel.add(selectorView.getBusqueda(), java.awt.BorderLayout.NORTH);
+        combinedPanel.add(selectorView.getListado(), java.awt.BorderLayout.CENTER);
 
         JFrame selectorFrame = new JFrame("Buscar Paciente");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         selectorFrame.setSize(600, 400);
         selectorFrame.setLocationRelativeTo(view.getPanel());
-        selectorFrame.setContentPane(selectorView.getMainPanel());
+        selectorFrame.setContentPane(combinedPanel);
         selectorFrame.setVisible(true);
 
+        // Configurar el botón de búsqueda del panel busqueda
+        selectorView.getBuscarButton().addActionListener(e -> {
+            String nombreBusqueda = selectorView.getNombreBuscar().getText().toLowerCase();
+
+
+            PacienteModel filteredModel = new PacienteModel();
+            filteredModel.setList(pacienteModel.getList().stream()
+                    .filter(p -> (nombreBusqueda.isEmpty() || p.getNombre().toLowerCase().contains(nombreBusqueda)))
+                    .toList());
+            selectorView.setModel(filteredModel);
+        });
+
+        // Selección de paciente desde la tabla
         selectorView.getTablaPacientes().getSelectionModel().addListSelectionListener(e -> {
             int fila = selectorView.getTablaPacientes().getSelectedRow();
-            if (fila >= 0 && selectorModel.getList().size() > fila) {
-                Paciente seleccionado = selectorModel.getList().get(fila);
+            if (fila >= 0 && pacienteModel.getList().size() > fila) {
+                Paciente seleccionado = pacienteModel.getList().get(fila);
                 model.setPaciente(seleccionado);
                 view.getNombrePacienteLabel().setText("Paciente: " + seleccionado.getNombre());
                 selectorFrame.dispose();
@@ -80,27 +91,42 @@ public class PrescribirController {
     }
 
     private void agregarMedicamento() {
-        String busqueda = JOptionPane.showInputDialog("Buscar medicamento (nombre o código):");
-        MedicamentoModel selectorModel = new MedicamentoModel();
-        selectorModel.setList(catalogoMed.consulta().stream()
-                .filter(m -> m.getNombre().toLowerCase().contains(busqueda.toLowerCase())
-                        || String.valueOf(m.getCodigo()).contains(busqueda))
-                .toList()); // Búsqueda aproximada
-
         MedicamentoView selectorView = new MedicamentoView();
-        selectorView.setModel(selectorModel);
+        selectorView.setModel(medicamentoModel);
+
+        // Crear un panel combinado para busqueda y listado
+        JPanel combinedPanel = new JPanel();
+        combinedPanel.setLayout(new java.awt.BorderLayout());
+        combinedPanel.add(selectorView.getBusqueda(), java.awt.BorderLayout.NORTH);
+        combinedPanel.add(selectorView.getListado(), java.awt.BorderLayout.CENTER);
 
         JFrame selectorFrame = new JFrame("Buscar Medicamento");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         selectorFrame.setSize(600, 400);
         selectorFrame.setLocationRelativeTo(view.getPanel());
-        selectorFrame.setContentPane(selectorView.getMainPanel());
+        selectorFrame.setContentPane(combinedPanel);
         selectorFrame.setVisible(true);
 
+        // Configurar el botón de búsqueda del panel busqueda
+        selectorView.getBuscarButton().addActionListener(e -> {
+            String nombreBusqueda = selectorView.getNombreBuscar().getText().toLowerCase();
+            String codigoBusqueda = selectorView.getCodigoBuscar().getText();
+            String descripcionBusqueda = selectorView.getDescripcionBuscar().getText().toLowerCase();
+
+            MedicamentoModel filteredModel = new MedicamentoModel();
+            filteredModel.setList(medicamentoModel.getList().stream()
+                    .filter(m -> (nombreBusqueda.isEmpty() || m.getNombre().toLowerCase().contains(nombreBusqueda))
+                            && (codigoBusqueda.isEmpty() || String.valueOf(m.getCodigo()).contains(codigoBusqueda))
+                            && (descripcionBusqueda.isEmpty() || m.getDescripcion().toLowerCase().contains(descripcionBusqueda)))
+                    .toList());
+            selectorView.setModel(filteredModel);
+        });
+
+        // Selección de medicamento desde la tabla
         selectorView.getTablaMedicamentos().getSelectionModel().addListSelectionListener(e -> {
             int fila = selectorView.getTablaMedicamentos().getSelectedRow();
-            if (fila >= 0 && selectorModel.getList().size() > fila) {
-                Medicamento seleccionado = selectorModel.getList().get(fila);
+            if (fila >= 0 && medicamentoModel.getList().size() > fila) {
+                Medicamento seleccionado = medicamentoModel.getList().get(fila);
                 selectorFrame.dispose();
 
                 try {
@@ -174,6 +200,10 @@ public class PrescribirController {
 
         try {
             RecetaService.instance().create(receta);
+            System.out.println("✅ Prescripción guardada correctamente: ID=" + recetaId +
+                    ", Médico=" + model.getMedico().getNombre() +
+                    ", Paciente=" + model.getPaciente().getNombre() +
+                    ", Fecha de retiro=" + fechaSeleccionada);
             JOptionPane.showMessageDialog(view.getPanel(),
                     "Receta guardada.\nMédico: " + model.getMedico().getNombre() +
                             "\nPaciente: " + model.getPaciente().getNombre() +
@@ -185,4 +215,3 @@ public class PrescribirController {
         }
     }
 }
-

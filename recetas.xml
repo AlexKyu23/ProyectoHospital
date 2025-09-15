@@ -13,4 +13,28 @@
         <medicoId>med01</medicoId>
         <pacienteId>PAC-001</pacienteId>
     </receta>
+    <receta>
+        <estado>CONFECCIONADA</estado>
+        <fechaConfeccion>2025-09-14</fechaConfeccion>
+        <fechaRetiro>2025-09-14</fechaRetiro>
+        <id>7052854f-c121-4439-b7bb-f6094ab13740</id>
+        <medicoId>med01</medicoId>
+        <pacienteId>PAC-001</pacienteId>
+    </receta>
+    <receta>
+        <estado>CONFECCIONADA</estado>
+        <fechaConfeccion>2025-09-14</fechaConfeccion>
+        <fechaRetiro>2025-09-14</fechaRetiro>
+        <id>37fdf90b-3584-479e-a30e-2641c54cb8b8</id>
+        <medicoId>med01</medicoId>
+        <pacienteId>PAC-002</pacienteId>
+    </receta>
+    <receta>
+        <estado>CONFECCIONADA</estado>
+        <fechaConfeccion>2025-09-14</fechaConfeccion>
+        <fechaRetiro>2025-09-14</fechaRetiro>
+        <id>af45b61f-23d9-4217-8e26-cadd358acece</id>
+        <medicoId>med01</medicoId>
+        <pacienteId>PAC-001</pacienteId>
+    </receta>
 </recetas>

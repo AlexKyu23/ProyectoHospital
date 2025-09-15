@@ -1,9 +1,6 @@
 package Clases.Medicamento.presentation;
 
 import Clases.Medicamento.logic.Medicamento;
-import Clases.Medicamento.presentation.MedicamentoController;
-import Clases.Medicamento.presentation.MedicamentoModel;
-import Clases.Medicamento.presentation.MedicamentoTableModel;
 
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
@@ -17,7 +14,7 @@ public class MedicamentoView extends JPanel implements PropertyChangeListener {
     private JPanel todo;
     private JPanel Medicamentos;
     private JPanel Busqueda;
-    private JPanel Listado;
+    private JPanel listado;
     private JTextField codigo;
     private JTextField nombre;
     private JTextField descripcion;
@@ -35,13 +32,13 @@ public class MedicamentoView extends JPanel implements PropertyChangeListener {
         return Busqueda;
     }
     public JPanel getListado() {
-        return Listado;
+        return listado;
     }
     public void setBusqueda(JPanel Busqueda) {
         this.Busqueda = Busqueda;
     }
     public void setListado(JPanel Listado) {
-        this.Listado = Listado;
+        this.listado = Listado;
     }
 
 
