@@ -17,7 +17,7 @@ import Clases.Paciente.presentation.PacienteModel;
 import Clases.Paciente.presentation.View.PacienteView;
 
 import Clases.Dashboard.presentation.DashboardView;
-import Clases.Receta.Data.historicoRecetas;
+import Clases.Receta.Data.RepositorioRecetas;
 import Clases.AcercaDe.presentation.AcercaDeView;
 import Clases.Medicamento.data.catalogoMedicamentos;
 
@@ -35,7 +35,7 @@ public class AdminController {
                            FarmaceutaModel farmModel,
                            PacienteModel pacienteModel,
                            MedicamentoModel medicamentoModel,
-                           historicoRecetas histRecetas,
+                           RepositorioRecetas repositorioRecetas,
                            catalogoMedicamentos medicamentos) {
         this.model = model;
         this.view = view;
@@ -44,17 +44,20 @@ public class AdminController {
         this.pacienteModel = pacienteModel;
         this.medicamentoModel = medicamentoModel;
 
-        inicializarTabs(histRecetas, medicamentos);
+        // Cargar recetas desde el archivo XML al iniciar
+        RepositorioRecetas.cargar();
+
+        inicializarTabs(repositorioRecetas, medicamentos);
     }
 
-    private void inicializarTabs(historicoRecetas histRecetas, catalogoMedicamentos medicamentos) {
+    private void inicializarTabs(RepositorioRecetas repositorioRecetas, catalogoMedicamentos medicamentos) {
         MedicoView medicoView = new MedicoView();
         new MedicoController(medicoModel, medicoView);
         view.getTabbedPane().addTab("Médicos", medicoView.getMainPanel());
 
         FarmaceutaView farmView = new FarmaceutaView();
         new FarmaceutaController(farmModel, farmView);
-        view.getTabbedPane().addTab("Farmaceutas", farmView.getMainPanel());
+        view.getTabbedPane().addTab("Farmacéuticos", farmView.getMainPanel());
 
         PacienteView pacienteView = new PacienteView();
         new PacienteController(pacienteModel, pacienteView);
@@ -64,7 +67,7 @@ public class AdminController {
         new MedicamentoController(medicamentoModel, medView);
         view.getTabbedPane().addTab("Medicamentos", medView.getMainPanel());
 
-        DashboardView dashboardView = new DashboardView(histRecetas ,medicamentos);
+        DashboardView dashboardView = new DashboardView(repositorioRecetas, medicamentos);
         view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
 
         AcercaDeView acercaDeView = new AcercaDeView();

@@ -1,29 +1,28 @@
 package Clases.Despacho.presentation;
 
 import Clases.Despacho.logic.DespachoService;
+import Clases.Receta.Data.RepositorioRecetas;
 import Clases.Receta.logic.EstadoReceta;
 import Clases.Receta.logic.Receta;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DespachoController {
     private DespachoModel model;
     private DespachoView view;
     private DespachoService service;
-    private DefaultTableModel tableModel;
-
+    private RepositorioRecetas repositorioRecetas;
     private DefaultTableModel tableModelIniciar;
     private DefaultTableModel tableModelAlistar;
     private DefaultTableModel tableModelLista;
 
-    public DespachoController(DespachoModel model, DespachoView view) {
+    public DespachoController(DespachoModel model, DespachoView view, RepositorioRecetas repositorioRecetas) {
         this.model = model;
         this.view = view;
         this.service = new DespachoService();
+        this.repositorioRecetas = repositorioRecetas;
 
         // 🔹 Inicialización de modelos de tabla
         tableModelIniciar = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
@@ -44,8 +43,8 @@ public class DespachoController {
         tableModelAlistar.setRowCount(0);
         tableModelLista.setRowCount(0);
 
-        // 🔹 Usar recetas dummy del mismo controller para prueba
-        model.setRecetas(recetasDisponiblesParaDespacho());
+        // 🔹 Usar recetas reales desde RepositorioRecetas
+        model.setRecetas(repositorioRecetas.getRecetas());
 
         for (Receta r : model.getRecetas()) {
             Object[] fila = {
@@ -62,6 +61,7 @@ public class DespachoController {
             }
         }
     }
+
     private void initController() {
         view.getIniciarBtn().addActionListener(e -> cambiarEstado("proceso"));
         view.getAlistarBtn().addActionListener(e -> cambiarEstado("lista"));
@@ -85,50 +85,44 @@ public class DespachoController {
         }
 
         if (selectedTable == null) {
-            JOptionPane.showMessageDialog(view, "Seleccione una receta primero.");
+            JOptionPane.showMessageDialog(view.getDespacho(), "Seleccione una receta primero.");
             return;
         }
+
         int row = selectedTable.getSelectedRow();
         String recetaId = selectedModel.getValueAt(row, 0).toString(); // 🔹 .toString() evita ClassCastException
 
         // 🔹 Validar flujo correcto de estados
-        switch (accion) {
-            case "proceso" -> {
-                if (selectedModel == tableModelIniciar) {
-                    service.iniciarDespacho(recetaId);
-                } else {
-                    JOptionPane.showMessageDialog(view, "Solo recetas CONFECCIONADAS pueden pasar a PROCESO.");
+        try {
+            switch (accion) {
+                case "proceso" -> {
+                    if (selectedModel == tableModelIniciar) {
+                        service.iniciarDespacho(recetaId);
+                    } else {
+                        JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas CONFECCIONADAS pueden pasar a PROCESO.");
+                    }
+                }
+                case "lista" -> {
+                    if (selectedModel == tableModelAlistar) {
+                        service.alistarMedicamentos(recetaId);
+                    } else {
+                        JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas EN PROCESO pueden pasar a LISTA.");
+                    }
+                }
+                case "entregada" -> {
+                    if (selectedModel == tableModelLista) {
+                        service.entregarReceta(recetaId);
+                    } else {
+                        JOptionPane.showMessageDialog(view.getDespacho(), "Solo recetas LISTAS pueden ser ENTREGADAS.");
+                    }
                 }
             }
-            case "lista" -> {
-                if (selectedModel == tableModelAlistar) {
-                    service.alistarMedicamentos(recetaId);
-                } else {
-                    JOptionPane.showMessageDialog(view, "Solo recetas EN PROCESO pueden pasar a LISTA.");
-                }
-            }
-            case "entregada" -> {
-                if (selectedModel == tableModelLista) {
-                    service.entregarReceta(recetaId);
-                } else {
-                    JOptionPane.showMessageDialog(view, "Solo recetas LISTAS pueden ser ENTREGADAS.");
-                }
-            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(view.getDespacho(), "Error al cambiar estado: " + e.getMessage());
         }
 
         // 🔹 Refrescar tablas
         cargarRecetas();
     }
-    public List<Receta> recetasDisponiblesParaDespacho() {
-        List<Receta> dummy = new ArrayList<>();
-        Receta r1 = new Receta("R1", "P1", LocalDate.now(), EstadoReceta.CONFECCIONADA);
-        Receta r2 = new Receta("R2", "P2", LocalDate.now(), EstadoReceta.EN_PROCESO);
-        Receta r3 = new Receta("R3", "P3", LocalDate.now(), EstadoReceta.LISTA);
-        dummy.add(r1);
-        dummy.add(r2);
-        dummy.add(r3);
-        return dummy;
-    }
-
 }
 

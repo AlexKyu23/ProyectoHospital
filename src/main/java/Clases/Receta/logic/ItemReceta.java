@@ -21,51 +21,23 @@ public class ItemReceta {
         this.duracionDias = duracionDias;
     }
 
+    @XmlElement
+    public int getMedicamentoCodigo() { return medicamentoCodigo; }
+    public void setMedicamentoCodigo(int medicamentoCodigo) { this.medicamentoCodigo = medicamentoCodigo; }
 
     @XmlElement
-    public int getMedicamentoCodigo() {
-        return medicamentoCodigo;
-    }
-
-    public void setMedicamentoCodigo(int medicamentoCodigo) {
-        this.medicamentoCodigo = medicamentoCodigo;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
     @XmlElement
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public int getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
 
     @XmlElement
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
+    public String getIndicaciones() { return indicaciones; }
+    public void setIndicaciones(String indicaciones) { this.indicaciones = indicaciones; }
 
     @XmlElement
-    public String getIndicaciones() {
-        return indicaciones;
-    }
-
-    public void setIndicaciones(String indicaciones) {
-        this.indicaciones = indicaciones;
-    }
-
-    @XmlElement
-    public int getDuracionDias() {
-        return duracionDias;
-    }
-
-    public void setDuracionDias(int duracionDias) {
-        this.duracionDias = duracionDias;
-    }
-
-
+    public int getDuracionDias() { return duracionDias; }
+    public void setDuracionDias(int duracionDias) { this.duracionDias = duracionDias; }
 }

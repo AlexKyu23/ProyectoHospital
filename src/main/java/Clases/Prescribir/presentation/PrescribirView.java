@@ -3,6 +3,7 @@ package Clases.Prescribir.presentation;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
+import java.time.LocalDate;
 
 public class PrescribirView {
     private JButton buscarPacienteButton;
@@ -12,51 +13,27 @@ public class PrescribirView {
     private JButton guardarButton;
     private JButton limpiarButton;
     private JButton descartarMedicamentoButton;
-    private JButton detallesButton;
     private JPanel todo;
+    private JButton detallesButton;
     private DatePicker Calendario;
 
+    public PrescribirView() {
+        createUIComponents();
+    }
+
     private void createUIComponents() {
-        // TODO: place custom component creation code here
+        Calendario = new DatePicker();
+        Calendario.getSettings().setAllowEmptyDates(false);
+        Calendario.getSettings().setDateRangeLimits(LocalDate.now(), null); // Solo fechas futuras o actuales
     }
 
-    public JButton getBuscarPacienteButton() {
-        return buscarPacienteButton;
-    }
-
-    public JButton getAgregarMedicamentoButton() {
-        return agregarMedicamentoButton;
-    }
-
-    public JButton getGuardarButton() {
-        return guardarButton;
-    }
-
-    public JButton getLimpiarButton() {
-        return limpiarButton;
-    }
-
-    public JButton getDescartarMedicamentoButton() {
-        return descartarMedicamentoButton;
-    }
-
-    public JButton getDetallesButton() {
-        return detallesButton;
-    }
-
-    public JLabel getNombrePacienteLabel() {
-        return NombrePaciente;
-    }
-
-    public JTable getMedicamentosPreenscritos() {
-        return MedicamentosPreenscritos;
-    }
-
-    public JPanel getPanel() {
-        return todo;
-    }
-
-    public DatePicker getCalendario() {
-        return Calendario;
-    }
+    public JButton getBuscarPacienteButton() { return buscarPacienteButton; }
+    public JButton getAgregarMedicamentoButton() { return agregarMedicamentoButton; }
+    public JButton getGuardarButton() { return guardarButton; }
+    public JButton getLimpiarButton() { return limpiarButton; }
+    public JButton getDescartarMedicamentoButton() { return descartarMedicamentoButton; }
+    public JLabel getNombrePacienteLabel() { return NombrePaciente; }
+    public JTable getMedicamentosPreenscritos() { return MedicamentosPreenscritos; }
+    public JPanel getPanel() { return todo; }
+    public DatePicker getCalendario() { return Calendario; }
 }

@@ -9,34 +9,27 @@ import Clases.Paciente.presentation.View.PacienteView;
 import Clases.Receta.logic.ItemReceta;
 import Clases.Receta.logic.Receta;
 import Clases.Receta.logic.EstadoReceta;
-import Clases.Receta.Data.RecetasWrapper;
 import Clases.Receta.logic.RecetaService;
 import Clases.Medico.logic.Medico;
 import Clases.Paciente.logic.Paciente;
 import Clases.Medicamento.logic.Medicamento;
-import Clases.Usuario.data.XmlPersister;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.io.File;
 import java.time.LocalDate;
 import java.util.UUID;
 
 public class PrescribirController {
-
     private PrescribirView view;
     private PrescripcionModel model;
     private DefaultTableModel tableModel;
-
     private Medico medicoEnSesion;
     private ListaPacientes listaPacientes;
     private catalogoMedicamentos catalogoMed;
 
     public PrescribirController(PrescribirView view, PrescripcionModel model,
-                                Medico medicoEnSesion,
-                                ListaPacientes listaPacientes,
+                                Medico medicoEnSesion, ListaPacientes listaPacientes,
                                 catalogoMedicamentos catalogoMed) {
-
         this.view = view;
         this.model = model;
         this.medicoEnSesion = medicoEnSesion;
@@ -44,7 +37,6 @@ public class PrescribirController {
         this.catalogoMed = catalogoMed;
 
         model.setMedico(medicoEnSesion);
-
         tableModel = new DefaultTableModel(new Object[]{"Medicamento", "Cantidad", "Indicaciones", "Duración"}, 0);
         view.getMedicamentosPreenscritos().setModel(tableModel);
 
@@ -61,10 +53,13 @@ public class PrescribirController {
 
     private void buscarPaciente() {
         PacienteModel selectorModel = new PacienteModel();
-        selectorModel.setList(listaPacientes.consulta()); // dispara evento LIST
+        selectorModel.setList(listaPacientes.consulta().stream()
+                .filter(p -> p.getNombre().toLowerCase().contains(view.getNombrePacienteLabel().getText().toLowerCase())
+                        || p.getId().toLowerCase().contains(view.getNombrePacienteLabel().getText().toLowerCase()))
+                .toList()); // Búsqueda aproximada
 
         PacienteView selectorView = new PacienteView();
-        selectorView.setModel(selectorModel); // actualiza tabla automáticamente
+        selectorView.setModel(selectorModel);
 
         JFrame selectorFrame = new JFrame("Buscar Paciente");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -85,11 +80,15 @@ public class PrescribirController {
     }
 
     private void agregarMedicamento() {
+        String busqueda = JOptionPane.showInputDialog("Buscar medicamento (nombre o código):");
         MedicamentoModel selectorModel = new MedicamentoModel();
-        selectorModel.setList(catalogoMed.consulta()); // dispara evento LIST
+        selectorModel.setList(catalogoMed.consulta().stream()
+                .filter(m -> m.getNombre().toLowerCase().contains(busqueda.toLowerCase())
+                        || String.valueOf(m.getCodigo()).contains(busqueda))
+                .toList()); // Búsqueda aproximada
 
         MedicamentoView selectorView = new MedicamentoView();
-        selectorView.setModel(selectorModel); // actualiza tabla automáticamente
+        selectorView.setModel(selectorModel);
 
         JFrame selectorFrame = new JFrame("Buscar Medicamento");
         selectorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -113,7 +112,7 @@ public class PrescribirController {
                     model.agregarItem(item);
                     tableModel.addRow(new Object[]{seleccionado.getNombre(), cantidad, indicaciones, duracion});
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos");
+                    JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos: " + ex.getMessage());
                 }
             }
         });
@@ -147,40 +146,42 @@ public class PrescribirController {
             return;
         }
 
-        LocalDate fechaSeleccionada = view.getCalendario().getDate();
-        if (fechaSeleccionada == null) {
-            JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar una fecha de retiro");
+        LocalDate fechaSeleccionada = null;
+        try {
+            fechaSeleccionada = view.getCalendario().getDate();
+            if (fechaSeleccionada == null) {
+                JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar una fecha de retiro válida");
+                return;
+            }
+            if (fechaSeleccionada.isBefore(LocalDate.now())) {
+                JOptionPane.showMessageDialog(view.getPanel(), "La fecha de retiro no puede ser anterior a hoy");
+                return;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(view.getPanel(), "Error al procesar la fecha: " + ex.getMessage());
             return;
         }
 
         String recetaId = UUID.randomUUID().toString();
-
         Receta receta = new Receta(
                 recetaId,
                 model.getMedico().getId(),
                 model.getPaciente().getId(),
                 LocalDate.now(),
-                fechaSeleccionada,
-                EstadoReceta.CONFECCIONADA
+                fechaSeleccionada
         );
         receta.setMedicamentos(model.getItems());
 
         try {
             RecetaService.instance().create(receta);
-
-            RecetasWrapper wrapper = new RecetasWrapper();
-            wrapper.setRecetas(RecetaService.instance().findAll());
-            XmlPersister.save(wrapper, new File("recetas.xml"));
-
             JOptionPane.showMessageDialog(view.getPanel(),
                     "Receta guardada.\nMédico: " + model.getMedico().getNombre() +
                             "\nPaciente: " + model.getPaciente().getNombre() +
                             "\nMedicamentos: " + receta.getMedicamentos().size() +
                             "\nFecha de retiro: " + fechaSeleccionada);
-
             limpiarFormulario();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(view.getPanel(), "Error: " + ex.getMessage());
+            JOptionPane.showMessageDialog(view.getPanel(), "Error al guardar la receta: " + ex.getMessage());
         }
     }
 }

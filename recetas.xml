@@ -2,8 +2,6 @@
 <recetas>
     <receta>
         <estado>CONFECCIONADA</estado>
-        <fechaConfeccion/>
-        <fechaRetiro/>
         <id>92f27bd5-bcda-4e7e-80e3-7c4fe7775600</id>
         <medicamentos>
             <cantidad>1</cantidad>

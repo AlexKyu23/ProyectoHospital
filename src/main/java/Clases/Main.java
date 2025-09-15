@@ -27,12 +27,10 @@ import Clases.Despacho.presentation.DespachoController;
 import Clases.Paciente.presentation.PacienteModel;
 import Clases.Medicamento.presentation.MedicamentoModel;
 import Clases.Medico.presentation.MedicoModel;
-import Clases.Admin.presentation.AdminView;
-import Clases.Receta.Data.historicoRecetas;
+import Clases.Receta.Data.RepositorioRecetas;
 import Clases.Medicamento.data.catalogoMedicamentos;
 
 import Clases.Usuario.logic.UsuarioService;
-import Clases.Prescribir.data.RepositorioPrescripciones;
 import Clases.DatosIniciales;
 
 import javax.swing.*;
@@ -41,7 +39,7 @@ public class Main {
     public static void main(String[] args) {
         // 🔹 Cargar todas las listas desde XML
         DatosIniciales.cargarTodo();
-        historicoRecetas recetas = DatosIniciales.gethistoricoRecetas();
+        RepositorioRecetas recetas = DatosIniciales.getRepositorioRecetas();
         catalogoMedicamentos medicamentos = DatosIniciales.getCatalogoMed();
 
         SwingUtilities.invokeLater(() -> {
@@ -83,7 +81,9 @@ public class Main {
                                 medicoModel,
                                 farmaceutaModel,
                                 pacienteModel,
-                                medicamentoModel, recetas, medicamentos);
+                                medicamentoModel,
+                                recetas,
+                                medicamentos);
 
                         adminView.setVisible(true);
 
@@ -91,7 +91,7 @@ public class Main {
                             @Override
                             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                                 UsuarioService.instance().guardar();
-                                RepositorioPrescripciones.guardar();
+                                RepositorioRecetas.guardar();
                                 System.out.println("✅ Guardado completo al cerrar (admin).");
                             }
                         });
@@ -122,7 +122,7 @@ public class Main {
                             @Override
                             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                                 UsuarioService.instance().guardar();
-                                RepositorioPrescripciones.guardar();
+                                RepositorioRecetas.guardar();
                                 System.out.println("✅ Guardado completo al cerrar (médico).");
                             }
                         });
@@ -137,9 +137,9 @@ public class Main {
                         despachoModel.setFarmaceuta(farm);
 
                         DespachoView despachoView = new DespachoView();
-                        new DespachoController(despachoModel, despachoView);
+                        new DespachoController(despachoModel, despachoView, recetas);
 
-                        JFrame despachoFrame = new JFrame("Panel Farmaceuta - Despacho");
+                        JFrame despachoFrame = new JFrame("Panel Farmacéuta - Despacho");
                         despachoFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         despachoFrame.setSize(800, 600);
                         despachoFrame.setLocationRelativeTo(null);
@@ -150,8 +150,8 @@ public class Main {
                             @Override
                             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                                 UsuarioService.instance().guardar();
-                                RepositorioPrescripciones.guardar();
-                                System.out.println("✅ Guardado completo al cerrar (farmaceuta).");
+                                RepositorioRecetas.guardar();
+                                System.out.println("✅ Guardado completo al cerrar (farmacéuta).");
                             }
                         });
 

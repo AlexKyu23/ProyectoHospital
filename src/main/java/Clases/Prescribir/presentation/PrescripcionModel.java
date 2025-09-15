@@ -22,28 +22,19 @@ public class PrescripcionModel extends AbstractModel {
         this.items = new ArrayList<>();
     }
 
-    public Paciente getPaciente() {
-        return paciente;
-    }
-
+    public Paciente getPaciente() { return paciente; }
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
         firePropertyChange(CURRENT);
     }
 
-    public Medico getMedico() {
-        return medico;
-    }
-
+    public Medico getMedico() { return medico; }
     public void setMedico(Medico medico) {
         this.medico = medico;
         firePropertyChange(CURRENT);
     }
 
-    public List<ItemReceta> getItems() {
-        return items;
-    }
-
+    public List<ItemReceta> getItems() { return items; }
     public void agregarItem(ItemReceta item) {
         items.add(item);
         firePropertyChange(LIST);
@@ -59,10 +50,7 @@ public class PrescripcionModel extends AbstractModel {
         firePropertyChange(LIST);
     }
 
-    public LocalDate getFechaRetiro() {
-        return fechaRetiro;
-    }
-
+    public LocalDate getFechaRetiro() { return fechaRetiro; }
     public void setFechaRetiro(LocalDate fechaRetiro) {
         this.fechaRetiro = fechaRetiro;
         firePropertyChange(CURRENT);

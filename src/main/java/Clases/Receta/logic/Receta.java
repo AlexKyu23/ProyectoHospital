@@ -2,7 +2,8 @@ package Clases.Receta.logic;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import Clases.Receta.logic.EstadoReceta;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,22 +18,14 @@ public class Receta {
     private EstadoReceta estado;
     private List<ItemReceta> medicamentos;
 
-    public Receta(String r1, String p1, LocalDate now, EstadoReceta confeccionada) {
+    // Constructor vacío para JAXB
+    public Receta() {
         medicamentos = new ArrayList<>();
         estado = EstadoReceta.CONFECCIONADA;
     }
-    public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro, EstadoReceta estado) {
-        this("R1", "P1", LocalDate.now(), EstadoReceta.CONFECCIONADA);
-        this.id = id;
-        this.medicoId = medicoId;
-        this.pacienteId = pacienteId;
-        this.fechaConfeccion = fechaConfeccion;
-        this.fechaRetiro = fechaRetiro;
-        this.estado = estado;
-    }
 
     public Receta(String id, String medicoId, String pacienteId, LocalDate fechaConfeccion, LocalDate fechaRetiro) {
-        this("R1", "P1", LocalDate.now(), EstadoReceta.CONFECCIONADA);
+        this();
         this.id = id;
         this.medicoId = medicoId;
         this.pacienteId = pacienteId;
@@ -41,65 +34,32 @@ public class Receta {
     }
 
     @XmlElement
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     @XmlElement
-    public String getMedicoId() {
-        return medicoId;
-    }
-
-    public void setMedicoId(String medicoId) {
-        this.medicoId = medicoId;
-    }
+    public String getMedicoId() { return medicoId; }
+    public void setMedicoId(String medicoId) { this.medicoId = medicoId; }
 
     @XmlElement
-    public String getPacienteId() {
-        return pacienteId;
-    }
-
-    public void setPacienteId(String pacienteId) {
-        this.pacienteId = pacienteId;
-    }
+    public String getPacienteId() { return pacienteId; }
+    public void setPacienteId(String pacienteId) { this.pacienteId = pacienteId; }
 
     @XmlElement
-    public LocalDate getFechaConfeccion() {
-        return fechaConfeccion;
-    }
-
-    public void setFechaConfeccion(LocalDate fechaConfeccion) {
-        this.fechaConfeccion = fechaConfeccion;
-    }
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    public LocalDate getFechaConfeccion() { return fechaConfeccion; }
+    public void setFechaConfeccion(LocalDate fechaConfeccion) { this.fechaConfeccion = fechaConfeccion; }
 
     @XmlElement
-    public LocalDate getFechaRetiro() {
-        return fechaRetiro;
-    }
-
-    public void setFechaRetiro(LocalDate fechaRetiro) {
-        this.fechaRetiro = fechaRetiro;
-    }
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    public LocalDate getFechaRetiro() { return fechaRetiro; }
+    public void setFechaRetiro(LocalDate fechaRetiro) { this.fechaRetiro = fechaRetiro; }
 
     @XmlElement
-    public EstadoReceta getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoReceta estado) {
-        this.estado = estado;
-    }
+    public EstadoReceta getEstado() { return estado; }
+    public void setEstado(EstadoReceta estado) { this.estado = estado; }
 
     @XmlElement
-    public List<ItemReceta> getMedicamentos() {
-        return medicamentos;
-    }
-
-    public void setMedicamentos(List<ItemReceta> medicamentos) {
-        this.medicamentos = medicamentos;
-    }
+    public List<ItemReceta> getMedicamentos() { return medicamentos; }
+    public void setMedicamentos(List<ItemReceta> medicamentos) { this.medicamentos = medicamentos; }
 }

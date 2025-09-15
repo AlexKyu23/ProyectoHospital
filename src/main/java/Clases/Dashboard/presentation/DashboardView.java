@@ -3,7 +3,7 @@ package Clases.Dashboard.presentation;
 import Clases.Dashboard.logic.LineChart_AWT;
 import Clases.Dashboard.logic.PieChart_AWT;
 import Clases.Medicamento.data.catalogoMedicamentos;
-import Clases.Receta.Data.historicoRecetas;
+import Clases.Receta.Data.RepositorioRecetas;
 
 import javax.swing.*;
 
@@ -20,11 +20,11 @@ public class DashboardView {
     private JButton checkButton;
     private JButton doubleCheckButton;
     private JPanel Lista;
-    private JPanel graficoMedicamentos;         //Importante! El gráfico "linechart" va aquí private JPanel graficoRecetas;
-    private JPanel graficoRecetas;              // Importante! El gráfico "pie" va aquí
+    private JPanel graficoMedicamentos; // Importante! El gráfico "linechart" va aquí
+    private JPanel graficoRecetas;     // Importante! El gráfico "pie" va aquí
     private JPanel dashboard;
 
-    public DashboardView(historicoRecetas historicRecetas, catalogoMedicamentos catalogMedicamentos) {
+    public DashboardView(RepositorioRecetas repositorioRecetas, catalogoMedicamentos catalogMedicamentos) {
         // Limpia y agrega el gráfico de medicamentos
         graficoMedicamentos.removeAll();
         graficoMedicamentos.add(LineChart_AWT.getChartPanel(catalogMedicamentos));
@@ -33,7 +33,7 @@ public class DashboardView {
 
         // Limpia y agrega el gráfico de recetas
         graficoRecetas.removeAll();
-        graficoRecetas.add(PieChart_AWT.getChartPanel(historicRecetas));
+        graficoRecetas.add(PieChart_AWT.getChartPanel(repositorioRecetas));
         graficoRecetas.revalidate();
         graficoRecetas.repaint();
     }
@@ -41,5 +41,4 @@ public class DashboardView {
     public JPanel getDashboard() {
         return dashboard;
     }
-
 }
