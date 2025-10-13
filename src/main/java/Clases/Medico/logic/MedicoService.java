@@ -1,6 +1,7 @@
 package Clases.Medico.logic;
 
 import Clases.Medico.data.ListaMedicos;
+import Clases.DatosIniciales;
 import java.util.List;
 
 public class MedicoService {
@@ -8,15 +9,13 @@ public class MedicoService {
     private ListaMedicos lista;
 
     private MedicoService() {
-        lista = new ListaMedicos();
-        System.out.println("⏳ Cargando médicos desde XML...");
-        lista.cargar();
+        lista = DatosIniciales.listaMedicos;
 
         if (lista.consulta().isEmpty()) {
             System.out.println("⚠️ Lista de médicos vacía. Precargando...");
             lista.inclusion(new Medico("MED-001", "Dr. Salas", "MED-001", "Cardiología"));
             lista.inclusion(new Medico("MED-002", "Dra. Vargas", "MED-002", "Pediatría"));
-            lista.guardar();
+            DatosIniciales.guardarTodo();
             System.out.println("✅ Precarga de médicos guardada.");
         } else {
             System.out.println("✅ Médicos cargados: " + lista.consulta().size());
@@ -33,8 +32,7 @@ public class MedicoService {
             throw new Exception("Médico ya existe");
         m.setClave(m.getId());
         lista.inclusion(m);
-        lista.guardar();
-        System.out.println("🆕 Médico creado: " + m.getNombre() + " (" + m.getId() + ")");
+        DatosIniciales.guardarTodo();
     }
 
     public Medico readById(String id) {
@@ -47,23 +45,15 @@ public class MedicoService {
 
     public void delete(String id) {
         lista.borrado(id);
-        lista.guardar();
-        System.out.println("🗑️ Médico eliminado: " + id);
+        DatosIniciales.guardarTodo();
     }
 
     public List<Medico> findAll() {
-        List<Medico> actual = lista.consulta();
-        System.out.println("📋 Consulta de médicos: " + actual.size());
-        return actual;
+        return lista.consulta();
     }
 
     public void update(Medico m) {
         lista.modificacion(m);
-        lista.guardar();
-        System.out.println("✏️ Médico actualizado: " + m.getNombre() + " (" + m.getId() + ")");
+        DatosIniciales.guardarTodo();
     }
-    public void guardar() {
-        lista.guardar();
-    }
-
 }

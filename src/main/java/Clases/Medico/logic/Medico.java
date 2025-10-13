@@ -19,24 +19,6 @@ public class Medico extends Trabajador {
     }
 
     @XmlElement
-    @Override
-    public String getId() {
-        return super.getId();
-    }
-
-    @XmlElement
-    @Override
-    public String getNombre() {
-        return super.getNombre();
-    }
-
-    @XmlElement
-    @Override
-    public String getClave() {
-        return super.getClave();
-    }
-
-    @XmlElement
     public String getEspecialidad() {
         return especialidad;
     }
@@ -48,6 +30,6 @@ public class Medico extends Trabajador {
     @Override
     public String toString() {
         return "Medico{id='" + id + "', nombre='" + nombre +
-                "', clave='" + getClave() + "', especialidad='" + especialidad + "'}";
+                "', clave='" + clave + "', especialidad='" + especialidad + "'}";
     }
 }

@@ -159,7 +159,7 @@ public class PrescribirController {
             return;
         }
 
-        LocalDate fechaSeleccionada = null;
+        LocalDate fechaSeleccionada;
         try {
             fechaSeleccionada = view.getCalendario().getDate();
             if (fechaSeleccionada == null) {
@@ -189,7 +189,7 @@ public class PrescribirController {
         receta.setMedicamentos(model.getItems());
 
         try {
-            RecetaService.instance().create(receta);
+            RecetaService.instance().create(receta); // Esto ya guarda en sistema.xml
             System.out.println("✅ Prescripción guardada correctamente: ID=" + recetaId +
                     ", Médico=" + model.getMedico().getNombre() +
                     ", Paciente=" + model.getPaciente().getNombre() +
@@ -204,4 +204,5 @@ public class PrescribirController {
             JOptionPane.showMessageDialog(view.getPanel(), "Error al guardar la receta: " + ex.getMessage());
         }
     }
+
 }

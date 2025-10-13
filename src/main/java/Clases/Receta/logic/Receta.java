@@ -1,9 +1,9 @@
 package Clases.Receta.logic;
 
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import Clases.Receta.logic.EstadoReceta;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,9 @@ public class Receta {
     public EstadoReceta getEstado() { return estado; }
     public void setEstado(EstadoReceta estado) { this.estado = estado; }
 
-    @XmlElement
+    // ✅ CORREGIDO: Anotaciones JAXB para serializar lista de medicamentos
+    @XmlElementWrapper(name = "medicamentos")
+    @XmlElement(name = "itemReceta")
     public List<ItemReceta> getMedicamentos() { return medicamentos; }
     public void setMedicamentos(List<ItemReceta> medicamentos) { this.medicamentos = medicamentos; }
 }

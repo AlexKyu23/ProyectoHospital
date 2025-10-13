@@ -47,7 +47,8 @@ public class AdminController {
         this.pacienteModel = pacienteModel;
         this.medicamentoModel = medicamentoModel;
 
-        RepositorioRecetas.cargar();
+        // ❌ Eliminado: RepositorioRecetas.cargar(); → ya se cargó desde DatosIniciales
+
         inicializarTabs(repositorioRecetas, medicamentos);
     }
 
@@ -71,14 +72,10 @@ public class AdminController {
         DashboardView dashboardView = new DashboardView(repositorioRecetas, medicamentos);
         view.getTabbedPane().addTab("Dashboard", dashboardView.getDashboard());
 
-        // 🔹 Histórico de Recetas como tab
         RecetaModel recetaModel = new RecetaModel();
         RecetaView recetaView = new RecetaView();
         new RecetaHistorialController(recetaModel, recetaView);
         view.getTabbedPane().addTab("Histórico de Recetas", recetaView.getPanel());
-
-        // AcercaDeView acercaDeView = new AcercaDeView();
-        // view.getTabbedPane().addTab("Acerca de", acercaDeView.getAcercaDe());
 
         view.getTabbedPane().setSelectedIndex(0);
     }

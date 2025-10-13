@@ -1,7 +1,7 @@
 package Clases.Medicamento.logic;
 
 import Clases.Medicamento.data.catalogoMedicamentos;
-
+import Clases.DatosIniciales;
 import java.util.List;
 
 public class MedicamentoService {
@@ -9,14 +9,12 @@ public class MedicamentoService {
     private catalogoMedicamentos catalogo;
 
     private MedicamentoService() {
-        catalogo = new catalogoMedicamentos();
-        catalogo.cargar(); // ← carga desde XML
+        catalogo = DatosIniciales.catalogoMed;
 
-        // Precarga opcional si el archivo está vacío
         if (catalogo.consulta().isEmpty()) {
             catalogo.inclusion(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
             catalogo.inclusion(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
-            catalogo.guardar(); // ← guarda precarga
+            DatosIniciales.guardarTodo();
         }
     }
 
@@ -29,7 +27,7 @@ public class MedicamentoService {
         if (readByCodigo(m.getCodigo()) != null)
             throw new Exception("Medicamento ya existe");
         catalogo.inclusion(m);
-        catalogo.guardar(); // ← guarda en XML
+        DatosIniciales.guardarTodo();
     }
 
     public Medicamento readByCodigo(int codigo) {
@@ -37,10 +35,9 @@ public class MedicamentoService {
     }
 
     public Medicamento readByNombre(String nombre) {
-        for (Medicamento m : catalogo.consulta()) {
-            if (m.getNombre().equalsIgnoreCase(nombre)) return m;
-        }
-        return null;
+        return catalogo.consulta().stream()
+                .filter(m -> m.getNombre().equalsIgnoreCase(nombre))
+                .findFirst().orElse(null);
     }
 
     public List<Medicamento> findAll() {
@@ -49,15 +46,11 @@ public class MedicamentoService {
 
     public void delete(int codigo) {
         catalogo.borrado(codigo);
-        catalogo.guardar(); // ← guarda en XML
+        DatosIniciales.guardarTodo();
     }
 
     public void update(Medicamento nuevo) {
         catalogo.modificacion(nuevo.getCodigo(), nuevo);
-        catalogo.guardar(); // ← guarda en XML
+        DatosIniciales.guardarTodo();
     }
-    public void guardar() {
-        catalogo.guardar();
-    }
-
 }

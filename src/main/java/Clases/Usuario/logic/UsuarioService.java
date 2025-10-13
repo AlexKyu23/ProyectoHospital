@@ -1,17 +1,15 @@
 package Clases.Usuario.logic;
 
 import Clases.Usuario.data.ListaUsuarios;
-
-import Listas.XmlPersister;
+import Clases.DatosIniciales;
+import java.util.List;
 
 public class UsuarioService {
     private static UsuarioService instance;
     private ListaUsuarios lista;
 
     private UsuarioService() {
-        lista = new ListaUsuarios();
-        System.out.println("⏳ Cargando usuarios desde XML...");
-        lista.cargar();
+        lista = DatosIniciales.listaUsuarios;
         System.out.println("✅ Usuarios cargados: " + lista.getUsuarios().size());
     }
 
@@ -33,28 +31,20 @@ public class UsuarioService {
         if (readById(u.getId()) != null)
             throw new Exception("Ya existe un usuario con ese ID");
         lista.inclusion(u);
-        lista.guardar();
-        System.out.println("🆕 Usuario creado: " + u.getNombre() + " (" + u.getId() + ")");
+        DatosIniciales.guardarTodo();
     }
 
     public void update(Usuario u) {
         lista.modificacion(u);
-        lista.guardar();
-        System.out.println("✏️ Usuario actualizado: " + u.getNombre() + " (" + u.getId() + ")");
+        DatosIniciales.guardarTodo();
     }
 
     public void delete(String id) {
         lista.borrado(id);
-        lista.guardar();
-        System.out.println("🗑️ Usuario eliminado: " + id);
+        DatosIniciales.guardarTodo();
     }
 
-    public void guardar() {
-        lista.guardar();
-        System.out.println("💾 Usuarios guardados manualmente.");
-    }
-
-    public ListaUsuarios getLista() {
-        return lista;
+    public List<Usuario> findAll() {
+        return lista.getUsuarios();
     }
 }

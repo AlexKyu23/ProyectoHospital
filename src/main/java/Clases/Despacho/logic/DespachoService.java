@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class DespachoService {
 
-    // Buscar recetas confeccionadas con fecha válida
+    // 🔍 Buscar recetas confeccionadas con fecha válida (±3 días desde hoy)
     public List<Receta> recetasDisponiblesParaDespacho() {
         LocalDate hoy = LocalDate.now();
         try {
@@ -30,17 +30,17 @@ public class DespachoService {
         }
     }
 
-    // Cambiar estado a "proceso"
+    // 🔄 Cambiar estado a EN_PROCESO
     public void iniciarDespacho(String recetaId) {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.EN_PROCESO);
     }
 
-    // Cambiar estado a "lista"
+    // 🔄 Cambiar estado a LISTA
     public void alistarMedicamentos(String recetaId) {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.LISTA);
     }
 
-    // Cambiar estado a "entregada"
+    // 🔄 Cambiar estado a ENTREGADA
     public void entregarReceta(String recetaId) {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.ENTREGADA);
     }

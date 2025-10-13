@@ -1,38 +1,26 @@
 package Clases.Farmaceuta.data;
 
 import Clases.Farmaceuta.logic.Farmaceuta;
-import Clases.Usuario.data.XmlPersister;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name = "listaFarmaceutas")
 public class ListaFarmaceutas {
     private List<Farmaceuta> farmaceutas;
-    private static final File ARCHIVO = new File("farmaceutas.xml");
 
     public ListaFarmaceutas() {
         farmaceutas = new ArrayList<>();
     }
 
-    @XmlElement(name = "farmaceuta")
-    public List<Farmaceuta> getFarmaceutas() {
+    public List<Farmaceuta> consulta() {
         return farmaceutas;
     }
 
-    public void setFarmaceutas(List<Farmaceuta> farmaceutas) {
-        this.farmaceutas = farmaceutas;
+    public void setList(List<Farmaceuta> farmaceutas) {
+        this.farmaceutas = farmaceutas != null ? farmaceutas : new ArrayList<>();
     }
 
     public void inclusion(Farmaceuta farmaceuta) {
         farmaceutas.add(farmaceuta);
-    }
-
-    public List<Farmaceuta> consulta() {
-        return farmaceutas;
     }
 
     public Farmaceuta busquedaPorId(String id) {
@@ -59,24 +47,4 @@ public class ListaFarmaceutas {
     public void borrado(String id) {
         farmaceutas.removeIf(f -> f.getId().equalsIgnoreCase(id));
     }
-
-    public void guardar() {
-        try {
-            XmlPersister.save(this, ARCHIVO);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void cargar() {
-        if (ARCHIVO.exists()) {
-            try {
-                ListaFarmaceutas cargada = XmlPersister.load(ListaFarmaceutas.class, ARCHIVO);
-                this.farmaceutas = cargada.getFarmaceutas();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }

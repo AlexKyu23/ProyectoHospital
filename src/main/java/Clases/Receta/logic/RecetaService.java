@@ -1,5 +1,6 @@
 package Clases.Receta.logic;
 
+import Clases.DatosIniciales;
 import Clases.Receta.Data.RepositorioRecetas;
 
 import java.util.List;
@@ -10,8 +11,7 @@ public class RecetaService {
     private RepositorioRecetas repositorio;
 
     private RecetaService() {
-        repositorio = new RepositorioRecetas();
-        RepositorioRecetas.cargar(); // Carga inicial
+        this.repositorio = DatosIniciales.repositorioRecetas;
     }
 
     public static RecetaService instance() {
@@ -22,32 +22,32 @@ public class RecetaService {
     public void create(Receta r) throws Exception {
         if (readById(r.getId()) != null)
             throw new Exception("Receta ya existe");
-        RepositorioRecetas.agregar(r);
-        RepositorioRecetas.guardar();
+        repositorio.agregar(r);
+        DatosIniciales.guardarTodo();
     }
 
     public Receta readById(String id) {
-        return RepositorioRecetas.getRecetas().stream()
+        return repositorio.getRecetas().stream()
                 .filter(r -> r.getId().equalsIgnoreCase(id))
                 .findFirst()
                 .orElse(null);
     }
 
     public List<Receta> findByPaciente(String pacienteId) {
-        return RepositorioRecetas.getRecetas().stream()
+        return repositorio.getRecetas().stream()
                 .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
                 .collect(Collectors.toList());
     }
 
     public List<Receta> findAll() {
-        return RepositorioRecetas.getRecetas();
+        return repositorio.getRecetas();
     }
 
     public void cambiarEstado(String recetaId, EstadoReceta nuevoEstado) {
         Receta r = readById(recetaId);
         if (r != null) {
             r.setEstado(nuevoEstado);
-            RepositorioRecetas.guardar(); // Persistir cambio
+            DatosIniciales.guardarTodo();
         }
     }
 }

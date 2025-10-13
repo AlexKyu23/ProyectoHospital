@@ -1,58 +1,40 @@
 package Clases.Receta.Data;
 
 import Clases.Receta.logic.Receta;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import Clases.Receta.logic.ItemReceta;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RepositorioRecetas {
-    private static List<Receta> recetas = new ArrayList<>();
-    private static final File ARCHIVO = new File("recetas.xml");
+    private List<Receta> recetas = new ArrayList<>();
 
-    public static void agregar(Receta r) {
+    public void agregar(Receta r) {
         recetas.add(r);
     }
 
-    public static List<Receta> getRecetas() {
+    public List<Receta> getRecetas() {
         return recetas;
     }
 
-    public static Receta buscarPorId(String id) {
-        for (Receta receta : recetas) {
-            if (receta.getId().equals(id)) {
-                return receta;
-            }
-        }
-        return null; // Retorna null si no se encuentra la receta
+    public void setRecetas(List<Receta> recetas) {
+        this.recetas = recetas != null ? recetas : new ArrayList<>();
     }
 
-    public static void guardar() {
-        try {
-            JAXBContext context = JAXBContext.newInstance(RecetasWrapper.class, Receta.class, ItemReceta.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            RecetasWrapper wrapper = new RecetasWrapper();
-            wrapper.setRecetas(recetas);
-            marshaller.marshal(wrapper, ARCHIVO);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public Receta buscarPorId(String id) {
+        return recetas.stream()
+                .filter(r -> r.getId().equalsIgnoreCase(id))
+                .findFirst()
+                .orElse(null);
     }
 
-    public static void cargar() {
-        if (ARCHIVO.exists()) {
-            try {
-                JAXBContext context = JAXBContext.newInstance(RecetasWrapper.class, Receta.class, ItemReceta.class);
-                Unmarshaller unmarshaller = context.createUnmarshaller();
-                RecetasWrapper wrapper = (RecetasWrapper) unmarshaller.unmarshal(ARCHIVO);
-                recetas = wrapper.getRecetas() != null ? wrapper.getRecetas() : new ArrayList<>();
-            } catch (Exception e) {
-                e.printStackTrace();
+    public void eliminarPorId(String id) {
+        recetas.removeIf(r -> r.getId().equalsIgnoreCase(id));
+    }
+
+    public void actualizar(Receta recetaActualizada) {
+        for (int i = 0; i < recetas.size(); i++) {
+            if (recetas.get(i).getId().equalsIgnoreCase(recetaActualizada.getId())) {
+                recetas.set(i, recetaActualizada);
+                return;
             }
         }
     }

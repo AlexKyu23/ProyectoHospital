@@ -1,7 +1,7 @@
 package Clases.Despacho.presentation;
 
 import Clases.Despacho.logic.DespachoService;
-import Clases.Receta.Data.RepositorioRecetas;
+import Clases.DatosIniciales;
 import Clases.Receta.logic.EstadoReceta;
 import Clases.Receta.logic.Receta;
 
@@ -14,25 +14,21 @@ public class DespachoController {
     private DespachoModel model;
     private DespachoView view;
     private DespachoService service;
-    private RepositorioRecetas repositorioRecetas;
     private DefaultTableModel tableModelIniciar;
     private DefaultTableModel tableModelAlistar;
     private DefaultTableModel tableModelLista;
     private DefaultTableModel tableModelEntregada;
 
-    public DespachoController(DespachoModel model, DespachoView view, RepositorioRecetas repositorioRecetas) {
+    public DespachoController(DespachoModel model, DespachoView view) {
         this.model = model;
         this.view = view;
         this.service = new DespachoService();
-        this.repositorioRecetas = repositorioRecetas;
 
-        // Inicialización de modelos de tabla
         tableModelIniciar = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
         tableModelAlistar = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
         tableModelLista = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
         tableModelEntregada = new DefaultTableModel(new Object[]{"ID", "Paciente", "Fecha Retiro", "Estado"}, 0);
 
-        // Asociar modelos a las tablas de la vista
         view.getTablaIniciar().setModel(tableModelIniciar);
         view.getTablaAlistar().setModel(tableModelAlistar);
         view.getTablaRecetaLista().setModel(tableModelLista);
@@ -48,8 +44,7 @@ public class DespachoController {
         tableModelLista.setRowCount(0);
         tableModelEntregada.setRowCount(0);
 
-        // Usar recetas reales desde RepositorioRecetas
-        model.setRecetas(repositorioRecetas.getRecetas());
+        model.setRecetas(DatosIniciales.repositorioRecetas.getRecetas());
 
         for (Receta r : model.getRecetas()) {
             Object[] fila = {
@@ -82,7 +77,6 @@ public class DespachoController {
             return;
         }
 
-        // Filtrar recetas por ID de paciente
         tableModelIniciar.setRowCount(0);
         tableModelAlistar.setRowCount(0);
         tableModelLista.setRowCount(0);
@@ -98,7 +92,7 @@ public class DespachoController {
                                 !retiro.isBefore(hoy.minusDays(3)) &&
                                 !retiro.isAfter(hoy.plusDays(3));
                     }
-                    return true; // Mostrar EN_PROCESO, LISTA, ENTREGADA sin filtro de fecha
+                    return true;
                 })
                 .toList();
 
@@ -127,7 +121,6 @@ public class DespachoController {
         JTable selectedTable = null;
         DefaultTableModel selectedModel = null;
 
-        // Determinar la tabla seleccionada
         if (view.getTablaIniciar().getSelectedRow() >= 0) {
             selectedTable = view.getTablaIniciar();
             selectedModel = tableModelIniciar;
@@ -146,9 +139,8 @@ public class DespachoController {
 
         int row = selectedTable.getSelectedRow();
         String recetaId = selectedModel.getValueAt(row, 0).toString();
-        Receta receta = repositorioRecetas.buscarPorId(recetaId);
+        Receta receta = DatosIniciales.repositorioRecetas.buscarPorId(recetaId);
 
-        // Validar flujo correcto de estados
         try {
             switch (accion) {
                 case "proceso" -> {
@@ -186,7 +178,7 @@ public class DespachoController {
             JOptionPane.showMessageDialog(view.getDespacho(), "Error al cambiar estado: " + e.getMessage());
         }
 
-        // Refrescar tablas
-        cargarRecetas();
+        DatosIniciales.guardarTodo(); // ✅ Guardar cambios en sistema.xml
+        cargarRecetas(); // ✅ Refrescar tablas
     }
 }

@@ -1,8 +1,11 @@
 package Clases.Trabajador;
 
-import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 
-public class Trabajador {
+@XmlAccessorType(XmlAccessType.PROPERTY)
+public abstract class Trabajador {
     protected String id;
     protected String nombre;
     protected String clave;
@@ -15,12 +18,18 @@ public class Trabajador {
         this.clave = clave;
     }
 
-    // 🔹 JAXB usará estos getters como propiedades
+    @XmlElement
     public String getId() { return id; }
-    public String getNombre() { return nombre; }
-    public String getClave() { return clave; }
 
     public void setId(String id) { this.id = id; }
+
+    @XmlElement
+    public String getNombre() { return nombre; }
+
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    @XmlElement
+    public String getClave() { return clave; }
+
     public void setClave(String clave) { this.clave = clave; }
 }

@@ -1,6 +1,6 @@
 package Clases.Receta.Presentation;
 
-import Clases.Receta.Data.RepositorioRecetas;
+import Clases.DatosIniciales;
 import Clases.Receta.logic.Receta;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class RecetaHistorialController {
     }
 
     private void cargarTodas() {
-        model.setList(RepositorioRecetas.getRecetas());
+        model.setList(DatosIniciales.repositorioRecetas.getRecetas());
     }
 
     private void buscarPorId() {
@@ -32,7 +32,7 @@ public class RecetaHistorialController {
         if (id.isEmpty()) {
             cargarTodas();
         } else {
-            List<Receta> filtradas = RepositorioRecetas.getRecetas().stream()
+            List<Receta> filtradas = DatosIniciales.repositorioRecetas.getRecetas().stream()
                     .filter(r -> r.getId().toLowerCase().contains(id.toLowerCase()))
                     .collect(Collectors.toList());
             model.setList(filtradas);
