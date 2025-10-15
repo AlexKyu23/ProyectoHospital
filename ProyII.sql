@@ -166,7 +166,7 @@ ENGINE = InnoDB;
 -- ----------------------------------------------------
 
 INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-001','Laura','1990-05-12','8888-1111');
-INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-002','Carlos','1985-08-23','8888-2222');
+INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-002','Carlos','1985-07-23','8888-2222');
 INSERT INTO Medico (id,nombre,clave,especialidad) VALUES ('MED-001','Dr. Salas','MED-001','Cardiologia');
 INSERT INTO Medico (id,nombre,clave,especialidad) VALUES ('MED-002','Dra. Vargas','MED-002','Pediatria');
 INSERT INTO Farmaceuta (id,nombre,clave) VALUES ('FAR-001','Carla Jimenez','FAR-001');

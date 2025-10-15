@@ -1,26 +1,15 @@
 package Clases.Paciente.logic;
 
-import Clases.Paciente.data.ListaPacientes;
-import Clases.DatosIniciales;
-import java.time.LocalDate;
+import Datos.PacienteDAO;
+
 import java.util.List;
 
 public class PacienteService {
     private static PacienteService instance;
-    private ListaPacientes lista;
+    private final PacienteDAO dao;
 
     private PacienteService() {
-        lista = DatosIniciales.listaPacientes;
-
-        if (lista.consulta().isEmpty()) {
-            System.out.println("⚠️ Lista de pacientes vacía. Precargando...");
-            lista.inclusion(new Paciente("PAC-001", "Laura", "8888-1111", LocalDate.of(1990, 5, 12)));
-            lista.inclusion(new Paciente("PAC-002", "Carlos", "8888-2222", LocalDate.of(1985, 8, 23)));
-            DatosIniciales.guardarTodo();
-            System.out.println("✅ Precarga de pacientes guardada.");
-        } else {
-            System.out.println("✅ Pacientes cargados: " + lista.consulta().size());
-        }
+        dao = new PacienteDAO();
     }
 
     public static PacienteService instance() {
@@ -31,29 +20,26 @@ public class PacienteService {
     public void create(Paciente p) throws Exception {
         if (readById(p.getId()) != null)
             throw new Exception("Paciente ya existe");
-        lista.inclusion(p);
-        DatosIniciales.guardarTodo();
+        dao.guardar(p);
     }
 
     public Paciente readById(String id) {
-        return lista.busquedaPorId(id);
+        return dao.buscarPorId(id);
     }
 
     public Paciente readByNombre(String nombre) {
-        return lista.busquedaPorNombre(nombre);
+        return dao.buscarPorNombre(nombre);
     }
 
     public void delete(String id) {
-        lista.borrado(id);
-        DatosIniciales.guardarTodo();
+        dao.borrar(id);
     }
 
     public List<Paciente> findAll() {
-        return lista.consulta();
+        return dao.listar();
     }
 
     public void update(Paciente p) {
-        lista.modificacion(p);
-        DatosIniciales.guardarTodo();
+        dao.actualizar(p);
     }
 }
