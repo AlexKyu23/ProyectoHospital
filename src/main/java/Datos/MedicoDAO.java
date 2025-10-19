@@ -7,10 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MedicoDAO {
+    private static MedicoDAO instance;
     Database db;
 
-    public MedicoDAO() {
+    private MedicoDAO() {
         db = Database.instance();
+    }
+
+    public static MedicoDAO instance() {
+        if (instance == null) instance = new MedicoDAO();
+        return instance;
     }
 
     public void guardar(Medico m) throws Exception {

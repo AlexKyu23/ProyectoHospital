@@ -2,24 +2,16 @@ package Clases.Medico.logic;
 
 import Clases.Medico.data.ListaMedicos;
 import Clases.DatosIniciales;
+import Datos.MedicoDAO;
+
 import java.util.List;
 
 public class MedicoService {
     private static MedicoService instance;
-    private ListaMedicos lista;
+    private final MedicoDAO medicoDAO;
 
     private MedicoService() {
-        lista = DatosIniciales.listaMedicos;
-
-        if (lista.consulta().isEmpty()) {
-            System.out.println("⚠️ Lista de médicos vacía. Precargando...");
-            lista.inclusion(new Medico("MED-001", "Dr. Salas", "MED-001", "Cardiología"));
-            lista.inclusion(new Medico("MED-002", "Dra. Vargas", "MED-002", "Pediatría"));
-            DatosIniciales.guardarTodo();
-            System.out.println("✅ Precarga de médicos guardada.");
-        } else {
-            System.out.println("✅ Médicos cargados: " + lista.consulta().size());
-        }
+        medicoDAO = MedicoDAO.instance();
     }
 
     public static MedicoService instance() {
@@ -28,32 +20,32 @@ public class MedicoService {
     }
 
     public void create(Medico m) throws Exception {
-        if (readById(m.getId()) != null)
-            throw new Exception("Médico ya existe");
-        m.setClave(m.getId());
-        lista.inclusion(m);
-        DatosIniciales.guardarTodo();
+        if (medicoDAO.buscarPorId(m.getId()) != null)
+            throw new Exception("El medico ya existe");
+        medicoDAO.guardar(m);
     }
 
-    public Medico readById(String id) {
-        return lista.busquedaPorId(id);
+    public Medico read(String idB) throws Exception {
+        return medicoDAO.buscarPorId(idB);
     }
 
-    public Medico readByNombre(String nombre) {
-        return lista.busquedaPorNombre(nombre);
+    public void update(Medico m) throws Exception {
+        medicoDAO.actualizar(m);
     }
 
-    public void delete(String id) {
-        lista.borrado(id);
-        DatosIniciales.guardarTodo();
+    public Medico readById(String id) throws Exception {
+        return medicoDAO.buscarPorId(id);
     }
 
-    public List<Medico> findAll() {
-        return lista.consulta();
+    public Medico readByNombre(String nombre) throws Exception {
+        return medicoDAO.buscarPorNombre(nombre);
     }
 
-    public void update(Medico m) {
-        lista.modificacion(m);
-        DatosIniciales.guardarTodo();
+    public void delete(String id) throws Exception {
+        medicoDAO.borrar(medicoDAO.buscarPorId(id));
+    }
+
+    public List<Medico> findAll() throws Exception {
+        return medicoDAO.listar();
     }
 }

@@ -1,59 +1,49 @@
 package Clases.Farmaceuta.logic;
 
-import Clases.Farmaceuta.data.ListaFarmaceutas;
-import Clases.DatosIniciales;
+import Datos.FarmaceutaDAO;
+
 import java.util.List;
 
 public class FarmaceutaService {
     private static FarmaceutaService instance;
-    private ListaFarmaceutas lista;
+    private final FarmaceutaDAO farmaceutaDAO;
+
+    public FarmaceutaService() {
+        farmaceutaDAO = FarmaceutaDAO.instance();
+    }
 
     public static FarmaceutaService instance() {
         if (instance == null) instance = new FarmaceutaService();
         return instance;
     }
 
-    private FarmaceutaService() {
-        lista = DatosIniciales.listaFarmaceutas;
-
-        if (lista.consulta().isEmpty()) {
-            System.out.println("⚠️ Lista de farmaceutas vacía. Precargando...");
-            lista.inclusion(new Farmaceuta("FAR-001", "Carla Jiménez", "FAR-001"));
-            lista.inclusion(new Farmaceuta("FAR-002", "Luis Mora", "FAR-002"));
-            DatosIniciales.guardarTodo();
-            System.out.println("✅ Precarga de farmaceutas guardada.");
-        } else {
-            System.out.println("✅ Farmaceutas cargados: " + lista.consulta().size());
-        }
-    }
-
-    public List<Farmaceuta> findAll() {
-        return lista.consulta();
-    }
-
     public void create(Farmaceuta f) throws Exception {
-        if (lista.busquedaPorId(f.getId()) != null)
-            throw new Exception("Ya existe un farmaceuta con ese ID");
-        f.setClave(f.getId());
-        lista.inclusion(f);
-        DatosIniciales.guardarTodo();
+        if (farmaceutaDAO.buscarPorId(f.getId()) != null)
+            throw new Exception("El farmaceuta ya existe");
+        farmaceutaDAO.guardar(f);
     }
 
-    public void delete(String id) {
-        lista.borrado(id);
-        DatosIniciales.guardarTodo();
+    public Farmaceuta read(String idB) throws Exception {
+        return farmaceutaDAO.buscarPorId(idB);
     }
 
-    public Farmaceuta readById(String id) {
-        return lista.busquedaPorId(id);
+    public void update(Farmaceuta f) throws Exception {
+        farmaceutaDAO.actualizar(f);
     }
 
-    public Farmaceuta readByNombre(String nombre) {
-        return lista.busquedaPorNombre(nombre);
+    public Farmaceuta readById(String id) throws Exception {
+        return farmaceutaDAO.buscarPorId(id);
     }
 
-    public void update(Farmaceuta f) {
-        lista.modificacion(f);
-        DatosIniciales.guardarTodo();
+    public Farmaceuta readByNombre(String nombre) throws Exception {
+        return farmaceutaDAO.buscarPorNombre(nombre);
+    }
+
+    public void delete(String id) throws Exception {
+        farmaceutaDAO.borrar(farmaceutaDAO.buscarPorId(id));
+    }
+
+    public List<Farmaceuta> findAll() throws Exception {
+        return farmaceutaDAO.listar();
     }
 }

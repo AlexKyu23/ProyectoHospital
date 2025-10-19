@@ -57,7 +57,13 @@ public class MedicamentoView extends JPanel implements PropertyChangeListener {
         guardarButton.addActionListener(e -> controller.guardar());
         borrarButton.addActionListener(e -> controller.borrar());
         limpiarButton.addActionListener(e -> controller.limpiar());
-        buscarButton.addActionListener(e -> controller.buscar());
+        buscarButton.addActionListener(e -> {
+            try {
+                controller.buscar();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         reporteButton.addActionListener(e -> controller.reporte());
 
         tablaMedicamentos.getSelectionModel().addListSelectionListener(e -> {

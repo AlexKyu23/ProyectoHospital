@@ -10,7 +10,7 @@ public class MedicamentoController {
     private MedicamentoModel model;
     private MedicamentoView view;
 
-    public MedicamentoController(MedicamentoModel model, MedicamentoView view) {
+    public MedicamentoController(MedicamentoModel model, MedicamentoView view) throws Exception {
         this.model = model;
         this.view = view;
 
@@ -64,12 +64,12 @@ public class MedicamentoController {
             model.setList(MedicamentoService.instance().findAll());
             model.setCurrent(new Medicamento());
 
-        } catch (NumberFormatException ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(view.getMainPanel(), "Debe ingresar un código válido");
         }
     }
 
-    public void buscar() {
+    public void buscar() throws Exception {
         String criterio = view.getNombreBuscar().getText();
         Medicamento m = null;
 
@@ -78,6 +78,8 @@ public class MedicamentoController {
             m = MedicamentoService.instance().readByCodigo(codigo);
         } catch (NumberFormatException e) {
             m = MedicamentoService.instance().readByNombre(criterio);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         if (m != null) {

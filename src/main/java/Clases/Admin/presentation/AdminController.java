@@ -39,7 +39,7 @@ public class AdminController {
                            PacienteModel pacienteModel,
                            MedicamentoModel medicamentoModel,
                            RepositorioRecetas repositorioRecetas,
-                           catalogoMedicamentos medicamentos) {
+                           catalogoMedicamentos medicamentos) throws Exception {
         this.model = model;
         this.view = view;
         this.medicoModel = medicoModel;
@@ -52,7 +52,7 @@ public class AdminController {
         inicializarTabs(repositorioRecetas, medicamentos);
     }
 
-    private void inicializarTabs(RepositorioRecetas repositorioRecetas, catalogoMedicamentos medicamentos) {
+    private void inicializarTabs(RepositorioRecetas repositorioRecetas, catalogoMedicamentos medicamentos) throws Exception {
         MedicoView medicoView = new MedicoView();
         new MedicoController(medicoModel, medicoView);
         view.getTabbedPane().addTab("Médicos", medicoView.getMainPanel());

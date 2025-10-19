@@ -54,7 +54,13 @@ public class Main {
                     loginFrame.dispose();
 
                     switch (u.getRol().toUpperCase()) {
-                        case "ADM" -> lanzarPanelAdmin(u);
+                        case "ADM" -> {
+                            try {
+                                lanzarPanelAdmin(u);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
                         case "MED" -> lanzarPanelMedico(u);
                         case "FAR" -> lanzarPanelFarmaceutico(u);
                         default -> JOptionPane.showMessageDialog(null, "Rol no reconocido. Acceso denegado.");
@@ -64,7 +70,7 @@ public class Main {
         });
     }
 
-    private static void lanzarPanelAdmin(Usuario u) {
+    private static void lanzarPanelAdmin(Usuario u) throws Exception {
         Admin admin = new Admin(u.getId(), u.getNombre(), u.getClave());
         AdminModel adminModel = new AdminModel(admin.getId(), admin.getNombre(), admin.getClave());
         adminModel.setCurrent(admin);

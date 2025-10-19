@@ -11,7 +11,7 @@ public class MedicoController {
     private MedicoModel model;
     private MedicoView view;
 
-    public MedicoController(MedicoModel model, MedicoView view) {
+    public MedicoController(MedicoModel model, MedicoView view) throws Exception {
         this.model = model;
         this.view = view;
 
@@ -24,7 +24,7 @@ public class MedicoController {
         model.setCurrent(new Medico());
     }
 
-    public void guardar() {
+    public void guardar() throws Exception {
         String id = view.getId().getText();
         String nombre = view.getNombre().getText();
         String especialidad = view.getEspecialidad().getText();
@@ -60,7 +60,7 @@ public class MedicoController {
     }
 
 
-    public void borrar() {
+    public void borrar() throws Exception {
         String id = view.getId().getText();
         if (id.isEmpty()) {
             JOptionPane.showMessageDialog(view.getMainPanel(), "Debe ingresar un id");
@@ -77,7 +77,7 @@ public class MedicoController {
     }
 
 
-    public void buscar() {
+    public void buscar() throws Exception {
         String criterio = view.getNombreBuscar().getText();
         Medico m = MedicoService.instance().readByNombre(criterio);
         if (m == null) m = MedicoService.instance().readById(criterio);

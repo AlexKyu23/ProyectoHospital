@@ -9,10 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MedicamentoDAO {
+    private static MedicamentoDAO instance;
     Database db;
 
-    public MedicamentoDAO() {
+    private MedicamentoDAO() {
         db = Database.instance();
+    }
+
+    public static MedicamentoDAO instance() {
+        if (instance == null) instance = new MedicamentoDAO();
+        return instance;
     }
 
     public void guardar(Medicamento m) throws Exception {

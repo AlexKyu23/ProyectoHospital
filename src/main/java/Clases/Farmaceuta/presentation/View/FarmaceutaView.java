@@ -40,10 +40,28 @@ public class FarmaceutaView extends JPanel implements PropertyChangeListener {
     }
 
     private void initListeners() {
-        guardarButton.addActionListener(e -> controller.guardar());
-        borrarButton.addActionListener(e -> controller.borrar());
+        guardarButton.addActionListener(e -> {
+            try {
+                controller.guardar();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        borrarButton.addActionListener(e -> {
+            try {
+                controller.borrar();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         limpiarButton.addActionListener(e -> controller.limpiar());
-        buscarButton.addActionListener(e -> controller.buscar());
+        buscarButton.addActionListener(e -> {
+            try {
+                controller.buscar();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         reporteButton.addActionListener(e -> controller.reporte());
 
         tablaFarmaceutas.getSelectionModel().addListSelectionListener(e -> {

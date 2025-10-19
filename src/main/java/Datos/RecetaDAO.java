@@ -9,11 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecetaDAO {
-
+    private static RecetaDAO instance;
     Database db;
 
-    public RecetaDAO() {
+    private RecetaDAO() {
         db = Database.instance();
+    }
+
+    public static RecetaDAO instance() {
+        if (instance == null) instance = new RecetaDAO();
+        return instance;
     }
 
     public void guardar(Receta r) throws Exception {

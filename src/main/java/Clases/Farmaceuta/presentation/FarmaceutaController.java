@@ -13,7 +13,7 @@ public class FarmaceutaController {
     private FarmaceutaModel model;
     private FarmaceutaView view;
 
-    public FarmaceutaController(FarmaceutaModel model, FarmaceutaView view) {
+    public FarmaceutaController(FarmaceutaModel model, FarmaceutaView view) throws Exception {
         this.model = model;
         this.view = view;
 
@@ -25,7 +25,7 @@ public class FarmaceutaController {
         model.setList(FarmaceutaService.instance().findAll());
         model.setCurrent(new Farmaceuta());
     }
-    public void guardar() {
+    public void guardar() throws Exception {
         String id = view.getId().getText();
         String nombre = view.getNombre().getText();
 
@@ -59,7 +59,7 @@ public class FarmaceutaController {
     }
 
 
-    public void borrar() {
+    public void borrar() throws Exception {
         String id = view.getId().getText();
         if (id.isEmpty()) {
             JOptionPane.showMessageDialog(view.getMainPanel(), "Debe ingresar un id");
@@ -76,7 +76,7 @@ public class FarmaceutaController {
     }
 
 
-    public void buscar() {
+    public void buscar() throws Exception {
         String criterio = view.getNombreBuscar().getText();
         Farmaceuta f = FarmaceutaService.instance().readByNombre(criterio);
         if (f == null) f = FarmaceutaService.instance().readById(criterio);

@@ -6,7 +6,8 @@ import Clases.Receta.Data.RepositorioRecetas;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RecetaService {
+public class
+RecetaService {
     private static RecetaService instance;
     private RepositorioRecetas repositorio;
 

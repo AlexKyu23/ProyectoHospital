@@ -2,20 +2,16 @@ package Clases.Medicamento.logic;
 
 import Clases.Medicamento.data.catalogoMedicamentos;
 import Clases.DatosIniciales;
+import Datos.MedicamentoDAO;
+
 import java.util.List;
 
 public class MedicamentoService {
     private static MedicamentoService instance;
-    private catalogoMedicamentos catalogo;
+    private final MedicamentoDAO medicamentoDAO;
 
-    private MedicamentoService() {
-        catalogo = DatosIniciales.catalogoMed;
-
-        if (catalogo.consulta().isEmpty()) {
-            catalogo.inclusion(new Medicamento("Paracetamol", "Analgésico y antipirético", 101));
-            catalogo.inclusion(new Medicamento("Amoxicilina", "Antibiótico de amplio espectro", 102));
-            DatosIniciales.guardarTodo();
-        }
+    public MedicamentoService() {
+        medicamentoDAO = MedicamentoDAO.instance();
     }
 
     public static MedicamentoService instance() {
@@ -24,33 +20,32 @@ public class MedicamentoService {
     }
 
     public void create(Medicamento m) throws Exception {
-        if (readByCodigo(m.getCodigo()) != null)
-            throw new Exception("Medicamento ya existe");
-        catalogo.inclusion(m);
-        DatosIniciales.guardarTodo();
+        if (medicamentoDAO.buscarPorCodigo(m.getCodigo()) != null)
+            throw new Exception("El medico ya existe");
+        medicamentoDAO.guardar(m);
     }
 
-    public Medicamento readByCodigo(int codigo) {
-        return catalogo.busquedaPorCodigo(codigo);
+    public Medicamento read(int codigo) throws Exception {
+        return medicamentoDAO.buscarPorCodigo(codigo);
     }
 
-    public Medicamento readByNombre(String nombre) {
-        return catalogo.consulta().stream()
-                .filter(m -> m.getNombre().equalsIgnoreCase(nombre))
-                .findFirst().orElse(null);
+    public void update(Medicamento m) throws Exception {
+        medicamentoDAO.actualizar(m);
     }
 
-    public List<Medicamento> findAll() {
-        return catalogo.consulta();
+    public Medicamento readByCodigo(int codigo) throws Exception {
+        return medicamentoDAO.buscarPorCodigo(codigo);
     }
 
-    public void delete(int codigo) {
-        catalogo.borrado(codigo);
-        DatosIniciales.guardarTodo();
+    public Medicamento readByNombre(String nombre) throws Exception {
+        return medicamentoDAO.buscarPorNombre(nombre);
     }
 
-    public void update(Medicamento nuevo) {
-        catalogo.modificacion(nuevo.getCodigo(), nuevo);
-        DatosIniciales.guardarTodo();
+    public void delete(int codigo) throws Exception {
+        medicamentoDAO.borrar(medicamentoDAO.buscarPorCodigo(codigo));
+    }
+
+    public List<Medicamento> findAll() throws Exception {
+        return medicamentoDAO.listar();
     }
 }

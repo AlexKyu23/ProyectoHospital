@@ -9,10 +9,16 @@ import java.util.List;
 
 public class FarmaceutaDAO {
 
+    private static FarmaceutaDAO instance;
     Database db;
 
-    public FarmaceutaDAO() {
+    private FarmaceutaDAO() {
         db = Database.instance();
+    }
+
+    public static FarmaceutaDAO instance() {
+        if (instance == null) instance = new FarmaceutaDAO();
+        return instance;
     }
 
     public void guardar(Farmaceuta f) throws Exception {
