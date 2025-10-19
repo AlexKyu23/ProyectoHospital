@@ -9,7 +9,7 @@ public class PacienteDAO {
 
     private static final String URL = "jdbc:mysql://localhost:3306/HospitalProy?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root";
-    private static final String PASS = "tu_password"; // Cambia por tu contraseña
+    private static final String PASS = "root"; // Cambia por tu contraseña
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);

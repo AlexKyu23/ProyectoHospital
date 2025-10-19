@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<datosSistema>
+    <farmaceutas>
+        <farmaceuta>
+            <clave>far</clave>
+            <id>far01</id>
+            <nombre>Luis Mora</nombre>
+        </farmaceuta>
+    </farmaceutas>
+    <medicamentos>
+        <medicamento>
+            <codigo>101</codigo>
+            <descripcion>Analgésico y antipirético</descripcion>
+            <nombre>Paracetamol</nombre>
+        </medicamento>
+        <medicamento>
+            <codigo>102</codigo>
+            <descripcion>Antibiótico de amplio espectro</descripcion>
+            <nombre>Amoxicilina</nombre>
+        </medicamento>
+    </medicamentos>
+    <medicos>
+        <medico>
+            <clave>med</clave>
+            <id>med01</id>
+            <nombre>Dr. Salas</nombre>
+            <especialidad>Cardiología</especialidad>
+        </medico>
+        <medico>
+            <clave>med02</clave>
+            <id>med02</id>
+            <nombre>Dr.Palma</nombre>
+            <especialidad>neurólogo</especialidad>
+        </medico>
+    </medicos>
+    <pacientes>
+        <paciente>
+            <id>PAC-001</id>
+            <nombre>Laura</nombre>
+            <fechaNacimiento>1990-05-12</fechaNacimiento>
+            <telefono>8888-1111</telefono>
+        </paciente>
+        <paciente>
+            <id>PAC-002</id>
+            <nombre>Carlos</nombre>
+            <fechaNacimiento>1985-08-23</fechaNacimiento>
+            <telefono>8888-2222</telefono>
+        </paciente>
+    </pacientes>
+    <recetas>
+        <receta>
+            <estado>CONFECCIONADA</estado>
+            <fechaConfeccion>2025-10-14</fechaConfeccion>
+            <fechaRetiro>2025-10-14</fechaRetiro>
+            <id>R001</id>
+            <medicamentos/>
+            <medicoId>med01</medicoId>
+            <pacienteId>PAC-002</pacienteId>
+        </receta>
+    </recetas>
+    <usuarios>
+        <usuario>
+            <clave>admin</clave>
+            <id>adm01</id>
+            <nombre>Administrador</nombre>
+            <rol>ADM</rol>
+        </usuario>
+        <usuario>
+            <clave>med</clave>
+            <id>med01</id>
+            <nombre>Dr. Salas</nombre>
+            <rol>MED</rol>
+        </usuario>
+        <usuario>
+            <clave>far</clave>
+            <id>far01</id>
+            <nombre>Luis Mora</nombre>
+            <rol>FAR</rol>
+        </usuario>
+    </usuarios>
+</datosSistema>

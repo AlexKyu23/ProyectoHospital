@@ -1,16 +1,15 @@
 package Clases.Usuario.logic;
 
-import Clases.Usuario.data.ListaUsuarios;
-import Clases.DatosIniciales;
+import Datos.UsuarioDAO;
 import java.util.List;
 
 public class UsuarioService {
     private static UsuarioService instance;
-    private ListaUsuarios lista;
+    private final UsuarioDAO dao;
 
     private UsuarioService() {
-        lista = DatosIniciales.listaUsuarios;
-        System.out.println("✅ Usuarios cargados: " + lista.getUsuarios().size());
+        dao = UsuarioDAO.instance();
+        System.out.println("✅ Usuarios cargados desde SQL: " + dao.findAll().size());
     }
 
     public static UsuarioService instance() {
@@ -19,7 +18,7 @@ public class UsuarioService {
     }
 
     public Usuario readById(String id) {
-        return lista.busquedaPorId(id);
+        return dao.readById(id);
     }
 
     public boolean verificarClave(String id, String clave) {
@@ -30,21 +29,18 @@ public class UsuarioService {
     public void create(Usuario u) throws Exception {
         if (readById(u.getId()) != null)
             throw new Exception("Ya existe un usuario con ese ID");
-        lista.inclusion(u);
-        DatosIniciales.guardarTodo();
+        dao.create(u);
     }
 
     public void update(Usuario u) {
-        lista.modificacion(u);
-        DatosIniciales.guardarTodo();
+        dao.update(u);
     }
 
     public void delete(String id) {
-        lista.borrado(id);
-        DatosIniciales.guardarTodo();
+        dao.delete(id);
     }
 
     public List<Usuario> findAll() {
-        return lista.getUsuarios();
+        return dao.findAll();
     }
 }
