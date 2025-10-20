@@ -1,18 +1,14 @@
 package Clases.Receta.logic;
 
-import Clases.DatosIniciales;
-import Clases.Receta.Data.RepositorioRecetas;
-
+import Datos.RecetaDAO;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class
-RecetaService {
+public class RecetaService {
     private static RecetaService instance;
-    private RepositorioRecetas repositorio;
+    private RecetaDAO dao;
 
     private RecetaService() {
-        this.repositorio = DatosIniciales.repositorioRecetas;
+        this.dao = RecetaDAO.instance();
     }
 
     public static RecetaService instance() {
@@ -23,32 +19,28 @@ RecetaService {
     public void create(Receta r) throws Exception {
         if (readById(r.getId()) != null)
             throw new Exception("Receta ya existe");
-        repositorio.agregar(r);
-        DatosIniciales.guardarTodo();
+        dao.guardar(r);
     }
 
-    public Receta readById(String id) {
-        return repositorio.getRecetas().stream()
-                .filter(r -> r.getId().equalsIgnoreCase(id))
-                .findFirst()
-                .orElse(null);
+    public Receta readById(String id) throws Exception {
+        return dao.buscarPorId(id);
     }
 
-    public List<Receta> findByPaciente(String pacienteId) {
-        return repositorio.getRecetas().stream()
+    public List<Receta> findByPaciente(String pacienteId) throws Exception {
+        return dao.listar().stream()
                 .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public List<Receta> findAll() {
-        return repositorio.getRecetas();
+    public List<Receta> findAll() throws Exception {
+        return dao.listar();
     }
 
-    public void cambiarEstado(String recetaId, EstadoReceta nuevoEstado) {
-        Receta r = readById(recetaId);
+    public void cambiarEstado(String recetaId, EstadoReceta nuevoEstado) throws Exception {
+        Receta r = dao.buscarPorId(recetaId);
         if (r != null) {
             r.setEstado(nuevoEstado);
-            DatosIniciales.guardarTodo();
+            dao.actualizar(r);
         }
     }
 }
