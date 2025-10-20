@@ -31,17 +31,17 @@ public class DespachoService {
     }
 
     // 🔄 Cambiar estado a EN_PROCESO
-    public void iniciarDespacho(String recetaId) {
+    public void iniciarDespacho(String recetaId) throws Exception {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.EN_PROCESO);
     }
 
     // 🔄 Cambiar estado a LISTA
-    public void alistarMedicamentos(String recetaId) {
+    public void alistarMedicamentos(String recetaId) throws Exception {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.LISTA);
     }
 
     // 🔄 Cambiar estado a ENTREGADA
-    public void entregarReceta(String recetaId) {
+    public void entregarReceta(String recetaId) throws Exception {
         RecetaService.instance().cambiarEstado(recetaId, EstadoReceta.ENTREGADA);
     }
 }

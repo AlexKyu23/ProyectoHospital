@@ -49,7 +49,13 @@ public class PrescribirController {
         view.getAgregarMedicamentoButton().addActionListener(e -> agregarMedicamento());
         view.getDescartarMedicamentoButton().addActionListener(e -> descartarMedicamento());
         view.getLimpiarButton().addActionListener(e -> limpiarFormulario());
-        view.getGuardarButton().addActionListener(e -> guardarReceta());
+        view.getGuardarButton().addActionListener(e -> {
+            try {
+                guardarReceta();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void buscarPaciente() {
@@ -153,7 +159,7 @@ public class PrescribirController {
         view.getCalendario().clear();
     }
 
-    private void guardarReceta() {
+    private void guardarReceta() throws Exception {
         if (model.getPaciente() == null) {
             JOptionPane.showMessageDialog(view.getPanel(), "Debe seleccionar un paciente");
             return;

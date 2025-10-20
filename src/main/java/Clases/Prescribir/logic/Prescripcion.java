@@ -3,36 +3,29 @@ package Clases.Prescribir.logic;
 import Clases.Paciente.logic.Paciente;
 import Clases.Medico.logic.Medico;
 import Clases.Receta.logic.ItemReceta;
-import Clases.Prescribir.data.LocalDateTimeAdapter;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@XmlRootElement(name = "prescripcion")
 public class Prescripcion {
 
+    private int numero;                // ✅ corresponde al campo AUTO_INCREMENT en SQL
     private Paciente paciente;
     private Medico medico;
-    private List<ItemReceta> items;
+    private ItemReceta item;           // ✅ un solo item, igual que antes
     private LocalDateTime fechaConfeccion;
     private LocalDateTime fechaRetiro;
-    private String estado; // "confeccionada", "enProceso", "lista", "entregada"
+    private String estado;             // "CONFECCIONADA", "EN_PROCESO", "LISTA", "ENTREGADA"
 
-    // 🔹 Constructor vacío obligatorio para JAXB
+    // 🔹 Constructor vacío (necesario para SQL y compatibilidad con JAXB anterior)
     public Prescripcion() {
-        this.items = new ArrayList<>();
     }
 
-    public Prescripcion(Paciente paciente, Medico medico, List<ItemReceta> medicamentos,
+    public Prescripcion(int numero, Paciente paciente, Medico medico, ItemReceta item,
                         LocalDateTime fechaConfeccion, LocalDateTime fechaRetiro, String estado) {
+        this.numero = numero;
         this.paciente = paciente;
         this.medico = medico;
-        this.items = medicamentos;
+        this.item = item;
         this.fechaConfeccion = fechaConfeccion;
         this.fechaRetiro = fechaRetiro;
         this.estado = estado;
@@ -40,53 +33,58 @@ public class Prescripcion {
 
     // ---------------- Getters y Setters ----------------
 
-    @XmlElement
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
+    }
+
     public Paciente getPaciente() {
         return paciente;
     }
+
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
     }
 
-    @XmlElement
     public Medico getMedico() {
         return medico;
     }
+
     public void setMedico(Medico medico) {
         this.medico = medico;
     }
 
-    @XmlElementWrapper(name = "items")
-    @XmlElement(name = "item")
-    public List<ItemReceta> getItems() {
-        return items;
-    }
-    public void setItems(List<ItemReceta> items) {
-        this.items = items;
+    public ItemReceta getItem() {
+        return item;
     }
 
-    @XmlElement
-    @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
+    public void setItem(ItemReceta item) {
+        this.item = item;
+    }
+
     public LocalDateTime getFechaConfeccion() {
         return fechaConfeccion;
     }
+
     public void setFechaConfeccion(LocalDateTime fechaConfeccion) {
         this.fechaConfeccion = fechaConfeccion;
     }
 
-    @XmlElement
-    @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
     public LocalDateTime getFechaRetiro() {
         return fechaRetiro;
     }
+
     public void setFechaRetiro(LocalDateTime fechaRetiro) {
         this.fechaRetiro = fechaRetiro;
     }
 
-    @XmlElement
     public String getEstado() {
         return estado;
     }
+
     public void setEstado(String estado) {
         this.estado = estado;
     }
@@ -95,9 +93,10 @@ public class Prescripcion {
     @Override
     public String toString() {
         return "Prescripcion{" +
-                "paciente=" + paciente +
+                "numero=" + numero +
+                ", paciente=" + paciente +
                 ", medico=" + medico +
-                ", items=" + items +
+                ", item=" + item +
                 ", fechaConfeccion=" + fechaConfeccion +
                 ", fechaRetiro=" + fechaRetiro +
                 ", estado='" + estado + '\'' +
