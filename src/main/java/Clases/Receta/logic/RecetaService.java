@@ -17,10 +17,9 @@ public class RecetaService {
     }
 
     public void create(Receta r) throws Exception {
-        if (readById(r.getId()) != null)
-            throw new Exception("Receta ya existe");
         dao.guardar(r);
     }
+
 
     public Receta readById(String id) throws Exception {
         return dao.buscarPorId(id);
