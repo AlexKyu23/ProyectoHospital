@@ -22,7 +22,7 @@ public class RecetaDAO {
     }
 
     public void guardar(Receta r) throws Exception {
-        String sql = "INSERT INTO Receta (id, medicoId, pacienteId, fechaConfeccion, fechaRetiro) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO Receta (id,medicoId, pacienteId, fechaConfeccion, fechaRetiro) VALUES (?,?,?,?,?)";
 
         String confeccionString = r.getFechaConfeccion().toString();
         String retiroString = r.getFechaRetiro().toString();
@@ -53,9 +53,6 @@ public class RecetaDAO {
         ps.setString(4, retiroString);
         int count = db.executeUpdate(ps);
 
-        if (count == 0) {
-            throw new Exception("Receta ya existe");
-        }
         if (count == 0) {
             throw new Exception("Receta no existe");
         }
@@ -96,7 +93,7 @@ public class RecetaDAO {
     public List<Receta> listar() throws Exception {
         List<Receta> lista = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM Medicamento";
+            String sql = "SELECT * FROM Receta";
             PreparedStatement stm = db.prepareStatement(sql);
             ResultSet rs =  db.executeQuery(stm);
             while (rs.next()) {
