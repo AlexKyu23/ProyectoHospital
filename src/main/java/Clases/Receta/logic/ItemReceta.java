@@ -5,6 +5,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "itemReceta")
 public class ItemReceta {
+    private String recetaId;
     private int medicamentoCodigo;
     private String descripcion;
     private int cantidad;
@@ -13,6 +14,15 @@ public class ItemReceta {
 
     public ItemReceta() {}
 
+    public ItemReceta(String recetaId, int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+        this.recetaId = recetaId;
+        this.medicamentoCodigo = medicamentoCodigo;
+        this.descripcion = descripcion;
+        this.cantidad = cantidad;
+        this.indicaciones = indicaciones;
+        this.duracionDias = duracionDias;
+    }
+
     public ItemReceta(int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
         this.medicamentoCodigo = medicamentoCodigo;
         this.descripcion = descripcion;
@@ -20,6 +30,10 @@ public class ItemReceta {
         this.indicaciones = indicaciones;
         this.duracionDias = duracionDias;
     }
+
+    @XmlElement
+    public String getRecetaId() { return recetaId; }
+    public void setRecetaId(String recetaId) { this.recetaId = recetaId; }
 
     @XmlElement
     public int getMedicamentoCodigo() { return medicamentoCodigo; }

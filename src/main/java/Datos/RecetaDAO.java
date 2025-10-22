@@ -23,7 +23,7 @@ public class RecetaDAO {
     }
 
     public void guardar(Receta r) throws Exception {
-        String sql = "INSERT INTO Receta (id,medicoId, pacienteId, fechaConfeccion, fechaRetiro,estado) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO Receta (id, medicoId, pacienteId, fechaConfeccion, fechaRetiro, estado) VALUES (?,?,?,?,?,?)";
 
         String confeccionString = r.getFechaConfeccion().toString();
         String retiroString = r.getFechaRetiro().toString();
@@ -35,21 +35,24 @@ public class RecetaDAO {
         ps.setString(4, confeccionString);
         ps.setString(5, retiroString);
         ps.setString(6, r.getEstado().name());
+
         int count = db.executeUpdate(ps);
-                                                                                    //Actualización para medicamentos !!Revisar!!
-        for (ItemReceta item : r.getMedicamentos()) {
-            String sqlItem = "INSERT INTO ItemReceta (medicamentoCodigo, descripcion, cantidad,indicaciones, duracionDias) VALUES (?,?,?,?,?)";
-            PreparedStatement psItem = db.prepareStatement(sqlItem);
-            psItem.setInt(1, item.getMedicamentoCodigo());
-            psItem.setString(2, item.getDescripcion());
-            psItem.setInt(3, item.getCantidad());
-            psItem.setString(4, item.getIndicaciones());
-            psItem.setInt(5, item.getDuracionDias());
-            db.executeUpdate(psItem);
+        if (count == 0) {
+            throw new Exception("No se pudo guardar la receta");
         }
 
-        if (count == 0) {
-            throw new Exception("Receta ya existe");
+        // 🔹 Guardar los medicamentos asociados
+        for (ItemReceta item : r.getMedicamentos()) {
+            item.setRecetaId(r.getId());
+            String sqlItem = "INSERT INTO ItemReceta (recetaId, medicamentoCodigo, descripcion, cantidad, indicaciones, duracionDias) VALUES (?,?,?,?,?,?)";
+            PreparedStatement psItem = db.prepareStatement(sqlItem);
+            psItem.setString(1, item.getRecetaId());
+            psItem.setInt(2, item.getMedicamentoCodigo());
+            psItem.setString(3, item.getDescripcion());
+            psItem.setInt(4, item.getCantidad());
+            psItem.setString(5, item.getIndicaciones());
+            psItem.setInt(6, item.getDuracionDias());
+            db.executeUpdate(psItem);
         }
     }
 
