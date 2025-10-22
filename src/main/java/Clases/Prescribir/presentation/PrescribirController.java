@@ -14,6 +14,7 @@ import Clases.Receta.logic.RecetaService;
 import Clases.Medico.logic.Medico;
 import Clases.Paciente.logic.Paciente;
 import Clases.Medicamento.logic.Medicamento;
+import java.util.UUID;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -127,7 +128,18 @@ public class PrescribirController {
                     String indicaciones = JOptionPane.showInputDialog("Indicaciones:");
                     int duracion = Integer.parseInt(JOptionPane.showInputDialog("Duración en días:"));
 
-                    ItemReceta item = new ItemReceta(seleccionado.getCodigo(), seleccionado.getNombre(), cantidad, indicaciones, duracion);
+                    // 🔹 Generar ID único para el item
+                    String itemId = "IR" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+                    // 🔹 Crear el item con itemRecetaId
+                    ItemReceta item = new ItemReceta();
+                    item.setItemRecetaId(itemId);
+                    item.setMedicamentoCodigo(seleccionado.getCodigo());
+                    item.setDescripcion(seleccionado.getNombre());
+                    item.setCantidad(cantidad);
+                    item.setIndicaciones(indicaciones);
+                    item.setDuracionDias(duracion);
+
                     model.agregarItem(item);
                     tableModel.addRow(new Object[]{seleccionado.getNombre(), cantidad, indicaciones, duracion});
                 } catch (Exception ex) {

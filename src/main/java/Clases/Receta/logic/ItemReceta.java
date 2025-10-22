@@ -3,8 +3,9 @@ package Clases.Receta.logic;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "itemReceta")
+@XmlRootElement(name = "ItemReceta")
 public class ItemReceta {
+    private String itemRecetaId;
     private String recetaId;
     private int medicamentoCodigo;
     private String descripcion;
@@ -14,7 +15,8 @@ public class ItemReceta {
 
     public ItemReceta() {}
 
-    public ItemReceta(String recetaId, int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+    public ItemReceta(String itemRecetaId, String recetaId, int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+        this.itemRecetaId = itemRecetaId;
         this.recetaId = recetaId;
         this.medicamentoCodigo = medicamentoCodigo;
         this.descripcion = descripcion;
@@ -23,13 +25,18 @@ public class ItemReceta {
         this.duracionDias = duracionDias;
     }
 
-    public ItemReceta(int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+    public ItemReceta(String itemRecetaId,int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+        this.itemRecetaId = itemRecetaId;
         this.medicamentoCodigo = medicamentoCodigo;
         this.descripcion = descripcion;
         this.cantidad = cantidad;
         this.indicaciones = indicaciones;
         this.duracionDias = duracionDias;
     }
+
+    @XmlElement
+    public String getItemRecetaId() { return itemRecetaId; }
+    public void setItemRecetaId(String itemRecetaId) { this.itemRecetaId = itemRecetaId; }
 
     @XmlElement
     public String getRecetaId() { return recetaId; }

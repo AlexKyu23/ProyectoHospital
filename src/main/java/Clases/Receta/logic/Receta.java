@@ -61,7 +61,7 @@ public class Receta {
 
     // ✅ CORREGIDO: Anotaciones JAXB para serializar lista de medicamentos
     @XmlElementWrapper(name = "medicamentos")
-    @XmlElement(name = "itemReceta")
+    @XmlElement(name = "ItemReceta")
     public List<ItemReceta> getMedicamentos() { return medicamentos; }
     public void setMedicamentos(List<ItemReceta> medicamentos) { this.medicamentos = medicamentos; }
 }

@@ -44,14 +44,16 @@ public class RecetaDAO {
         // 🔹 Guardar los medicamentos asociados
         for (ItemReceta item : r.getMedicamentos()) {
             item.setRecetaId(r.getId());
-            String sqlItem = "INSERT INTO ItemReceta (recetaId, medicamentoCodigo, descripcion, cantidad, indicaciones, duracionDias) VALUES (?,?,?,?,?,?)";
+
+            String sqlItem = "INSERT INTO ItemReceta (itemRecetaId, recetaId, medicamentoCodigo, descripcion, cantidad, indicaciones, duracionDias) VALUES (?,?,?,?,?,?,?)";
             PreparedStatement psItem = db.prepareStatement(sqlItem);
-            psItem.setString(1, item.getRecetaId());
-            psItem.setInt(2, item.getMedicamentoCodigo());
-            psItem.setString(3, item.getDescripcion());
-            psItem.setInt(4, item.getCantidad());
-            psItem.setString(5, item.getIndicaciones());
-            psItem.setInt(6, item.getDuracionDias());
+            psItem.setString(1, item.getItemRecetaId());
+            psItem.setString(2, item.getRecetaId());
+            psItem.setInt(3, item.getMedicamentoCodigo());
+            psItem.setString(4, item.getDescripcion());
+            psItem.setInt(5, item.getCantidad());
+            psItem.setString(6, item.getIndicaciones());
+            psItem.setInt(7, item.getDuracionDias());
             db.executeUpdate(psItem);
         }
     }
