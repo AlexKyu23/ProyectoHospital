@@ -1,8 +1,5 @@
-package Clases.Dashboard.logic;
+package logic;
 
-import Clases.Receta.Data.RepositorioRecetas;
-import Clases.Receta.logic.Receta;
-import Clases.Receta.logic.ItemReceta;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -10,12 +7,13 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class LineChart_AWT {
+public class LineChart_AWT implements Serializable {
 
     public static JPanel getChartPanel(RepositorioRecetas repositorio, String selectedMed, LocalDate start, LocalDate end) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
