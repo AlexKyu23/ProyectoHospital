@@ -324,6 +324,18 @@ public class Service {
         }
         recetaDAO.borrar(recetaId);
     }
+    public List<Receta> findAllRecetas() throws Exception {
+        return recetaDAO.listar();
+    }
+
+    public List<Receta> findRecetasBetween(LocalDate start, LocalDate end) throws Exception {
+        return recetaDAO.listar().stream()
+                .filter(r -> {
+                    LocalDate fecha = r.getFechaConfeccion();
+                    return fecha != null && !fecha.isBefore(start) && !fecha.isAfter(end);
+                })
+                .collect(Collectors.toList());
+    }
     public void resetDatosDePrueba() throws Exception {
         try {
             List<Prescripcion> pres = prescripcionDAO.listar();

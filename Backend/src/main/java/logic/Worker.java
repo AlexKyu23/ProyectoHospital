@@ -2,6 +2,7 @@ package logic;
 
 import java.io.*;
 import java.net.Socket;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Worker {
@@ -93,6 +94,19 @@ public class Worker {
                     case Protocol.RECETA_SEARCH -> {
                         String pacienteId = (String) is.readObject();
                         List<Receta> recetas = service.findRecetaByPaciente(pacienteId);
+                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        os.writeObject(recetas);
+                    }
+                    case Protocol.RECETA_READ_ALL -> {
+                        List<Receta> recetas = service.findAllRecetas();
+                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        os.writeObject(recetas);
+                    }
+
+                    case Protocol.RECETA_SEARCH_BETWEEN -> {
+                        LocalDate start = (LocalDate) is.readObject();
+                        LocalDate end = (LocalDate) is.readObject();
+                        List<Receta> recetas = service.findRecetasBetween(start, end);
                         os.writeInt(Protocol.ERROR_NO_ERROR);
                         os.writeObject(recetas);
                     }

@@ -53,6 +53,8 @@ public class Protocol {
     public static final int ITEMRECETA_UPDATE = 962;
     public static final int ITEMRECETA_DELETE = 963;
     public static final int ITEMRECETA_SEARCH = 964;
+    public static final int RECETA_READ_ALL = 975;           // NUEVO: listar todas
+    public static final int RECETA_SEARCH_BETWEEN = 976;     // NUEVO: buscar por rango de fechas
 
     // 📄 Receta (970–979)
     public static final int RECETA_CREATE = 970;

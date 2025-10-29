@@ -12,6 +12,7 @@
     <modules>
         <module>Backend</module>
         <module>Protocol</module>
+        <module>Frontend</module>
     </modules>
 
     <properties>
