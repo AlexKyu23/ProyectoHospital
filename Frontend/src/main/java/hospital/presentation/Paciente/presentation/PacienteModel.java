@@ -26,16 +26,21 @@ public class PacienteModel extends AbstractModel {
         super.addPropertyChangeListener(listener);
     }
 
-    public Paciente getCurrent() { return current; }
-    public List<Paciente> getList() { return list; }
+    public Paciente getCurrent() {
+        return current != null ? current : new Paciente();
+    }
+
+    public List<Paciente> getList() {
+        return list != null ? list : new ArrayList<>();
+    }
 
     public void setCurrent(Paciente paciente) {
-        this.current = paciente;
+        this.current = paciente != null ? paciente : new Paciente();
         firePropertyChange(CURRENT);
     }
 
     public void setList(List<Paciente> list) {
-        this.list = list;
+        this.list = list != null ? list : new ArrayList<>();
         firePropertyChange(LIST);
     }
 }

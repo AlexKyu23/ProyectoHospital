@@ -1,9 +1,9 @@
 package hospital.presentation.Farmaceuta.presentation;
 
-
-import logic.Farmaceuta;
 import hospital.presentation.AbstractTableModel;
+import logic.Farmaceuta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FarmaceutaTableModel extends AbstractTableModel<Farmaceuta> {
@@ -11,7 +11,7 @@ public class FarmaceutaTableModel extends AbstractTableModel<Farmaceuta> {
     public static final int NOMBRE = 1;
 
     public FarmaceutaTableModel(int[] cols, List<Farmaceuta> rows) {
-        super(cols, rows);
+        super(cols, rows != null ? rows : new ArrayList<>());
     }
 
     @Override
@@ -23,10 +23,10 @@ public class FarmaceutaTableModel extends AbstractTableModel<Farmaceuta> {
 
     @Override
     protected Object getPropetyAt(Farmaceuta f, int col) {
-        switch (cols[col]) {
-            case ID: return f.getId();
-            case NOMBRE: return f.getNombre();
-            default: return "";
-        }
+        return switch (cols[col]) {
+            case ID -> f.getId();
+            case NOMBRE -> f.getNombre();
+            default -> "";
+        };
     }
 }

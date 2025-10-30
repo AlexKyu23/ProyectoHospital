@@ -18,7 +18,7 @@ public class MedicamentoDAO {
     public void guardar(Medicamento m) throws Exception {
         String sql = "INSERT INTO Medicamento (codigo, nombre, descripcion) VALUES (?, ?, ?)";
         PreparedStatement ps = db.prepareStatement(sql);
-        ps.setInt(1, m.getCodigo());
+        ps.setString(1, m.getCodigo());
         ps.setString(2, m.getNombre());
         ps.setString(3, m.getDescripcion());
         int count = db.executeUpdate(ps);
@@ -32,7 +32,7 @@ public class MedicamentoDAO {
         PreparedStatement ps = db.prepareStatement(sql);
         ps.setString(1, m.getNombre());
         ps.setString(2, m.getDescripcion());
-        ps.setInt(3, m.getCodigo());
+        ps.setString(3, m.getCodigo());
         int count = db.executeUpdate(ps);
         if (count == 0) {
             throw new Exception("Medicamento no existe");
@@ -61,7 +61,7 @@ public class MedicamentoDAO {
     }
 
     public List<Medicamento> listar() throws Exception {
-        return search(new Medicamento("", "", 0)); // Búsqueda sin filtro para listar todos
+        return search(new Medicamento("", "", "")); // Búsqueda sin filtro para listar todos
     }
 
     public List<Medicamento> search(Medicamento e) throws Exception {
@@ -80,7 +80,7 @@ public class MedicamentoDAO {
         Medicamento e = new Medicamento(
                 rs.getString(alias + "nombre"),
                 rs.getString(alias + "descripcion"),
-                rs.getInt(alias + "codigo")
+                rs.getString(alias + "codigo")
         );
         return e;
     }

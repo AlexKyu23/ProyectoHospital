@@ -1,11 +1,9 @@
 package hospital.presentation.Paciente.presentation;
 
-
-
-
 import hospital.presentation.AbstractTableModel;
 import logic.Paciente;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PacienteTableModel extends AbstractTableModel<Paciente> {
@@ -15,7 +13,7 @@ public class PacienteTableModel extends AbstractTableModel<Paciente> {
     public static final int FECHA = 3;
 
     public PacienteTableModel(int[] cols, List<Paciente> rows) {
-        super(cols, rows);
+        super(cols, rows != null ? rows : new ArrayList<>());
     }
 
     @Override
@@ -29,12 +27,12 @@ public class PacienteTableModel extends AbstractTableModel<Paciente> {
 
     @Override
     protected Object getPropetyAt(Paciente p, int col) {
-        switch (cols[col]) {
-            case ID: return p.getId();
-            case NOMBRE: return p.getNombre();
-            case TELEFONO: return p.getTelefono();
-            case FECHA: return p.getFechaNacimiento();
-            default: return "";
-        }
+        return switch (cols[col]) {
+            case ID -> p.getId();
+            case NOMBRE -> p.getNombre();
+            case TELEFONO -> p.getTelefono();
+            case FECHA -> p.getFechaNacimiento();
+            default -> "";
+        };
     }
 }

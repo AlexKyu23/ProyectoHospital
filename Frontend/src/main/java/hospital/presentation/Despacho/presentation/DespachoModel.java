@@ -66,5 +66,6 @@ public class DespachoModel extends AbstractModel {
     }
 
     public void setFarmaceuta(Farmaceuta farm) {
+
     }
 }

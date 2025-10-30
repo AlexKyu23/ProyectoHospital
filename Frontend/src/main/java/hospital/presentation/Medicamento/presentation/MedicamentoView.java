@@ -23,7 +23,6 @@ public class MedicamentoView implements PropertyChangeListener {
     private JTextField codigo;
     private JTextField nombre;
     private JTextField descripcion;
-    // ❌ REMOVIDO: private JTextField nombreBuscar;
     private JTextField descripcionBuscar;
     private JTextField codigoBuscar;
     private JButton guardarButton;
@@ -45,13 +44,8 @@ public class MedicamentoView implements PropertyChangeListener {
         buscarButton.addActionListener(e -> {
             try {
                 Medicamento filter = new Medicamento();
-                // ❌ REMOVIDO: filter.setNombre(nombreBuscar.getText());
-                filter.setDescripcion(descripcionBuscar.getText());
-                try {
-                    filter.setCodigo(Integer.parseInt(codigoBuscar.getText()));
-                } catch (NumberFormatException ex) {
-                    filter.setCodigo(0);
-                }
+                filter.setDescripcion(descripcionBuscar.getText().trim());
+                filter.setCodigo(codigoBuscar.getText().trim()); // ✅ Ahora String
                 controller.search(filter);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(todo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -120,16 +114,15 @@ public class MedicamentoView implements PropertyChangeListener {
             }
             case MedicamentoModel.CURRENT -> {
                 Medicamento m = model.getCurrent();
-                codigo.setText(String.valueOf(m.getCodigo()));
+                codigo.setText(m.getCodigo()); // ✅ Ahora String
                 nombre.setText(m.getNombre());
                 descripcion.setText(m.getDescripcion());
                 resetBorders();
             }
             case MedicamentoModel.FILTER -> {
                 Medicamento f = model.getFilter();
-                // ❌ REMOVIDO: nombreBuscar.setText(f.getNombre());
                 descripcionBuscar.setText(f.getDescripcion());
-                codigoBuscar.setText(f.getCodigo() > 0 ? String.valueOf(f.getCodigo()) : "");
+                codigoBuscar.setText(f.getCodigo() != null && !f.getCodigo().isEmpty() ? f.getCodigo() : ""); // ✅ String
             }
             case MedicamentoModel.MODE -> {
                 boolean editando = model.getMode() == Application.MODE_EDIT;
@@ -143,7 +136,7 @@ public class MedicamentoView implements PropertyChangeListener {
 
     public Medicamento take() {
         Medicamento m = new Medicamento();
-        m.setCodigo(Integer.parseInt(codigo.getText().trim()));
+        m.setCodigo(codigo.getText().trim()); // ✅ Ahora String directamente
         m.setNombre(nombre.getText().trim());
         m.setDescripcion(descripcion.getText().trim());
         return m;
@@ -153,11 +146,19 @@ public class MedicamentoView implements PropertyChangeListener {
         boolean valid = true;
         resetBorders();
 
-        try {
-            Integer.parseInt(codigo.getText().trim());
-        } catch (NumberFormatException e) {
+        // ✅ Validación: código debe ser numérico
+        String codigoText = codigo.getText().trim();
+        if (codigoText.isEmpty()) {
             valid = false;
             codigo.setBorder(BORDER_ERROR);
+        } else {
+            try {
+                Integer.parseInt(codigoText);
+            } catch (NumberFormatException e) {
+                valid = false;
+                codigo.setBorder(BORDER_ERROR);
+                JOptionPane.showMessageDialog(todo, "El código debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
 
         if (nombre.getText().trim().isEmpty()) {
@@ -183,7 +184,6 @@ public class MedicamentoView implements PropertyChangeListener {
     public JTextField getCodigo() { return codigo; }
     public JTextField getNombre() { return nombre; }
     public JTextField getDescripcion() { return descripcion; }
-    // ❌ REMOVIDO: public JTextField getNombreBuscar() { return nombreBuscar; }
     public JTextField getDescripcionBuscar() { return descripcionBuscar; }
     public JTextField getCodigoBuscar() { return codigoBuscar; }
     public JTable getTablaMedicamentos() { return tablaMedicamentos; }

@@ -20,10 +20,7 @@ public class FarmaceutaController implements ThreadListener {
         this.model = model;
 
         System.out.println("📦 Iniciando FarmaceutaController...");
-
         model.init();
-
-        // ✅ CARGA ASÍNCRONA
         cargarDatosAsincrono();
 
         view.setController(this);
@@ -37,20 +34,22 @@ public class FarmaceutaController implements ThreadListener {
     private void cargarDatosAsincrono() {
         SwingWorker<List<Farmaceuta>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Farmaceuta> doInBackground() throws Exception {
-                System.out.println("🔄 Cargando farmacéuticos del backend...");
-                return Service.instance().findAllFarmaceuta();
+            protected List<Farmaceuta> doInBackground() {
+                try {
+                    System.out.println("🔄 Cargando farmacéuticos del backend...");
+                    return Service.instance().findAllFarmaceuta();
+                } catch (Exception e) {
+                    System.err.println("❌ Error al cargar farmacéuticos: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    List<Farmaceuta> lista = get();
-                    System.out.println("📡 Farmacéuticos cargados: " + lista.size());
-                    model.setList(lista);
+                    model.setList(get());
                 } catch (Exception e) {
-                    System.err.println("❌ Error al cargar farmacéuticos: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println("❌ Error en carga asincrónica: " + e.getMessage());
                 }
             }
         };
@@ -60,8 +59,13 @@ public class FarmaceutaController implements ThreadListener {
     public void search(Farmaceuta filter) {
         SwingWorker<List<Farmaceuta>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Farmaceuta> doInBackground() throws Exception {
-                return Service.instance().searchFarmaceuta(filter.getNombre());
+            protected List<Farmaceuta> doInBackground() {
+                try {
+                    return Service.instance().searchFarmaceuta(filter.getNombre());
+                } catch (Exception e) {
+                    System.err.println("❌ Error en búsqueda: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
@@ -72,7 +76,7 @@ public class FarmaceutaController implements ThreadListener {
                     model.setCurrent(new Farmaceuta());
                     model.setList(get());
                 } catch (Exception e) {
-                    System.err.println("Error en búsqueda: " + e.getMessage());
+                    System.err.println("❌ Error al aplicar búsqueda: " + e.getMessage());
                 }
             }
         };
@@ -82,48 +86,56 @@ public class FarmaceutaController implements ThreadListener {
     public void save(Farmaceuta f) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                switch (model.getMode()) {
-                    case 1 -> { // MODE_CREATE
+            protected Void doInBackground() {
+                try {
+                    if (model.getMode() == 1) {
                         Service.instance().createFarmaceuta(f);
                         Usuario u = new Usuario(f.getId(), f.getNombre(), f.getId(), "FAR");
                         Service.instance().createUsuario(u);
+                    } else {
+                        Service.instance().updateFarmaceuta(f);
                     }
-                    case 2 -> // MODE_EDIT
-                            Service.instance().updateFarmaceuta(f);
+                } catch (Exception e) {
+                    System.err.println("❌ Error al guardar farmacéutico: " + e.getMessage());
                 }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    model.setFilter(new Farmaceuta());
-                    search(model.getFilter());
-                } catch (Exception ex) {
-                    System.err.println("Error al guardar: " + ex.getMessage());
-                }
+                model.setFilter(new Farmaceuta());
+                search(model.getFilter());
             }
         };
         worker.execute();
     }
 
     public void edit(int row) {
-        Farmaceuta f = model.getList().get(row);
+        List<Farmaceuta> lista = model.getList();
+        if (lista == null || row >= lista.size()) return;
+
+        Farmaceuta f = lista.get(row);
         SwingWorker<Farmaceuta, Void> worker = new SwingWorker<>() {
             @Override
-            protected Farmaceuta doInBackground() throws Exception {
-                return Service.instance().readFarmaceuta(f.getId());
+            protected Farmaceuta doInBackground() {
+                try {
+                    return Service.instance().readFarmaceuta(f.getId());
+                } catch (Exception e) {
+                    System.err.println("❌ Error al leer farmacéutico: " + e.getMessage());
+                    return null;
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    model.setMode(2); // MODE_EDIT
-                    model.setCurrent(get());
-                } catch (Exception ex) {
-                    System.err.println("Error al editar: " + ex.getMessage());
+                    Farmaceuta result = get();
+                    if (result != null) {
+                        model.setMode(2); // MODE_EDIT
+                        model.setCurrent(result);
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Error al editar: " + e.getMessage());
                 }
             }
         };
@@ -133,21 +145,21 @@ public class FarmaceutaController implements ThreadListener {
     public void delete() {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                Farmaceuta f = model.getCurrent();
-                Service.instance().deleteFarmaceuta(f.getId());
-                Service.instance().deleteUsuario(f.getId());
+            protected Void doInBackground() {
+                try {
+                    Farmaceuta f = model.getCurrent();
+                    Service.instance().deleteFarmaceuta(f.getId());
+                    Service.instance().deleteUsuario(f.getId());
+                } catch (Exception e) {
+                    System.err.println("❌ Error al eliminar farmacéutico: " + e.getMessage());
+                }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    search(model.getFilter());
-                } catch (Exception ex) {
-                    System.err.println("Error al eliminar: " + ex.getMessage());
-                }
+                model.setFilter(new Farmaceuta());
+                search(model.getFilter());
             }
         };
         worker.execute();
@@ -161,27 +173,10 @@ public class FarmaceutaController implements ThreadListener {
 
     @Override
     public void refresh() {
-        SwingWorker<List<Farmaceuta>, Void> worker = new SwingWorker<>() {
-            @Override
-            protected List<Farmaceuta> doInBackground() throws Exception {
-                return Service.instance().findAllFarmaceuta();
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    model.setList(get());
-                } catch (Exception e) {
-                    System.err.println("Error al refrescar: " + e.getMessage());
-                }
-            }
-        };
-        worker.execute();
+        cargarDatosAsincrono();
     }
 
     public void stop() {
-        if (refresher != null) {
-            refresher.stop();
-        }
+        if (refresher != null) refresher.stop();
     }
 }

@@ -22,10 +22,7 @@ public class PacienteController implements ThreadListener {
         System.out.println("📦 Iniciando PacienteController...");
         view.setController(this);
         view.setModel(model);
-
         model.init();
-
-        // ✅ CARGA ASÍNCRONA
         cargarDatosAsincrono();
 
         refresher = new Refresher(this);
@@ -36,20 +33,22 @@ public class PacienteController implements ThreadListener {
     private void cargarDatosAsincrono() {
         SwingWorker<List<Paciente>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Paciente> doInBackground() throws Exception {
-                System.out.println("🔄 Cargando pacientes del backend...");
-                return Service.instance().findAllPacientes();
+            protected List<Paciente> doInBackground() {
+                try {
+                    System.out.println("🔄 Cargando pacientes del backend...");
+                    return Service.instance().findAllPacientes();
+                } catch (Exception e) {
+                    System.err.println("❌ Error al cargar pacientes: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    List<Paciente> lista = get();
-                    System.out.println("📡 Pacientes cargados: " + lista.size());
-                    model.setList(lista);
+                    model.setList(get());
                 } catch (Exception e) {
-                    System.err.println("❌ Error al cargar pacientes: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println("❌ Error en carga asincrónica: " + e.getMessage());
                 }
             }
         };
@@ -69,7 +68,7 @@ public class PacienteController implements ThreadListener {
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 try {
                     Paciente existente = Service.instance().readPaciente(id);
                     existente.setNombre(nombre);
@@ -77,28 +76,23 @@ public class PacienteController implements ThreadListener {
                     existente.setFechaNacimiento(fechaNacimiento);
                     Service.instance().updatePaciente(existente);
                     SwingUtilities.invokeLater(() ->
-                            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente actualizado")
-                    );
+                            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente actualizado"));
                 } catch (Exception e) {
-                    Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
-                    Service.instance().createPaciente(nuevo);
-                    SwingUtilities.invokeLater(() ->
-                            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente agregado")
-                    );
+                    try {
+                        Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
+                        Service.instance().createPaciente(nuevo);
+                        SwingUtilities.invokeLater(() ->
+                                JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente agregado"));
+                    } catch (Exception ex) {
+                        System.err.println("❌ Error al crear paciente: " + ex.getMessage());
+                    }
                 }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    actualizarLista();
-                } catch (Exception ex) {
-                    SwingUtilities.invokeLater(() ->
-                            JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage())
-                    );
-                }
+                actualizarLista();
             }
         };
         worker.execute();
@@ -113,20 +107,19 @@ public class PacienteController implements ThreadListener {
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                Service.instance().deletePaciente(id);
+            protected Void doInBackground() {
+                try {
+                    Service.instance().deletePaciente(id);
+                } catch (Exception e) {
+                    System.err.println("❌ Error al eliminar paciente: " + e.getMessage());
+                }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente eliminado");
-                    actualizarLista();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
-                }
+                JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente eliminado");
+                actualizarLista();
             }
         };
         worker.execute();
@@ -141,8 +134,13 @@ public class PacienteController implements ThreadListener {
 
         SwingWorker<Paciente, Void> worker = new SwingWorker<>() {
             @Override
-            protected Paciente doInBackground() throws Exception {
-                return Service.instance().readPaciente(criterio);
+            protected Paciente doInBackground() {
+                try {
+                    return Service.instance().readPaciente(criterio);
+                } catch (Exception e) {
+                    System.err.println("❌ Error en búsqueda: " + e.getMessage());
+                    return null;
+                }
             }
 
             @Override
@@ -156,7 +154,7 @@ public class PacienteController implements ThreadListener {
                         JOptionPane.showMessageDialog(view.getMainPanel(), "No se encontró el paciente");
                     }
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
+                    JOptionPane.showMessageDialog(view.getMainPanel(), "Error: " + e.getMessage());
                 }
             }
         };
@@ -183,8 +181,13 @@ public class PacienteController implements ThreadListener {
     private void actualizarLista() {
         SwingWorker<List<Paciente>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Paciente> doInBackground() throws Exception {
-                return Service.instance().findAllPacientes();
+            protected List<Paciente> doInBackground() {
+                try {
+                    return Service.instance().findAllPacientes();
+                } catch (Exception e) {
+                    System.err.println("❌ Error al actualizar lista: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
@@ -207,8 +210,6 @@ public class PacienteController implements ThreadListener {
     }
 
     public void stop() {
-        if (refresher != null) {
-            refresher.stop();
-        }
+        if (refresher != null) refresher.stop();
     }
 }

@@ -19,10 +19,7 @@ public class MedicamentoController implements ThreadListener {
         this.model = model;
 
         System.out.println("📦 Iniciando MedicamentoController...");
-
         model.init();
-
-        // ✅ CARGA ASÍNCRONA
         cargarDatosAsincrono();
 
         view.setController(this);
@@ -36,20 +33,22 @@ public class MedicamentoController implements ThreadListener {
     private void cargarDatosAsincrono() {
         SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Medicamento> doInBackground() throws Exception {
-                System.out.println("🔄 Cargando medicamentos del backend...");
-                return Service.instance().findAllMedicamentos();
+            protected List<Medicamento> doInBackground() {
+                try {
+                    System.out.println("🔄 Cargando medicamentos del backend...");
+                    return Service.instance().findAllMedicamentos();
+                } catch (Exception e) {
+                    System.err.println("❌ Error al cargar medicamentos: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    List<Medicamento> lista = get();
-                    System.out.println("📡 Medicamentos cargados: " + lista.size());
-                    model.setList(lista);
+                    model.setList(get());
                 } catch (Exception e) {
-                    System.err.println("❌ Error al cargar medicamentos: " + e.getMessage());
-                    e.printStackTrace();
+                    System.err.println("❌ Error en carga asincrónica: " + e.getMessage());
                 }
             }
         };
@@ -59,19 +58,24 @@ public class MedicamentoController implements ThreadListener {
     public void search(Medicamento filter) {
         SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<Medicamento> doInBackground() throws Exception {
-                return Service.instance().searchMedicamento(filter);
+            protected List<Medicamento> doInBackground() {
+                try {
+                    return Service.instance().searchMedicamento(filter);
+                } catch (Exception e) {
+                    System.err.println("❌ Error en búsqueda: " + e.getMessage());
+                    return List.of();
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    model.setFilter(filter);
+                    model.setFilter(filter != null ? filter : new Medicamento());
                     model.setMode(Application.MODE_CREATE);
                     model.setCurrent(new Medicamento());
                     model.setList(get());
                 } catch (Exception e) {
-                    System.err.println("Error en búsqueda: " + e.getMessage());
+                    System.err.println("❌ Error al aplicar búsqueda: " + e.getMessage());
                 }
             }
         };
@@ -81,43 +85,54 @@ public class MedicamentoController implements ThreadListener {
     public void save(Medicamento m) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                switch (model.getMode()) {
-                    case Application.MODE_CREATE -> Service.instance().createMedicamento(m);
-                    case Application.MODE_EDIT -> Service.instance().updateMedicamento(m);
+            protected Void doInBackground() {
+                try {
+                    if (model.getMode() == Application.MODE_CREATE) {
+                        Service.instance().createMedicamento(m);
+                    } else {
+                        Service.instance().updateMedicamento(m);
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Error al guardar medicamento: " + e.getMessage());
                 }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    model.setFilter(new Medicamento());
-                    search(model.getFilter());
-                } catch (Exception ex) {
-                    System.err.println("Error al guardar: " + ex.getMessage());
-                }
+                model.setFilter(new Medicamento());
+                search(model.getFilter());
             }
         };
         worker.execute();
     }
 
     public void edit(int row) {
-        Medicamento m = model.getList().get(row);
+        List<Medicamento> lista = model.getList();
+        if (lista == null || row >= lista.size()) return;
+
+        Medicamento m = lista.get(row);
         SwingWorker<Medicamento, Void> worker = new SwingWorker<>() {
             @Override
-            protected Medicamento doInBackground() throws Exception {
-                return Service.instance().readMedicamento(m.getCodigo());
+            protected Medicamento doInBackground() {
+                try {
+                    return Service.instance().readMedicamento(m.getCodigo());
+                } catch (Exception e) {
+                    System.err.println("❌ Error al leer medicamento: " + e.getMessage());
+                    return null;
+                }
             }
 
             @Override
             protected void done() {
                 try {
-                    model.setMode(Application.MODE_EDIT);
-                    model.setCurrent(get());
-                } catch (Exception ex) {
-                    System.err.println("Error al editar: " + ex.getMessage());
+                    Medicamento result = get();
+                    if (result != null) {
+                        model.setMode(Application.MODE_EDIT);
+                        model.setCurrent(result);
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Error al editar: " + e.getMessage());
                 }
             }
         };
@@ -127,19 +142,20 @@ public class MedicamentoController implements ThreadListener {
     public void delete() {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                Service.instance().deleteMedicamento(model.getCurrent().getCodigo());
+            protected Void doInBackground() {
+                try {
+                    Medicamento m = model.getCurrent();
+                    Service.instance().deleteMedicamento(m.getCodigo());
+                } catch (Exception e) {
+                    System.err.println("❌ Error al eliminar medicamento: " + e.getMessage());
+                }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    search(model.getFilter());
-                } catch (Exception ex) {
-                    System.err.println("Error al eliminar: " + ex.getMessage());
-                }
+                model.setFilter(new Medicamento());
+                search(model.getFilter());
             }
         };
         worker.execute();
@@ -148,38 +164,22 @@ public class MedicamentoController implements ThreadListener {
     public void clear() {
         model.setMode(Application.MODE_CREATE);
         model.setCurrent(new Medicamento());
-        // ❌ REMOVIDO: view.getNombreBuscar().setText("");
         view.getDescripcionBuscar().setText("");
         view.getCodigoBuscar().setText("");
     }
 
     @Override
     public void refresh() {
-        SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
-            @Override
-            protected List<Medicamento> doInBackground() throws Exception {
-                return Service.instance().findAllMedicamentos();
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    model.setList(get());
-                } catch (Exception e) {
-                    System.err.println("Error al refrescar: " + e.getMessage());
-                }
-            }
-        };
-        worker.execute();
+        cargarDatosAsincrono();
     }
 
     public void reporte() {
-        StringBuilder sb = new StringBuilder("Lista de Medicamentos:\n\n");
+        StringBuilder sb = new StringBuilder("📋 Lista de Medicamentos:\n\n");
         for (Medicamento m : model.getList()) {
-            sb.append("Código: ").append(m.getCodigo())
-                    .append(" | Nombre: ").append(m.getNombre())
-                    .append(" | Desc: ").append(m.getDescripcion())
-                    .append("\n-------------------------\n");
+            sb.append("Código: ").append(m.getCodigo()).append("\n");
+            sb.append("Nombre: ").append(m.getNombre()).append("\n");
+            sb.append("Descripción: ").append(m.getDescripcion()).append("\n");
+            sb.append("-------------------------\n");
         }
         JOptionPane.showMessageDialog(view.getMainPanel(), sb.toString(), "Reporte", JOptionPane.INFORMATION_MESSAGE);
     }

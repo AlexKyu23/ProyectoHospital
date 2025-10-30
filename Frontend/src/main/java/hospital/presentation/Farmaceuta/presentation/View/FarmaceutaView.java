@@ -1,9 +1,10 @@
-
 package hospital.presentation.Farmaceuta.presentation.View;
+
 import logic.Farmaceuta;
 import hospital.presentation.Farmaceuta.presentation.FarmaceutaController;
 import hospital.presentation.Farmaceuta.presentation.FarmaceutaModel;
 import hospital.presentation.Farmaceuta.presentation.FarmaceutaTableModel;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.event.MouseAdapter;
@@ -14,7 +15,8 @@ import java.beans.PropertyChangeListener;
 public class FarmaceutaView implements PropertyChangeListener {
     private FarmaceutaController controller;
     private FarmaceutaModel model;
-
+    private FarmaceutaTableModel tableModel;
+    private final int[] cols = {FarmaceutaTableModel.ID, FarmaceutaTableModel.NOMBRE};
 
     private JPanel todo;
     private JPanel farmaceutas;
@@ -30,7 +32,6 @@ public class FarmaceutaView implements PropertyChangeListener {
     private JButton reporteButton;
     private JTable tablaFarmaceutas;
 
-    // Para validación visual
     private static final Border BORDER_ERROR = BorderFactory.createLineBorder(java.awt.Color.RED, 1);
     private static final Border BORDER_NORMAL = UIManager.getBorder("TextField.border");
 
@@ -38,9 +39,7 @@ public class FarmaceutaView implements PropertyChangeListener {
         initListeners();
     }
 
-    // === LISTENERS ===
     private void initListeners() {
-        // BUSCAR
         buscarButton.addActionListener(e -> {
             try {
                 Farmaceuta filter = new Farmaceuta();
@@ -51,7 +50,6 @@ public class FarmaceutaView implements PropertyChangeListener {
             }
         });
 
-        // GUARDAR
         guardarButton.addActionListener(e -> {
             if (validate()) {
                 Farmaceuta f = take();
@@ -64,18 +62,14 @@ public class FarmaceutaView implements PropertyChangeListener {
             }
         });
 
-        // SELECCIONAR FILA
         tablaFarmaceutas.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = tablaFarmaceutas.getSelectedRow();
-                if (row >= 0) {
-                    controller.edit(row);
-                }
+                if (row >= 0) controller.edit(row);
             }
         });
 
-        // BORRAR
         borrarButton.addActionListener(e -> {
             try {
                 controller.delete();
@@ -85,19 +79,18 @@ public class FarmaceutaView implements PropertyChangeListener {
             }
         });
 
-        // LIMPIAR
         limpiarButton.addActionListener(e -> controller.clear());
-
-
     }
 
-    // === MVC ===
     public void setController(FarmaceutaController controller) {
         this.controller = controller;
     }
 
     public void setModel(FarmaceutaModel model) {
         this.model = model;
+        this.tableModel = new FarmaceutaTableModel(cols, model.getList());
+        tablaFarmaceutas.setModel(tableModel);
+        tablaFarmaceutas.setRowHeight(30);
         model.addPropertyChangeListener(this);
     }
 
@@ -105,58 +98,46 @@ public class FarmaceutaView implements PropertyChangeListener {
         return todo;
     }
 
-    // === PROPERTY CHANGE ===
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         switch (evt.getPropertyName()) {
-            case FarmaceutaModel.LIST -> {
-                int[] cols = {FarmaceutaTableModel.ID, FarmaceutaTableModel.NOMBRE};
-                tablaFarmaceutas.setModel(new FarmaceutaTableModel(cols, model.getList()));
-                tablaFarmaceutas.setRowHeight(30);
-            }
+            case FarmaceutaModel.LIST -> tableModel.setRows(model.getList());
             case FarmaceutaModel.CURRENT -> {
                 Farmaceuta f = model.getCurrent();
                 id.setText(f.getId());
                 nombre.setText(f.getNombre());
                 resetBorders();
             }
-            case FarmaceutaModel.FILTER -> {
-                nombreBuscar.setText(model.getFilter().getNombre());
-            }
+            case FarmaceutaModel.FILTER -> nombreBuscar.setText(model.getFilter().getNombre());
             case FarmaceutaModel.MODE -> {
-                boolean editando = model.getMode() == 2; // MODE_EDIT
+                boolean editando = model.getMode() == 2;
                 guardarButton.setText(editando ? "Actualizar" : "Guardar");
                 borrarButton.setEnabled(editando);
-                id.setEnabled(!editando); // ID no editable al editar
+                id.setEnabled(!editando);
             }
         }
         todo.revalidate();
     }
 
-    // === TOMAR DATOS DEL FORMULARIO ===
     public Farmaceuta take() {
         Farmaceuta f = new Farmaceuta();
         f.setId(id.getText().trim());
         f.setNombre(nombre.getText().trim());
-        f.setClave(f.getId()); // clave = id
+        f.setClave(f.getId());
         return f;
     }
 
-    // === VALIDAR CAMPOS ===
     private boolean validate() {
         boolean valid = true;
         resetBorders();
-
         if (id.getText().trim().isEmpty()) {
             valid = false;
             id.setBorder(BORDER_ERROR);
         }
-
         if (nombre.getText().trim().isEmpty()) {
             valid = false;
             nombre.setBorder(BORDER_ERROR);
         }
-
         return valid;
     }
 
@@ -165,7 +146,6 @@ public class FarmaceutaView implements PropertyChangeListener {
         nombre.setBorder(BORDER_NORMAL);
     }
 
-    // === GETTERS (para compatibilidad con Controller si los necesitas) ===
     public JTextField getId() { return id; }
     public JTextField getNombre() { return nombre; }
     public JTextField getNombreBuscar() { return nombreBuscar; }

@@ -10,12 +10,12 @@ import java.io.Serializable;
 public class Medicamento implements Serializable {
     private String nombre;
     private String descripcion;
-    private int codigo;
+    private String codigo;
 
 
     public Medicamento() {}
 
-    public Medicamento(String nombre, String descripcion, int codigo) {
+    public Medicamento(String nombre, String descripcion, String codigo) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.codigo = codigo;
@@ -31,10 +31,10 @@ public class Medicamento implements Serializable {
     }
 
     @XmlElement
-    public int getCodigo() {
+    public String getCodigo() {
         return codigo;
     }
-    public void setCodigo(int codigo) {
+    public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 

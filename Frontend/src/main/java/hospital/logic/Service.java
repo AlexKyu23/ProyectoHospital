@@ -31,126 +31,443 @@ public class Service {
         }
     }
 
-    // 🔄 Utilidad común para enviar y recibir
-    private <T> T request(int code, Object payload, Class<T> type) {
+    // ===================================================================
+    // === USUARIO (900–909) ============================================
+    // ===================================================================
+    public boolean login(Usuario u) throws Exception {
         synchronized (lock) {
-            try {
-                out.writeInt(code);
-                if (payload != null) out.writeObject(payload);
-                out.flush();
-                return in.readInt() == Protocol.ERROR_NO_ERROR ? type.cast(in.readObject()) : null;
-            } catch (Exception e) {
-                System.err.println("❌ Error en operación " + code + ": " + e.getMessage());
-                return null;
-            }
+            out.writeInt(Protocol.USUARIO_LOGIN);
+            out.writeObject(u);
+            out.flush();
+            return in.readInt() == Protocol.ERROR_NO_ERROR;
         }
     }
 
-    private boolean send(int code, Object payload) {
+    public void createUsuario(Usuario u) throws Exception {
         synchronized (lock) {
-            try {
-                out.writeInt(code);
-                if (payload != null) out.writeObject(payload);
-                out.flush();
-                return in.readInt() == Protocol.ERROR_NO_ERROR;
-            } catch (Exception e) {
-                System.err.println("❌ Error en envío " + code + ": " + e.getMessage());
-                return false;
-            }
+            out.writeInt(Protocol.USUARIO_CREATE);
+            out.writeObject(u);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("USUARIO DUPLICADO");
         }
     }
 
-    // 🔐 USUARIO
-    public boolean login(Usuario u) { return send(Protocol.USUARIO_LOGIN, u); }
-    public Usuario readUsuario(String id) { return request(Protocol.USUARIO_READ, id, Usuario.class); }
-    public boolean createUsuario(Usuario u) { return send(Protocol.USUARIO_CREATE, u); }
-    public boolean updateUsuario(Usuario u) { return send(Protocol.USUARIO_UPDATE, u); }
-    public boolean deleteUsuario(String id) { return send(Protocol.USUARIO_DELETE, id); }
-    public List<Usuario> findAllUsuario() { return request(Protocol.ADMIN_READ_ALL, null, List.class); }
-
-    // 👨‍⚕️ MÉDICO
-    public boolean createMedico(Medico m) { return send(Protocol.MEDICO_CREATE, m); }
-    public Medico readMedico(String id) { return request(Protocol.MEDICO_READ, id, Medico.class); }
-    public boolean updateMedico(Medico m) { return send(Protocol.MEDICO_UPDATE, m); }
-    public boolean deleteMedico(String id) { return send(Protocol.MEDICO_DELETE, id); }
-    public List<Medico> findAllMedicos() { return request(Protocol.MEDICO_READ_ALL, null, List.class); }
-
-    // 👩‍🔬 FARMACÉUTICO
-    public boolean createFarmaceuta(Farmaceuta f) { return send(Protocol.FARMACEUTA_CREATE, f); }
-    public Farmaceuta readFarmaceuta(String id) { return request(Protocol.FARMACEUTA_READ, id, Farmaceuta.class); }
-    public boolean updateFarmaceuta(Farmaceuta f) { return send(Protocol.FARMACEUTA_UPDATE, f); }
-    public boolean deleteFarmaceuta(String id) { return send(Protocol.FARMACEUTA_DELETE, id); }
-    public List<Farmaceuta> findAllFarmaceuta() { return request(Protocol.FARMACEUTA_READ_ALL, null, List.class); }
-
-    // 🧍 PACIENTE
-    public boolean createPaciente(Paciente p) { return send(Protocol.PACIENTE_CREATE, p); }
-    public Paciente readPaciente(String id) { return request(Protocol.PACIENTE_READ, id, Paciente.class); }
-    public boolean updatePaciente(Paciente p) { return send(Protocol.PACIENTE_UPDATE, p); }
-    public boolean deletePaciente(String id) { return send(Protocol.PACIENTE_DELETE, id); }
-    public List<Paciente> findAllPacientes() { return request(Protocol.PACIENTE_READ_ALL, null, List.class); }
-
-    // 💊 MEDICAMENTO
-    public boolean createMedicamento(Medicamento m) { return send(Protocol.MEDICAMENTO_CREATE, m); }
-    public Medicamento readMedicamento(int codigo) { return request(Protocol.MEDICAMENTO_READ, codigo, Medicamento.class); }
-    public boolean updateMedicamento(Medicamento m) { return send(Protocol.MEDICAMENTO_UPDATE, m); }
-    public boolean deleteMedicamento(int codigo) { return send(Protocol.MEDICAMENTO_DELETE, codigo); }
-    public List<Medicamento> findAllMedicamentos() { return request(Protocol.MEDICAMENTO_READ_ALL, null, List.class); }
-
-    // 📄 RECETA
-    public boolean createReceta(Receta r) { return send(Protocol.RECETA_CREATE, r); }
-    public Receta readReceta(String id) { return request(Protocol.RECETA_READ, id, Receta.class); }
-    public boolean updateReceta(Receta r) { return send(Protocol.RECETA_UPDATE, r); }
-    public boolean deleteReceta(String id) { return send(Protocol.RECETA_DELETE, id); }
-    public List<Receta> findAllRecetas() { return request(Protocol.RECETA_READ_ALL, null, List.class); }
-
-    // 📝 ITEMRECETA
-    public boolean createItemReceta(ItemReceta ir) { return send(Protocol.ITEMRECETA_CREATE, ir); }
-    public List<ItemReceta> findItemsByReceta(String recetaId) { return request(Protocol.ITEMRECETA_READ, recetaId, List.class); }
-    // 🔍 Buscar usuarios por criterio
-
-
-    // 🔍 Buscar médicos por criterio
-    public List<Medico> searchMedico(String criterio) {
-        return request(Protocol.MEDICO_SEARCH, criterio, List.class);
-    }
-
-    // 🔍 Buscar farmaceutas por criterio
-    public List<Farmaceuta> searchFarmaceuta(String criterio) {
-        return request(Protocol.FARMACEUTA_SEARCH, criterio, List.class);
-    }
-
-    // 🔍 Buscar pacientes por criterio
-    public List<Paciente> searchPaciente(String criterio) {
-        return request(Protocol.PACIENTE_SEARCH, criterio, List.class);
-    }
-
-    // 🔍 Buscar medicamentos por filtro
-    public List<Medicamento> searchMedicamento(Medicamento filtro) {
-        return request(Protocol.MEDICAMENTO_SEARCH, filtro, List.class);
-    }
-
-    // 🔍 Buscar recetas por criterio (ID de paciente o médico)
-    public List<Receta> searchReceta(String criterio) {
-        return request(Protocol.RECETA_SEARCH, criterio, List.class);
-    }
-
-    // 🔍 Buscar recetas entre fechas
-    public List<Receta> searchRecetasBetween(LocalDate start, LocalDate end) {
+    public Usuario readUsuario(String id) throws Exception {
         synchronized (lock) {
-            try {
-                out.writeInt(Protocol.RECETA_SEARCH_BETWEEN);
-                out.writeObject(start);
-                out.writeObject(end);
-                out.flush();
-                return in.readInt() == Protocol.ERROR_NO_ERROR ? (List<Receta>) in.readObject() : List.of();
-            } catch (Exception e) {
-                System.err.println("❌ Error en búsqueda por fechas: " + e.getMessage());
-                return List.of();
-            }
+            out.writeInt(Protocol.USUARIO_READ);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Usuario) in.readObject();
+            else throw new Exception("USUARIO NO EXISTE");
         }
     }
 
-    // 🔌 DESCONECTAR
+    public void updateUsuario(Usuario u) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.USUARIO_UPDATE);
+            out.writeObject(u);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("USUARIO NO EXISTE");
+        }
+    }
+
+    public void deleteUsuario(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.USUARIO_DELETE);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("USUARIO NO EXISTE");
+        }
+    }
+
+    public void logout() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.USUARIO_LOGOUT);
+            out.writeObject(null);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("ERROR AL LOGOUT");
+        }
+    }
+
+    // ===================================================================
+    // === MÉDICO (910–919) ============================================
+    // ===================================================================
+    public void createMedico(Medico m) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_CREATE);
+            out.writeObject(m);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MÉDICO DUPLICADO");
+        }
+    }
+
+    public Medico readMedico(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_READ);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Medico) in.readObject();
+            else throw new Exception("MÉDICO NO EXISTE");
+        }
+    }
+
+    public void updateMedico(Medico m) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_UPDATE);
+            out.writeObject(m);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MÉDICO NO EXISTE");
+        }
+    }
+
+    public void deleteMedico(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_DELETE);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MÉDICO NO EXISTE");
+        }
+    }
+
+    public List<Medico> searchMedico(String criterio) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_SEARCH);
+            out.writeObject(criterio);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Medico>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    public List<Medico> findAllMedicos() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICO_READ_ALL);
+            out.writeObject(null);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Medico>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    // ===================================================================
+    // === FARMACÉUTICO (920–929) ======================================
+    // ===================================================================
+    public void createFarmaceuta(Farmaceuta f) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_CREATE);
+            out.writeObject(f);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("FARMACÉUTICO DUPLICADO");
+        }
+    }
+
+    public Farmaceuta readFarmaceuta(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_READ);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Farmaceuta) in.readObject();
+            else throw new Exception("FARMACÉUTICO NO EXISTE");
+        }
+    }
+
+    public void updateFarmaceuta(Farmaceuta f) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_UPDATE);
+            out.writeObject(f);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("FARMACÉUTICO NO EXISTE");
+        }
+    }
+
+    public void deleteFarmaceuta(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_DELETE);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("FARMACÉUTICO NO EXISTE");
+        }
+    }
+
+    public List<Farmaceuta> searchFarmaceuta(String criterio) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_SEARCH);
+            out.writeObject(criterio);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Farmaceuta>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    public List<Farmaceuta> findAllFarmaceuta() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.FARMACEUTA_READ_ALL);
+            out.writeObject(null);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Farmaceuta>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    // ===================================================================
+    // === PACIENTE (940–949) ==========================================
+    // ===================================================================
+    public void createPaciente(Paciente p) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_CREATE);
+            out.writeObject(p);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("PACIENTE DUPLICADO");
+        }
+    }
+
+    public Paciente readPaciente(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_READ);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Paciente) in.readObject();
+            else throw new Exception("PACIENTE NO EXISTE");
+        }
+    }
+
+    public void updatePaciente(Paciente p) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_UPDATE);
+            out.writeObject(p);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("PACIENTE NO EXISTE");
+        }
+    }
+
+    public void deletePaciente(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_DELETE);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("PACIENTE NO EXISTE");
+        }
+    }
+
+    public List<Paciente> searchPaciente(String criterio) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_SEARCH);
+            out.writeObject(criterio);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Paciente>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    public List<Paciente> findAllPacientes() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.PACIENTE_READ_ALL);
+            out.writeObject(null);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Paciente>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    // ===================================================================
+    // === MEDICAMENTO (950–959) ✅ CODIGO AHORA ES STRING =============
+    // ===================================================================
+    public void createMedicamento(Medicamento m) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_CREATE);
+            out.writeObject(m);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MEDICAMENTO DUPLICADO");
+        }
+    }
+
+    public Medicamento readMedicamento(String codigo) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_READ);
+            out.writeObject(codigo); // ✅ String
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Medicamento) in.readObject();
+            else throw new Exception("MEDICAMENTO NO EXISTE");
+        }
+    }
+
+    public void updateMedicamento(Medicamento m) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_UPDATE);
+            out.writeObject(m);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MEDICAMENTO NO EXISTE");
+        }
+    }
+
+    public void deleteMedicamento(String codigo) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_DELETE);
+            out.writeObject(codigo); // ✅ String
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("MEDICAMENTO NO EXISTE");
+        }
+    }
+
+    public List<Medicamento> searchMedicamento(Medicamento filtro) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_SEARCH);
+            out.writeObject(filtro);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Medicamento>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    public List<Medicamento> findAllMedicamentos() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.MEDICAMENTO_READ_ALL);
+            out.writeObject(null);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Medicamento>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    // ===================================================================
+    // === RECETA (970–979) ===========================================
+    // ===================================================================
+    public void createReceta(Receta r) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_CREATE);
+            out.writeObject(r);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("RECETA DUPLICADA");
+        }
+    }
+
+    public Receta readReceta(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_READ);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) return (Receta) in.readObject();
+            else throw new Exception("RECETA NO EXISTE");
+        }
+    }
+
+    public void updateReceta(Receta r) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_UPDATE);
+            out.writeObject(r);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("RECETA NO EXISTE");
+        }
+    }
+
+    public void deleteReceta(String id) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_DELETE);
+            out.writeObject(id);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("RECETA NO EXISTE");
+        }
+    }
+
+    public List<Receta> searchReceta(String criterio) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_SEARCH);
+            out.writeObject(criterio);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Receta>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    public List<Receta> findAllRecetas() throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_READ_ALL);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Receta>) in.readObject();
+            }
+            else throw new Exception("Error al listar recetas");
+        }
+    }
+
+    public List<Receta> findRecetasBetween(LocalDate start, LocalDate end) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.RECETA_SEARCH_BETWEEN);
+            out.writeObject(start);
+            out.writeObject(end);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<Receta>) in.readObject();
+            }
+            else throw new Exception("Error al buscar por fecha");
+        }
+    }
+
+    // ===================================================================
+    // === ITEMRECETA (960–969) ========================================
+    // ===================================================================
+    public void createItemReceta(ItemReceta ir) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.ITEMRECETA_CREATE);
+            out.writeObject(ir);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {}
+            else throw new Exception("ITEM DUPLICADO");
+        }
+    }
+
+    public List<ItemReceta> findItemsByReceta(String recetaId) throws Exception {
+        synchronized (lock) {
+            out.writeInt(Protocol.ITEMRECETA_READ);
+            out.writeObject(recetaId);
+            out.flush();
+            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+                return (List<ItemReceta>) in.readObject();
+            }
+            else return List.of();
+        }
+    }
+
+    // ===================================================================
+    // === DESCONEXIÓN =================================================
+    // ===================================================================
     public void stop() {
         synchronized (lock) {
             try {
