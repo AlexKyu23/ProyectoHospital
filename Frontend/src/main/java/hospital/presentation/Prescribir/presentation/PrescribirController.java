@@ -103,7 +103,7 @@ public class PrescribirController {
 
                     ItemReceta item = new ItemReceta();
                     item.setItemRecetaId("IR" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
-                    item.setMedicamentoCodigo(seleccionado.getCodigo())
+                    item.setMedicamentoCodigo(seleccionado.getCodigo());
 
                     item.setDescripcion(seleccionado.getNombre());
                     item.setCantidad(cantidad);

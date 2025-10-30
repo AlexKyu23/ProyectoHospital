@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class ItemReceta implements Serializable {
     private String itemRecetaId;
     private String recetaId;
-    private int medicamentoCodigo;
+    private String medicamentoCodigo; // ✅ Cambiado de int a String
     private String descripcion;
     private int cantidad;
     private String indicaciones;
@@ -17,7 +17,8 @@ public class ItemReceta implements Serializable {
 
     public ItemReceta() {}
 
-    public ItemReceta(String itemRecetaId, String recetaId, int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+    public ItemReceta(String itemRecetaId, String recetaId, String medicamentoCodigo,
+                      String descripcion, int cantidad, String indicaciones, int duracionDias) {
         this.itemRecetaId = itemRecetaId;
         this.recetaId = recetaId;
         this.medicamentoCodigo = medicamentoCodigo;
@@ -27,7 +28,8 @@ public class ItemReceta implements Serializable {
         this.duracionDias = duracionDias;
     }
 
-    public ItemReceta(String itemRecetaId,int medicamentoCodigo, String descripcion, int cantidad, String indicaciones, int duracionDias) {
+    public ItemReceta(String itemRecetaId, String medicamentoCodigo,
+                      String descripcion, int cantidad, String indicaciones, int duracionDias) {
         this.itemRecetaId = itemRecetaId;
         this.medicamentoCodigo = medicamentoCodigo;
         this.descripcion = descripcion;
@@ -45,8 +47,8 @@ public class ItemReceta implements Serializable {
     public void setRecetaId(String recetaId) { this.recetaId = recetaId; }
 
     @XmlElement
-    public int getMedicamentoCodigo() { return medicamentoCodigo; }
-    public void setMedicamentoCodigo(int medicamentoCodigo) { this.medicamentoCodigo = medicamentoCodigo; }
+    public String getMedicamentoCodigo() { return medicamentoCodigo; } // ✅ Retorna String
+    public void setMedicamentoCodigo(String medicamentoCodigo) { this.medicamentoCodigo = medicamentoCodigo; } // ✅ Recibe String
 
     @XmlElement
     public String getDescripcion() { return descripcion; }

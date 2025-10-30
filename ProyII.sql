@@ -1,196 +1,160 @@
--- MySQL Workbench Forward Engineering
-
+-- Reiniciar configuración temporal
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
+-- Crear base de datos y usarla
+DROP DATABASE IF EXISTS HospitalProy;
 CREATE DATABASE HospitalProy;
-use HospitalProy;
+USE HospitalProy;
 
--- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
+-- Tabla EstadoReceta
+CREATE TABLE EstadoReceta (
+                              estado VARCHAR(45) NOT NULL PRIMARY KEY
+) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Table `Paciente`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Paciente` (
-  `id` VARCHAR(100) NOT NULL,
-  `nombre` VARCHAR(10) NULL,
-  `fechaNacimiento` DATE NULL,
-  `telefono` VARCHAR(10) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+-- Tabla Paciente
+CREATE TABLE Paciente (
+                          id VARCHAR(10) NOT NULL PRIMARY KEY,
+                          nombre VARCHAR(45),
+                          fechaNacimiento DATE,
+                          telefono VARCHAR(15)
+) ENGINE=InnoDB;
 
+-- Tabla Medico
+CREATE TABLE Medico (
+                        id VARCHAR(10) NOT NULL PRIMARY KEY,
+                        nombre VARCHAR(45),
+                        clave VARCHAR(45),
+                        especialidad VARCHAR(45)
+) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Table `Medico`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Medico` (
-  `id` VARCHAR(100) NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `clave` VARCHAR(45) NULL,
-  `especialidad` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+-- Tabla Medicamento
+CREATE TABLE Medicamento (
+                             codigo VARCHAR(15) NOT NULL PRIMARY KEY,
+                             nombre VARCHAR(45),
+                             descripcion VARCHAR(255)
+) ENGINE=InnoDB;
 
+-- Tabla Receta
+CREATE TABLE Receta (
+                        id VARCHAR(10) NOT NULL PRIMARY KEY,
+                        medicoId VARCHAR(10),
+                        pacienteId VARCHAR(10),
+                        fechaConfeccion DATE,
+                        fechaRetiro DATE,
+                        estado VARCHAR(45) NOT NULL,
+                        FOREIGN KEY (medicoId) REFERENCES Medico(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                        FOREIGN KEY (pacienteId) REFERENCES Paciente(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                        FOREIGN KEY (estado) REFERENCES EstadoReceta(estado) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Table `Medicamento`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Medicamento` (
-  `codigo` VARCHAR(10) NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `descripcion` VARCHAR(65) NULL,
-  PRIMARY KEY (`codigo`))
-ENGINE = InnoDB;
+-- Tabla ItemReceta
+CREATE TABLE ItemReceta (
+                            itemRecetaId VARCHAR(10) NOT NULL PRIMARY KEY,
+                            recetaId VARCHAR(10) NOT NULL,
+                            medicamentoCodigo VARCHAR(15) NOT NULL,
+                            descripcion VARCHAR(50),
+                            cantidad INT,
+                            indicaciones VARCHAR(500),
+                            duracionDias INT,
+                            FOREIGN KEY (recetaId) REFERENCES Receta(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                            FOREIGN KEY (medicamentoCodigo) REFERENCES Medicamento(codigo) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
+-- Tabla Usuario
+CREATE TABLE Usuario (
+                         id VARCHAR(10) NOT NULL PRIMARY KEY,
+                         nombre VARCHAR(45),
+                         clave VARCHAR(45),
+                         rol VARCHAR(45)
+) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Table `ItemReceta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ItemReceta` (
-  `medicamentoCodigo` INT NOT NULL,
-  `descripcion` VARCHAR(50) NULL,
-  `cantidad` INT NULL,
-  `indicaciones` VARCHAR(500) NULL,
-  `duracionDias` INT NULL,
-  PRIMARY KEY (`medicamentoCodigo`))
-ENGINE = InnoDB;
+-- Tabla Farmaceuta
+CREATE TABLE Farmaceuta (
+                            id VARCHAR(10) NOT NULL PRIMARY KEY,
+                            nombre VARCHAR(45),
+                            clave VARCHAR(45)
+) ENGINE=InnoDB;
 
+-- Tabla Admin
+CREATE TABLE Admin (
+                       id VARCHAR(10) NOT NULL PRIMARY KEY,
+                       nombre VARCHAR(45),
+                       clave VARCHAR(45)
+) ENGINE=InnoDB;
 
--- -----------------------------------------------------
--- Table `Prescripcion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Prescripcion` (
-  `numero` INT NOT NULL AUTO_INCREMENT,
-  `fechaConfeccion` DATE NULL,
-  `fechaRetiro` DATE NULL,
-  `estado` VARCHAR(45) NULL,
-  `items` INT NOT NULL,
-  `paciente` VARCHAR(10) NOT NULL,
-  `medico` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`numero`),
-  INDEX `fk_Prescripcion_ItemReceta1_idx` (`items` ASC) VISIBLE,
-  INDEX `fk_Prescripcion_Paciente1_idx` (`paciente` ASC) VISIBLE,
-  INDEX `fk_Prescripcion_Medico1_idx` (`medico` ASC) VISIBLE,
-  CONSTRAINT `fk_Prescripcion_ItemReceta1`
-    FOREIGN KEY (`items`)
-    REFERENCES `ItemReceta` (`medicamentoCodigo`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Prescripcion_Paciente1`
-    FOREIGN KEY (`paciente`)
-    REFERENCES `Paciente` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Prescripcion_Medico1`
-    FOREIGN KEY (`medico`)
-    REFERENCES `Medico` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+-- Tabla Prescripcion (columnas consistentes con DAO)
+CREATE TABLE Prescripcion (
+                              numero INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                              fechaConfeccion DATETIME,
+                              fechaRetiro DATETIME,
+                              estado VARCHAR(45),
+                              itemRecetaId VARCHAR(10) NOT NULL,
+                              paciente VARCHAR(10) NOT NULL,
+                              medico VARCHAR(10) NOT NULL,
+                              FOREIGN KEY (itemRecetaId) REFERENCES ItemReceta(itemRecetaId) ON DELETE CASCADE ON UPDATE CASCADE,
+                              FOREIGN KEY (paciente) REFERENCES Paciente(id) ON DELETE CASCADE ON UPDATE CASCADE,
+                              FOREIGN KEY (medico) REFERENCES Medico(id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
+-- Insertar estados válidos
+INSERT INTO EstadoReceta VALUES
+                             ('CONFECCIONADA'),
+                             ('EN_PROCESO'),
+                             ('LISTA'),
+                             ('ENTREGADA');
 
--- -----------------------------------------------------
--- Table `EstadoReceta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `EstadoReceta` (
-  `estado` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`estado`))
-ENGINE = InnoDB;
+-- Insertar Medicamentos de prueba
+INSERT INTO Medicamento (codigo, nombre, descripcion) VALUES
+                                                          ('101', 'Paracetamol', 'Analgesico y antipiretico'),
+                                                          ('102', 'Paracetamol', 'Analgesico y antipiretico'),
+                                                          ('999', 'Ibuprofeno', 'Antiinflamatorio');
 
+-- Insertar Pacientes de prueba
+INSERT INTO Paciente (id, nombre, fechaNacimiento, telefono) VALUES
+                                                                 ('PAC-001', 'Laura', '1990-05-12', '8888-1111'),
+                                                                 ('PAC-002', 'Carlos', '1985-07-23', '8888-2222'),
+                                                                 ('PAC-100', 'Juan Perez', '1990-01-15', '8888-3333');
 
--- -----------------------------------------------------
--- Table `Receta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Receta` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `medicoId` VARCHAR(10) NULL,
-  `pacienteId` VARCHAR(10) NULL,
-  `fechaConfeccion` DATE NULL,
-  `fechaRetiro` DATE NULL,
-  `estado` VARCHAR(45) NOT NULL,
-  `medicamentos` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_Receta_EstadoReceta1_idx` (`estado` ASC) VISIBLE,
-  INDEX `fk_Receta_Medicamento1_idx` (`medicamentos` ASC) VISIBLE,
-  CONSTRAINT `fk_Receta_EstadoReceta1`
-    FOREIGN KEY (`estado`)
-    REFERENCES `EstadoReceta` (`estado`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Receta_Medicamento1`
-    FOREIGN KEY (`medicamentos`)
-    REFERENCES `Medicamento` (`codigo`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+-- Insertar Medicos de prueba
+INSERT INTO Medico (id, nombre, clave, especialidad) VALUES
+                                                         ('MED-001', 'Dr. Salas', 'MED-001', 'Cardiologia'),
+                                                         ('MED-002', 'Dra. Vargas', 'MED-002', 'Pediatria'),
+                                                         ('MED-100', 'Dr. Test', '1234', 'Cardiologia');
 
+-- Insertar Farmaceutas de prueba
+INSERT INTO Farmaceuta (id, nombre, clave) VALUES
+                                               ('FAR-001', 'Carla Jimenez', 'FAR-001'),
+                                               ('FAR-002', 'Luis Mora', 'FAR-002'),
+                                               ('FAR-100', 'Ana Farm', '9999');
 
--- -----------------------------------------------------
--- Table `Usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Usuario` (
-  `id` VARCHAR(100) NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `clave` VARCHAR(45) NULL,
-  `rol` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+-- Insertar Admin de prueba
+INSERT INTO Admin (id, nombre, clave) VALUES ('adm01', 'Administrador', '1');
 
+-- Insertar Usuarios
+INSERT INTO Usuario (id, nombre, clave, rol) VALUES
+                                                 ('med01', 'Dr. House', '1234', 'MED'),
+                                                 ('far01', 'Farmaceuta Ana', '5678', 'FAR'),
+                                                 ('adm01', 'Administrador', '1', 'ADM');
+-- --------------------------
+-- Crear Receta
+-- --------------------------
+INSERT INTO Receta (id, medicoId, pacienteId, fechaConfeccion, fechaRetiro, estado)
+VALUES ('REC-200', 'MED-001', 'PAC-001', '2025-10-30', '2025-11-06', 'CONFECCIONADA');
 
--- -----------------------------------------------------
--- Table `Farmaceuta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Farmaceuta` (
-  `id` VARCHAR(100) NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `clave` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
+-- --------------------------
+-- Crear Item de Receta
+-- --------------------------
+INSERT INTO ItemReceta (itemRecetaId, recetaId, medicamentoCodigo, descripcion, cantidad, indicaciones, duracionDias)
+VALUES ('ITEM-200', 'REC-200', '101', 'Paracetamol 500mg', 10, 'Tomar cada 12 horas', 5);
 
-
--- -----------------------------------------------------
--- Table `Admin`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Admin` (
-  `id` VARCHAR(100) NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `clave` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
--- ----------------------------------------------------
---
--- ----------------------------------------------------
-
-INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-001','Laura','1990-05-12','8888-1111');
-INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-002','Carlos','1985-07-23','8888-2222');
-INSERT INTO Medico (id,nombre,clave,especialidad) VALUES ('MED-001','Dr. Salas','MED-001','Cardiologia');
-INSERT INTO Medico (id,nombre,clave,especialidad) VALUES ('MED-002','Dra. Vargas','MED-002','Pediatria');
-INSERT INTO Farmaceuta (id,nombre,clave) VALUES ('FAR-001','Carla Jimenez','FAR-001');
-INSERT INTO Farmaceuta (id,nombre,clave) VALUES ('FAR-002','Luis Mora','FAR-002');
-INSERT INTO Admin (id,nombre,clave) VALUES ('adm01','Administrador','1');
-INSERT INTO Usuario (id,nombre,clave,rol) VALUES ('med01','Dr. House','1234','MED');
-INSERT INTO Usuario (id,nombre,clave,rol) VALUES ('far01','Farmaceuta Ana','5678','FAR');
-INSERT INTO Usuario (id,nombre,clave,rol) VALUES ('adm01','Administrador','1','ADM');
-
-INSERT INTO EstadoReceta (estado) VALUES ('CONFECCIONADA');
-INSERT INTO EstadoReceta (estado) VALUES ('EN_PROCESO');
-INSERT INTO EstadoReceta (estado) VALUES ('LISTA');
-INSERT INTO EstadoReceta (estado) VALUES ('ENTREGADA');
-
-INSERT INTO Medicamento (codigo,nombre,descripcion) VALUES ('101','Paracetamol','Analgesico y antipiretico');
-INSERT INTO Medicamento (codigo,nombre,descripcion) VALUES ('102','Paracetamol','Analgesico y antipiretico');
-
-INSERT INTO Receta (id,medicoId,pacienteId,fechaConfeccion,fechaRetiro,estado,medicamentos) VALUES ('92f27bd5-bcda-4e7e-80e3-7c4fe7775600','MED-001','PAC-001','2025-10-13','2025-10-16','CONFECCIONADA','101');
-
-INSERT INTO ItemReceta (medicamentoCodigo,descripcion,cantidad,indicaciones,duracionDias) VALUES ('101','Pastillas',10,'Tomar 1 cada dia',10);
-
-INSERT INTO Prescripcion (fechaConfeccion,fechaRetiro,estado,items,paciente,medico) VALUES ('2025-10-13','2025-10-16','CONFECCIONADA','101','PAC-001','MED-001');
-
-
+-- --------------------------
+-- Crear Prescripción
+-- --------------------------
+INSERT INTO Prescripcion (fechaConfeccion, fechaRetiro, estado, itemRecetaId, paciente, medico)
+VALUES ('2025-10-30 10:00:00', '2025-11-06 10:00:00', 'CONFECCIONADA', 'ITEM-200', 'PAC-001', 'MED-001');
+-- Restaurar configuración
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

@@ -20,14 +20,22 @@ public class ItemRecetaDAO {
         PreparedStatement ps = db.prepareStatement(sql);
         ps.setString(1, item.getItemRecetaId());
         ps.setString(2, item.getRecetaId());
-        ps.setInt(3, item.getMedicamentoCodigo());
+
+        // ✅ Convierte String a int para la BD (asumiendo que la columna es INT)
+        try {
+            ps.setInt(3, Integer.parseInt(item.getMedicamentoCodigo()));
+        } catch (NumberFormatException e) {
+            throw new Exception("Código de medicamento inválido: " + item.getMedicamentoCodigo());
+        }
+
         ps.setString(4, item.getDescripcion());
         ps.setInt(5, item.getCantidad());
         ps.setString(6, item.getIndicaciones());
         ps.setInt(7, item.getDuracionDias());
+
         int count = db.executeUpdate(ps);
         if (count == 0) {
-            throw new Exception("ItemReceta ya existe");
+            throw new Exception("Error al guardar ItemReceta");
         }
     }
 
@@ -35,12 +43,20 @@ public class ItemRecetaDAO {
         String sql = "UPDATE ItemReceta SET recetaId = ?, medicamentoCodigo = ?, descripcion = ?, cantidad = ?, indicaciones = ?, duracionDias = ? WHERE itemRecetaId = ?";
         PreparedStatement ps = db.prepareStatement(sql);
         ps.setString(1, item.getRecetaId());
-        ps.setInt(2, item.getMedicamentoCodigo());
+
+        // ✅ Convierte String a int para la BD
+        try {
+            ps.setInt(2, Integer.parseInt(item.getMedicamentoCodigo()));
+        } catch (NumberFormatException e) {
+            throw new Exception("Código de medicamento inválido: " + item.getMedicamentoCodigo());
+        }
+
         ps.setString(3, item.getDescripcion());
         ps.setInt(4, item.getCantidad());
         ps.setString(5, item.getIndicaciones());
         ps.setInt(6, item.getDuracionDias());
         ps.setString(7, item.getItemRecetaId());
+
         int count = db.executeUpdate(ps);
         if (count == 0) {
             throw new Exception("ItemReceta no existe");
@@ -69,7 +85,8 @@ public class ItemRecetaDAO {
     }
 
     public List<ItemReceta> listar() throws Exception {
-        return search(new ItemReceta("", "", 0, "", 0, "", 0));
+        // ✅ Constructor actualizado con String en lugar de int
+        return search(new ItemReceta("", "", "0", "", 0, "", 0));
     }
 
     public List<ItemReceta> search(ItemReceta e) throws Exception {
@@ -97,10 +114,11 @@ public class ItemRecetaDAO {
     }
 
     public ItemReceta from(ResultSet rs, String alias) throws Exception {
+        // ✅ Convierte int de BD a String para el objeto Java
         ItemReceta e = new ItemReceta(
                 rs.getString(alias + "itemRecetaId"),
                 rs.getString(alias + "recetaId"),
-                rs.getInt(alias + "medicamentoCodigo"),
+                String.valueOf(rs.getInt(alias + "medicamentoCodigo")), // ✅ int → String
                 rs.getString(alias + "descripcion"),
                 rs.getInt(alias + "cantidad"),
                 rs.getString(alias + "indicaciones"),

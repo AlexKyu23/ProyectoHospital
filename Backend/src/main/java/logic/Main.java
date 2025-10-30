@@ -1,73 +1,70 @@
 package logic;
 
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) {
+        Service service = Service.instance();
+
         try {
-            Service service = Service.instance();
             System.out.println("✅ Conectado al servicio\n");
 
-            // 👨‍⚕️ Médicos
-            List<Medico> medicos = service.findAllMedico();
-            System.out.println("📋 Médicos (" + medicos.size() + "):");
-            for (Medico m : medicos) {
-                System.out.println("   - " + m.getId() + " | " + m.getNombre() + " | " + m.getEspecialidad());
-            }
-
-            // 🧍 Pacientes
-            List<Paciente> pacientes = service.findAllPaciente();
-            System.out.println("\n📋 Pacientes (" + pacientes.size() + "):");
-            for (Paciente p : pacientes) {
-                System.out.println("   - " + p.getId() + " | " + p.getNombre() + " | " + p.getTelefono() + " | " + p.getFechaNacimiento());
-            }
-
-            // 💊 Medicamentos
-            List<Medicamento> medicamentos = service.findAllMedicamento();
-            System.out.println("\n📋 Medicamentos (" + medicamentos.size() + "):");
-            for (Medicamento m : medicamentos) {
-                System.out.println("   - " + m.getCodigo() + " | " + m.getNombre() + " | " + m.getDescripcion());
-            }
-
-            // 📄 Recetas
-            List<Receta> recetas = service.findAllRecetas();
-            System.out.println("\n📋 Recetas (" + recetas.size() + "):");
-            for (Receta r : recetas) {
-                System.out.println("   - " + r.getId() + " | Médico: " + r.getMedicoId() + " | Paciente: " + r.getPacienteId() +
-                        " | Fecha: " + r.getFechaConfeccion() + " | Retiro: " + r.getFechaRetiro() + " | Estado: " + r.getEstado());
-            }
-
-            // 📝 Items de receta
-            System.out.println("\n📋 Items de receta:");
-            for (Receta r : recetas) {
-                List<ItemReceta> items = service.findItemRecetaByReceta(r.getId());
-                System.out.println("   Receta " + r.getId() + " (" + items.size() + " items):");
-                for (ItemReceta ir : items) {
-                    System.out.println("     - " + ir.getItemRecetaId() + " | Medicamento: " + ir.getMedicamentoCodigo() +
-                            " | Cantidad: " + ir.getCantidad() + " | Indicaciones: " + ir.getIndicaciones());
-                }
-            }
-
-            // 🚚 Prescripciones
-            List<Prescripcion> prescripciones = service.findAllPrescripcion();
-            System.out.println("\n📋 Prescripciones (" + prescripciones.size() + "):");
-            for (Prescripcion p : prescripciones) {
-                System.out.println("   - #" + p.getNumero() + " | Médico: " + p.getMedico().getNombre() +
-                        " | Paciente: " + p.getPaciente().getNombre() + " | Estado: " + p.getEstado());
-            }
-
-            // 🔐 Usuarios
-            List<Usuario> usuarios = service.findAllUsuario();
-            System.out.println("\n📋 Usuarios (" + usuarios.size() + "):");
-            for (Usuario u : usuarios) {
-                System.out.println("   - " + u.getId() + " | " + u.getNombre() + " | Rol: " + u.getRol());
-            }
-
-            System.out.println("\n✅ Verificación completa de contenido en base de datos");
+            // --------------------------
+            // Mostrar todos los registros existentes
+            // --------------------------
+            mostrarTodo(service);
 
         } catch (Exception e) {
-            System.err.println("❌ Error durante la verificación: " + e.getMessage());
+            System.err.println("❌ Error: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private static void mostrarTodo(Service service) throws Exception {
+        System.out.println("\n📋 Médicos:");
+        for (Medico m : service.searchMedico(new Medico())) {
+            System.out.println(" - " + m);
+        }
+
+        System.out.println("\n📋 Farmaceutas:");
+        for (Farmaceuta f : service.searchFarmaceuta(new Farmaceuta())) {
+            System.out.println(" - " + f);
+        }
+
+        System.out.println("\n📋 Pacientes:");
+        for (Paciente p : service.searchPaciente(new Paciente())) {
+            System.out.println(" - " + p);
+        }
+
+        System.out.println("\n📋 Medicamentos:");
+        for (Medicamento m : service.searchMedicamento(new Medicamento())) {
+            System.out.println(" - " + m);
+        }
+
+        System.out.println("\n📋 Recetas:");
+        for (Receta r : service.searchReceta()) {
+            System.out.println(" - " + r.getId() + " | Médico: " + r.getMedicoId() + " | Paciente: " + r.getPacienteId());
+            System.out.println("   Items:");
+            for (ItemReceta i : service.buscarItemsPorReceta(r.getId())) {
+                System.out.println("    - " + i.getItemRecetaId() + " | " + i.getMedicamentoCodigo() + " | " +
+                        i.getCantidad() + " | " + i.getIndicaciones());
+            }
+        }
+
+        System.out.println("\n📋 Prescripciones:");
+        for (Prescripcion p : service.listarPrescripciones()) {
+            String fechaConfeccion = p.getFechaConfeccion() != null
+                    ? p.getFechaConfeccion().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    : "N/A";
+            String fechaRetiro = p.getFechaRetiro() != null
+                    ? p.getFechaRetiro().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                    : "N/A";
+
+            System.out.println(" - #" + p.getNumero() + " | Médico: " + p.getMedico().getNombre() +
+                    " | Paciente: " + p.getPaciente().getNombre() + " | Item: " + p.getItem().getMedicamentoCodigo() +
+                    " | Estado: " + p.getEstado() +
+                    " | Confección: " + fechaConfeccion +
+                    " | Retiro: " + fechaRetiro);
         }
     }
 }

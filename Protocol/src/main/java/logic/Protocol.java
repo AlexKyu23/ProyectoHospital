@@ -11,6 +11,7 @@ public class Protocol {
     public static final int USUARIO_CREATE = 903;
     public static final int USUARIO_UPDATE = 904;
     public static final int USUARIO_DELETE = 905;
+    public static final int USUARIO_SEARCH = 906;
 
     // 👨‍⚕️ Medico (910–919)
     public static final int MEDICO_CREATE = 910;

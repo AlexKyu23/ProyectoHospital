@@ -8,28 +8,20 @@ import java.util.stream.Collectors;
 
 public class Service {
     private static Service instance;
-    private final AdminDAO adminDAO;
-    private final FarmaceutaDAO farmaceutaDAO;
-    private final MedicamentoDAO medicamentoDAO;
-    private final MedicoDAO medicoDAO;
-    private final PacienteDAO pacienteDAO;
-    private final RecetaDAO recetaDAO;
-    private final UsuarioDAO usuarioDAO;
-    private final ItemRecetaDAO itemRecetaDAO;
-    private final PrescripcionDAO prescripcionDAO;
+    private final AdminDAO adminDAO = new AdminDAO();
+    private final FarmaceutaDAO farmaceutaDAO = new FarmaceutaDAO();
+    private final MedicamentoDAO medicamentoDAO = new MedicamentoDAO();
+    private final MedicoDAO medicoDAO = new MedicoDAO();
+    private final PacienteDAO pacienteDAO = new PacienteDAO();
+    private final RecetaDAO recetaDAO = new RecetaDAO();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private final ItemRecetaDAO itemRecetaDAO = new ItemRecetaDAO();
+    private final PrescripcionDAO prescripcionDAO = new PrescripcionDAO();
 
     private Service() {
-        adminDAO = new AdminDAO();
-        farmaceutaDAO = new FarmaceutaDAO();
-        medicamentoDAO = new MedicamentoDAO();
-        medicoDAO = new MedicoDAO();
-        pacienteDAO = new PacienteDAO();
-        recetaDAO = new RecetaDAO();
-        usuarioDAO = new UsuarioDAO();
-        itemRecetaDAO = new ItemRecetaDAO();
-        prescripcionDAO = new PrescripcionDAO();
         try {
-            System.out.println("✅ Usuarios cargados desde SQL: " + usuarioDAO.search(new Usuario("", "", "", "")).size());
+            System.out.println("✅ Usuarios cargados desde SQL: " +
+                    usuarioDAO.search(new Usuario("", "", "", "")).size());
         } catch (Exception e) {
             System.err.println("Error al cargar usuarios: " + e.getMessage());
         }
@@ -40,304 +32,106 @@ public class Service {
         return instance;
     }
 
-    // ===================================================================
-    // === ADMIN ========================================================
-    // ===================================================================
-    public void createAdmin(Admin admin) throws Exception {
-        if (adminDAO.buscarPorId(admin.getId()) != null)
-            throw new Exception("El admin ya existe");
-        adminDAO.guardar(admin);
+    // =============================================================
+    // === MÉTODOS GENERALES DE APOYO ==============================
+    // =============================================================
+    private <T> List<T> safeList(List<T> list) {
+        return list != null ? list : new ArrayList<>();
     }
 
-    public Admin readAdmin(String id) throws Exception {
-        return adminDAO.buscarPorId(id);
-    }
+    // =============================================================
+    // === ADMIN ===================================================
+    // =============================================================
+    public void create(Admin e) throws Exception { adminDAO.guardar(e); }
+    public Admin readAdmin(String id) throws Exception { return adminDAO.buscarPorId(id); }
+    public void update(Admin e) throws Exception { adminDAO.actualizar(e); }
+    public void deleteAdmin(String id) throws Exception { adminDAO.borrar(id); }
+    public List<Admin> searchAdmin() throws Exception { return safeList(adminDAO.listar()); }
 
-    public void updateAdmin(Admin admin) throws Exception {
-        adminDAO.actualizar(admin);
-    }
+    // =============================================================
+    // === FARMACEUTA ==============================================
+    // =============================================================
+    public void create(Farmaceuta e) throws Exception { farmaceutaDAO.guardar(e); }
+    public Farmaceuta readFarmaceuta(String id) throws Exception { return farmaceutaDAO.buscarPorId(id); }
+    public void update(Farmaceuta e) throws Exception { farmaceutaDAO.actualizar(e); }
+    public void deleteFarmaceuta(String id) throws Exception { farmaceutaDAO.borrar(id); }
+    public List<Farmaceuta> searchFarmaceuta(Farmaceuta f) throws Exception { return safeList(farmaceutaDAO.search(f)); }
 
-    public void deleteAdmin(String id) throws Exception {
-        adminDAO.borrar(id);
-    }
-
-    public List<Admin> findAllAdmin() throws Exception {
-        List<Admin> lista = adminDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === FARMACEUTA ===================================================
-    // ===================================================================
-    public void createFarmaceuta(Farmaceuta f) throws Exception {
-        if (farmaceutaDAO.buscarPorId(f.getId()) != null)
-            throw new Exception("El farmaceuta ya existe");
-        farmaceutaDAO.guardar(f);
-    }
-
-    public Farmaceuta readFarmaceuta(String id) throws Exception {
-        return farmaceutaDAO.buscarPorId(id);
-    }
-
-    public Farmaceuta readFarmaceutaByNombre(String nombre) throws Exception {
-        List<Farmaceuta> list = farmaceutaDAO.search(new Farmaceuta("", nombre, ""));
-        return list.isEmpty() ? null : list.get(0);
-    }
-
-    public void updateFarmaceuta(Farmaceuta f) throws Exception {
-        farmaceutaDAO.actualizar(f);
-    }
-
-    public void deleteFarmaceuta(String id) throws Exception {
-        farmaceutaDAO.borrar(id);
-    }
-
-    public List<Farmaceuta> findAllFarmaceuta() throws Exception {
-        List<Farmaceuta> lista = farmaceutaDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Farmaceuta> searchFarmaceuta(String criterio) throws Exception {
-        List<Farmaceuta> lista = farmaceutaDAO.search(new Farmaceuta("", criterio, ""));
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === MEDICAMENTO (✅ CODIGO AHORA ES STRING) ======================
-    // ===================================================================
-    public void createMedicamento(Medicamento m) throws Exception {
-        try {
-            int codigoInt = Integer.parseInt(m.getCodigo());
-            if (medicamentoDAO.buscarPorCodigo(codigoInt) != null)
-                throw new Exception("El medicamento ya existe");
-            medicamentoDAO.guardar(m);
-        } catch (NumberFormatException e) {
-            throw new Exception("Código de medicamento inválido: " + m.getCodigo());
-        }
+    // =============================================================
+    // === MEDICAMENTO (Código tipo String) ========================
+    // =============================================================
+    public void create(Medicamento e) throws Exception {
+        if (medicamentoDAO.buscarPorCodigo(e.getCodigo()) != null)
+            throw new Exception("Medicamento ya existe");
+        medicamentoDAO.guardar(e);
     }
 
     public Medicamento readMedicamento(String codigo) throws Exception {
-        try {
-            int codigoInt = Integer.parseInt(codigo);
-            return medicamentoDAO.buscarPorCodigo(codigoInt);
-        } catch (NumberFormatException e) {
-            throw new Exception("Código de medicamento inválido: " + codigo);
-        }
+        return medicamentoDAO.buscarPorCodigo(codigo);
     }
 
-    public Medicamento readMedicamentoByNombre(String nombre) throws Exception {
-        List<Medicamento> list = medicamentoDAO.search(new Medicamento(nombre, "", ""));
-        return list.isEmpty() ? null : list.get(0);
-    }
+    public void update(Medicamento e) throws Exception { medicamentoDAO.actualizar(e); }
+    public void deleteMedicamento(String codigo) throws Exception { medicamentoDAO.borrar(codigo); }
+    public List<Medicamento> searchMedicamento(Medicamento e) throws Exception { return safeList(medicamentoDAO.search(e)); }
 
-    public void updateMedicamento(Medicamento m) throws Exception {
-        try {
-            int codigoInt = Integer.parseInt(m.getCodigo());
-            // Valida que existe antes de actualizar
-            if (medicamentoDAO.buscarPorCodigo(codigoInt) == null)
-                throw new Exception("El medicamento no existe");
-            medicamentoDAO.actualizar(m);
-        } catch (NumberFormatException e) {
-            throw new Exception("Código de medicamento inválido: " + m.getCodigo());
-        }
-    }
+    // =============================================================
+    // === MÉDICO ==================================================
+    // =============================================================
+    public void create(Medico e) throws Exception { medicoDAO.guardar(e); }
+    public Medico readMedico(String id) throws Exception { return medicoDAO.buscarPorId(id); }
+    public void update(Medico e) throws Exception { medicoDAO.actualizar(e); }
+    public void deleteMedico(String id) throws Exception { medicoDAO.borrar(id); }
+    public List<Medico> searchMedico(Medico e) throws Exception { return safeList(medicoDAO.search(e)); }
 
-    public void deleteMedicamento(String codigo) throws Exception {
-        try {
-            int codigoInt = Integer.parseInt(codigo);
-            medicamentoDAO.borrar(codigoInt);
-        } catch (NumberFormatException e) {
-            throw new Exception("Código de medicamento inválido: " + codigo);
-        }
-    }
+    // =============================================================
+    // === PACIENTE ================================================
+    // =============================================================
+    public void create(Paciente e) throws Exception { pacienteDAO.guardar(e); }
+    public Paciente readPaciente(String id) throws Exception { return pacienteDAO.buscarPorId(id); }
+    public void update(Paciente e) throws Exception { pacienteDAO.actualizar(e); }
+    public void deletePaciente(String id) throws Exception { pacienteDAO.borrar(id); }
+    public List<Paciente> searchPaciente(Paciente e) throws Exception { return safeList(pacienteDAO.search(e)); }
 
-    public List<Medicamento> findAllMedicamento() throws Exception {
-        List<Medicamento> lista = medicamentoDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Medicamento> searchMedicamento(Medicamento filtro) throws Exception {
-        List<Medicamento> lista = medicamentoDAO.search(filtro);
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === MEDICO =======================================================
-    // ===================================================================
-    public void createMedico(Medico m) throws Exception {
-        if (medicoDAO.buscarPorId(m.getId()) != null)
-            throw new Exception("El medico ya existe");
-        medicoDAO.guardar(m);
-    }
-
-    public Medico readMedico(String id) throws Exception {
-        return medicoDAO.buscarPorId(id);
-    }
-
-    public Medico readMedicoByNombre(String nombre) throws Exception {
-        List<Medico> list = medicoDAO.search(new Medico("", nombre, "", ""));
-        return list.isEmpty() ? null : list.get(0);
-    }
-
-    public void updateMedico(Medico m) throws Exception {
-        medicoDAO.actualizar(m);
-    }
-
-    public void deleteMedico(String id) throws Exception {
-        medicoDAO.borrar(id);
-    }
-
-    public List<Medico> findAllMedico() throws Exception {
-        List<Medico> lista = medicoDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Medico> searchMedico(String criterio) throws Exception {
-        List<Medico> lista = medicoDAO.search(new Medico("", criterio, "", ""));
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === PACIENTE =====================================================
-    // ===================================================================
-    public void createPaciente(Paciente p) throws Exception {
-        if (pacienteDAO.buscarPorId(p.getId()) != null)
-            throw new Exception("Paciente ya existe");
-        pacienteDAO.guardar(p);
-    }
-
-    public Paciente readPacienteById(String id) throws Exception {
-        return pacienteDAO.buscarPorId(id);
-    }
-
-    public Paciente readPacienteByNombre(String nombre) throws Exception {
-        List<Paciente> list = pacienteDAO.search(new Paciente("", nombre, "", null));
-        return list.isEmpty() ? null : list.get(0);
-    }
-
-    public void updatePaciente(Paciente p) throws Exception {
-        pacienteDAO.actualizar(p);
-    }
-
-    public void deletePaciente(String id) throws Exception {
-        pacienteDAO.borrar(id);
-    }
-
-    public List<Paciente> findAllPaciente() throws Exception {
-        List<Paciente> lista = pacienteDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Paciente> searchPaciente(String criterio) throws Exception {
-        List<Paciente> lista = pacienteDAO.search(new Paciente("", criterio, "", null));
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === RECETA =======================================================
-    // ===================================================================
-    public void createReceta(Receta r) throws Exception {
-        recetaDAO.guardar(r);
-    }
-
-    public Receta readRecetaById(String id) throws Exception {
-        return recetaDAO.buscarPorId(id);
-    }
-
-    public void updateReceta(Receta r) throws Exception {
-        recetaDAO.actualizar(r);
-    }
-
-    public void deleteReceta(String id) throws Exception {
-        recetaDAO.borrar(id);
-    }
-
-    public void deleteRecetaById(String recetaId) throws Exception {
-        List<ItemReceta> items = itemRecetaDAO.buscarPorRecetaId(recetaId);
-        for (ItemReceta item : items) {
-            itemRecetaDAO.borrar(item.getItemRecetaId());
-        }
-        recetaDAO.borrar(recetaId);
-    }
-
-    public List<Receta> findRecetaByPaciente(String pacienteId) throws Exception {
-        List<Receta> all = recetaDAO.listar();
-        if (all == null) return new ArrayList<>();
-        return all.stream()
-                .filter(r -> r.getPacienteId().equalsIgnoreCase(pacienteId))
-                .collect(Collectors.toList());
-    }
-
-    public List<Receta> findAllReceta() throws Exception {
-        List<Receta> lista = recetaDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Receta> findAllRecetas() throws Exception {
-        return findAllReceta();
-    }
+    // =============================================================
+    // === RECETA ==================================================
+    // =============================================================
+    public void create(Receta e) throws Exception { recetaDAO.guardar(e); }
+    public Receta readReceta(String id) throws Exception { return recetaDAO.buscarPorId(id); }
+    public void update(Receta e) throws Exception { recetaDAO.actualizar(e); }
+    public void deleteReceta(String id) throws Exception { recetaDAO.borrar(id); }
+    public List<Receta> searchReceta() throws Exception { return safeList(recetaDAO.listar()); }
 
     public List<Receta> findRecetasBetween(LocalDate start, LocalDate end) throws Exception {
-        List<Receta> lista = recetaDAO.listar();
-        if (lista == null) return new ArrayList<>();
-        return lista.stream()
+        return safeList(recetaDAO.listar()).stream()
                 .filter(r -> {
-                    LocalDate fecha = r.getFechaConfeccion();
-                    return fecha != null && !fecha.isBefore(start) && !fecha.isAfter(end);
-                })
-                .collect(Collectors.toList());
+                    LocalDate f = r.getFechaConfeccion();
+                    return f != null && !f.isBefore(start) && !f.isAfter(end);
+                }).collect(Collectors.toList());
     }
 
-    public List<Receta> searchReceta(String criterio) throws Exception {
-        List<Receta> all = recetaDAO.listar();
-        if (all == null) return new ArrayList<>();
-        if (criterio == null || criterio.trim().isEmpty()) return all;
-
-        return all.stream()
-                .filter(r -> r.getId().toLowerCase().contains(criterio.toLowerCase()) ||
-                        r.getPacienteId().toLowerCase().contains(criterio.toLowerCase()) ||
-                        r.getMedicoId().toLowerCase().contains(criterio.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    public void cambiarEstadoReceta(String recetaId, EstadoReceta nuevoEstado) throws Exception {
+    public void cambiarEstadoReceta(String recetaId, EstadoReceta estado) throws Exception {
         Receta r = recetaDAO.buscarPorId(recetaId);
-        if (r != null) {
-            r.setEstado(nuevoEstado);
-            recetaDAO.actualizar(r);
+        if (r != null) { r.setEstado(estado); recetaDAO.actualizar(r); }
+    }
+
+    // =============================================================
+    // === ITEM RECETA =============================================
+    // =============================================================
+    public void create(ItemReceta e) throws Exception { itemRecetaDAO.guardar(e); }
+    public List<ItemReceta> buscarItemsPorReceta(String recetaId) throws Exception {
+        return safeList(itemRecetaDAO.buscarPorRecetaId(recetaId));
+    }
+    public void deleteItemReceta(String itemRecetaId) throws Exception {
+        if (itemRecetaId == null || itemRecetaId.isEmpty()) {
+            throw new Exception("ItemRecetaId inválido para borrar");
         }
+        itemRecetaDAO.borrar(itemRecetaId);
     }
 
-    // ===================================================================
-    // === ITEMRECETA ===================================================
-    // ===================================================================
-    public void createItemReceta(ItemReceta item) throws Exception {
-        if (itemRecetaDAO.buscarPorId(item.getItemRecetaId()) != null)
-            throw new Exception("El item ya existe");
-        itemRecetaDAO.guardar(item);
-    }
-
-    public ItemReceta readItemReceta(String id) throws Exception {
-        return itemRecetaDAO.buscarPorId(id);
-    }
-
-    public void updateItemReceta(ItemReceta item) throws Exception {
-        itemRecetaDAO.actualizar(item);
-    }
-
-    public void deleteItemReceta(String id) throws Exception {
-        itemRecetaDAO.borrar(id);
-    }
-
-    public List<ItemReceta> findItemRecetaByReceta(String recetaId) throws Exception {
-        List<ItemReceta> lista = itemRecetaDAO.buscarPorRecetaId(recetaId);
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === PRESCRIPCION =================================================
-    // ===================================================================
-    public void createPrescripcion(Prescripcion p) throws Exception {
+    // =============================================================
+// === PRESCRIPCIÓN ============================================
+// =============================================================
+    public void create(Prescripcion p) throws Exception {
         prescripcionDAO.guardar(p);
     }
 
@@ -345,7 +139,7 @@ public class Service {
         return prescripcionDAO.buscarPorNumero(numero);
     }
 
-    public void updatePrescripcion(Prescripcion p) throws Exception {
+    public void update(Prescripcion p) throws Exception {
         prescripcionDAO.actualizar(p);
     }
 
@@ -353,133 +147,74 @@ public class Service {
         prescripcionDAO.borrar(numero);
     }
 
-    public List<Prescripcion> findAllPrescripcion() throws Exception {
-        List<Prescripcion> lista = prescripcionDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
+    public List<Prescripcion> searchPrescripcion(Prescripcion filtro) throws Exception {
+        // Si tu DAO no tiene un método search personalizado, puedes hacer esto:
+        return safeList(prescripcionDAO.listar()).stream()
+                .filter(p ->
+                        (filtro.getPaciente() == null || filtro.getPaciente().getId() == null ||
+                                p.getPaciente().getId().contains(filtro.getPaciente().getId())) &&
+                                (filtro.getMedico() == null || filtro.getMedico().getId() == null ||
+                                        p.getMedico().getId().contains(filtro.getMedico().getId())) &&
+                                (filtro.getEstado() == null || filtro.getEstado().isEmpty() ||
+                                        p.getEstado().equalsIgnoreCase(filtro.getEstado()))
+                )
+                .toList();
     }
 
-    public List<Prescripcion> searchPrescripcionByEstado(String estado) throws Exception {
-        Prescripcion filtro = new Prescripcion();
-        filtro.setEstado(estado);
-        List<Prescripcion> lista = prescripcionDAO.search(filtro);
-        return lista != null ? lista : new ArrayList<>();
+    public List<Prescripcion> listarPrescripciones() throws Exception {
+        return safeList(prescripcionDAO.listar());
     }
 
-    // ===================================================================
-    // === DESPACHO =====================================================
-    // ===================================================================
-    public List<Receta> recetasDisponiblesParaDespacho() throws Exception {
+    // =============================================================
+    // === USUARIO ==================================================
+    // =============================================================
+    public void create(Usuario e) throws Exception { usuarioDAO.guardar(e); }
+    public Usuario readUsuario(String id) throws Exception { return usuarioDAO.buscarPorId(id); }
+    public void update(Usuario e) throws Exception { usuarioDAO.actualizar(e); }
+    public void deleteUsuario(String id) throws Exception { usuarioDAO.borrar(id); }
+    public List<Usuario> searchUsuario(Usuario e) throws Exception { return safeList(usuarioDAO.search(e)); }
+
+    // =============================================================
+    // === DESPACHO (LÓGICA DE ESTADOS) ============================
+    // =============================================================
+    public List<Receta> recetasParaDespacho() throws Exception {
         LocalDate hoy = LocalDate.now();
-        List<Receta> all = recetaDAO.listar();
-        if (all == null) return new ArrayList<>();
-
-        return all.stream()
+        return safeList(recetaDAO.listar()).stream()
                 .filter(r -> r.getEstado() == EstadoReceta.CONFECCIONADA)
                 .filter(r -> {
                     LocalDate retiro = r.getFechaRetiro();
-                    return retiro != null &&
-                            !retiro.isBefore(hoy.minusDays(3)) &&
-                            !retiro.isAfter(hoy.plusDays(3));
+                    return retiro != null && !retiro.isBefore(hoy.minusDays(3)) && !retiro.isAfter(hoy.plusDays(3));
                 })
                 .collect(Collectors.toList());
     }
 
-    public void iniciarDespacho(String recetaId) throws Exception {
-        cambiarEstadoReceta(recetaId, EstadoReceta.EN_PROCESO);
-    }
+    public void iniciarDespacho(String id) throws Exception { cambiarEstadoReceta(id, EstadoReceta.EN_PROCESO); }
+    public void alistarMedicamentos(String id) throws Exception { cambiarEstadoReceta(id, EstadoReceta.LISTA); }
+    public void entregarReceta(String id) throws Exception { cambiarEstadoReceta(id, EstadoReceta.ENTREGADA); }
 
-    public void alistarMedicamentos(String recetaId) throws Exception {
-        cambiarEstadoReceta(recetaId, EstadoReceta.LISTA);
-    }
-
-    public void entregarReceta(String recetaId) throws Exception {
-        cambiarEstadoReceta(recetaId, EstadoReceta.ENTREGADA);
-    }
-
-    // ===================================================================
-    // === USUARIO ======================================================
-    // ===================================================================
-    public Usuario readUsuarioById(String id) throws Exception {
-        return usuarioDAO.buscarPorId(id);
-    }
-
-    public boolean verificarClaveUsuario(String id, String clave) throws Exception {
-        Usuario u = readUsuarioById(id);
-        return u != null && u.verificarClave(clave);
-    }
-
-    public void createUsuario(Usuario u) throws Exception {
-        if (readUsuarioById(u.getId()) != null)
-            throw new Exception("Ya existe un usuario con ese ID");
-        usuarioDAO.guardar(u);
-    }
-
-    public void updateUsuario(Usuario u) throws Exception {
-        usuarioDAO.actualizar(u);
-    }
-
-    public void deleteUsuario(String id) throws Exception {
-        usuarioDAO.borrar(id);
-    }
-
-    public List<Usuario> findAllUsuario() throws Exception {
-        List<Usuario> lista = usuarioDAO.listar();
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    public List<Usuario> searchUsuario(String criterio) throws Exception {
-        List<Usuario> lista = usuarioDAO.search(new Usuario("", criterio, "", ""));
-        return lista != null ? lista : new ArrayList<>();
-    }
-
-    // ===================================================================
-    // === COMBINED REGISTRATION METHODS ================================
-    // ===================================================================
+    // =============================================================
+    // === REGISTROS AUTOMÁTICOS ==================================
+    // =============================================================
     public void registrarMedico(Medico m) throws Exception {
-        createMedico(m);
-        Usuario u = new Usuario(m.getId(), m.getNombre(), m.getId(), "MED");
-        createUsuario(u);
+        if (medicoDAO.buscarPorId(m.getId()) != null) {
+            throw new Exception("El médico con ID " + m.getId() + " ya existe");
+        }
+        if (usuarioDAO.buscarPorId(m.getId()) != null) {
+            throw new Exception("El usuario con ID " + m.getId() + " ya existe");
+        }
+        create(m);
+        create(new Usuario(m.getId(), m.getNombre(), m.getId(), "MED"));
     }
 
     public void registrarFarmaceuta(Farmaceuta f) throws Exception {
-        createFarmaceuta(f);
-        Usuario u = new Usuario(f.getId(), f.getNombre(), f.getId(), "FAR");
-        createUsuario(u);
+        if (farmaceutaDAO.buscarPorId(f.getId()) != null) {
+            throw new Exception("El farmaceuta con ID " + f.getId() + " ya existe");
+        }
+        if (usuarioDAO.buscarPorId(f.getId()) != null) {
+            throw new Exception("El usuario con ID " + f.getId() + " ya existe");
+        }
+        create(f);
+        create(new Usuario(f.getId(), f.getNombre(), f.getId(), "FAR"));
     }
 
-    // ===================================================================
-    // === TESTING UTILITIES ============================================
-    // ===================================================================
-    public void resetDatosDePrueba() throws Exception {
-        try {
-            List<Prescripcion> pres = prescripcionDAO.listar();
-            for (Prescripcion p : pres) {
-                prescripcionDAO.borrar(p.getNumero());
-            }
-        } catch (Exception ignored) {}
-
-        try {
-            deleteRecetaById("R500");
-        } catch (Exception ignored) {}
-
-        try {
-            itemRecetaDAO.borrar("IR600");
-        } catch (Exception ignored) {}
-
-        try {
-            usuarioDAO.borrar("U700");
-        } catch (Exception ignored) {}
-
-        try {
-            medicamentoDAO.borrar(3001);
-        } catch (Exception ignored) {}
-
-        try {
-            pacienteDAO.borrar("P200");
-        } catch (Exception ignored) {}
-
-        try {
-            medicoDAO.borrar("M100");
-        } catch (Exception ignored) {}
-    }
 }
