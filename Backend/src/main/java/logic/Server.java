@@ -7,12 +7,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Server {
+public class    Server {
     private ServerSocket serverSocket;
     private final List<Worker> workers = Collections.synchronizedList(new ArrayList<>());
 
     public Server() {
-
         try {
             serverSocket = new ServerSocket(Protocol.PORT);
             System.out.println("Servidor iniciado en puerto " + Protocol.PORT);
@@ -31,7 +30,7 @@ public class Server {
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                System.out.println("Conexión aceptada...");
+                System.out.println("Conexión aceptada desde: " + socket.getInetAddress());
                 Worker worker = new Worker(this, socket, service);
                 workers.add(worker);
                 System.out.println("Clientes conectados: " + workers.size());
@@ -42,11 +41,11 @@ public class Server {
         }
     }
 
-
     public void remove(Worker w) {
         workers.remove(w);
         System.out.println("Clientes conectados: " + workers.size());
     }
+
     public void stop() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
@@ -57,5 +56,4 @@ public class Server {
             System.out.println("⚠️ Error al cerrar ServerSocket: " + e.getMessage());
         }
     }
-
 }

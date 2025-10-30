@@ -2,10 +2,6 @@ package logic;
 
 import java.io.*;
 import java.net.Socket;
-
-
-import java.io.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +17,7 @@ public class Worker {
         this.server = server;
         this.socket = socket;
         this.service = service;
+
         try {
             os = new ObjectOutputStream(socket.getOutputStream());
             is = new ObjectInputStream(socket.getInputStream());
@@ -41,14 +38,11 @@ public class Worker {
         System.out.println("🔌 Conexión finalizada.");
     }
 
-    // ---------------------------
-    // Métodos auxiliares
-    // ---------------------------
     private void sendOk() throws IOException { os.writeInt(Protocol.ERROR_NO_ERROR); }
     private void sendError() throws IOException { os.writeInt(Protocol.ERROR_ERROR); }
 
     @SuppressWarnings("unchecked")
-    public void listen() {
+    private void listen() {
         while (continuar) {
             try {
                 int method = is.readInt();
@@ -56,9 +50,7 @@ public class Worker {
 
                 switch (method) {
 
-                    // ======================================================
-                    // === USUARIO ==========================================
-                    // ======================================================
+                    // ================= USUARIO =================
                     case Protocol.USUARIO_CREATE -> handleSimpleOp(() ->
                             service.create((Usuario) is.readObject()));
 
@@ -79,19 +71,16 @@ public class Worker {
                             Usuario u = (Usuario) is.readObject();
                             Usuario real = service.readUsuario(u.getId());
                             if (real != null && real.getClave().equals(u.getClave())) {
-                                os.writeInt(Protocol.ERROR_NO_ERROR);
-                                os.writeObject(real); // enviamos el usuario válido
-                            } else {
-                                os.writeInt(Protocol.ERROR_ERROR);
-                            }
+                                sendOk();
+                                os.writeObject(real);
+                            } else sendError();
                         } catch (Exception e) {
                             sendError();
-                        }}
+                            System.out.println("❌ Error en login: " + e.getMessage());
+                        }
+                    }
 
-
-                    // ======================================================
-                    // === MÉDICO ===========================================
-                    // ======================================================
+                    // ================= MÉDICO =================
                     case Protocol.MEDICO_CREATE -> handleSimpleOp(() ->
                             service.create((Medico) is.readObject()));
 
@@ -107,9 +96,7 @@ public class Worker {
                     case Protocol.MEDICO_SEARCH -> handleListOp(() ->
                             service.searchMedico((Medico) is.readObject()));
 
-                    // ======================================================
-                    // === PACIENTE =========================================
-                    // ======================================================
+                    // ================= PACIENTE =================
                     case Protocol.PACIENTE_CREATE -> handleSimpleOp(() ->
                             service.create((Paciente) is.readObject()));
 
@@ -125,9 +112,7 @@ public class Worker {
                     case Protocol.PACIENTE_SEARCH -> handleListOp(() ->
                             service.searchPaciente((Paciente) is.readObject()));
 
-                    // ======================================================
-                    // === MEDICAMENTO ======================================
-                    // ======================================================
+                    // ================= MEDICAMENTO =================
                     case Protocol.MEDICAMENTO_CREATE -> handleSimpleOp(() ->
                             service.create((Medicamento) is.readObject()));
 
@@ -143,9 +128,7 @@ public class Worker {
                     case Protocol.MEDICAMENTO_SEARCH -> handleListOp(() ->
                             service.searchMedicamento((Medicamento) is.readObject()));
 
-                    // ======================================================
-                    // === RECETA ===========================================
-                    // ======================================================
+                    // ================= RECETA =================
                     case Protocol.RECETA_CREATE -> handleSimpleOp(() ->
                             service.create((Receta) is.readObject()));
 
@@ -160,9 +143,7 @@ public class Worker {
 
                     case Protocol.RECETA_SEARCH -> handleListOp(service::searchReceta);
 
-                    // ======================================================
-                    // === ITEM RECETA / PRESCRIPCIÓN =======================
-                    // ======================================================
+                    // ================= ITEM RECETA =================
                     case Protocol.ITEMRECETA_CREATE -> handleSimpleOp(() ->
                             service.create((ItemReceta) is.readObject()));
 
@@ -175,9 +156,7 @@ public class Worker {
                     case Protocol.PRESCRIPCION_SEARCH -> handleListOp(() ->
                             service.searchPrescripcion((Prescripcion) is.readObject()));
 
-                    // ======================================================
-                    // === ADMIN / FARMACEUTA ===============================
-                    // ======================================================
+                    // ================= ADMIN / FARMACEUTA =================
                     case Protocol.ADMIN_CREATE -> handleSimpleOp(() ->
                             service.create((Admin) is.readObject()));
 
@@ -190,9 +169,7 @@ public class Worker {
                     case Protocol.FARMACEUTA_READ -> handleReturnOp(() ->
                             service.readFarmaceuta((String) is.readObject()));
 
-                    // ======================================================
-                    // === DESCONECTAR ======================================
-                    // ======================================================
+                    // ================= DESCONECTAR =================
                     case Protocol.DISCONNECT -> {
                         System.out.println("👋 Cliente desconectado.");
                         stop();
@@ -208,19 +185,16 @@ public class Worker {
                 os.flush();
 
             } catch (IOException e) {
-                System.out.println("⚠️ Cliente desconectado: " + e.getMessage());
+                System.out.println("⚠️ Cliente desconectado (IOException): " + e.getMessage());
                 stop();
-            } catch (Exception e) {
+            } catch (Exception e) {  // aquí se captura ClassNotFoundException y otros
                 System.out.println("❌ Error general en Worker: " + e.getMessage());
                 stop();
             }
         }
     }
 
-    // ============================================================
-    // === Handlers auxiliares genéricos ==========================
-    // ============================================================
-
+    // ---------------- Handlers auxiliares ----------------
     private void handleSimpleOp(IOAction action) {
         try {
             action.run();
@@ -237,10 +211,7 @@ public class Worker {
             sendOk();
             os.writeObject(result);
         } catch (Exception e) {
-            try {
-                sendError();
-                os.writeObject(null);
-            } catch (IOException ignored) {}
+            try { sendError(); os.writeObject(null); } catch (IOException ignored) {}
             System.out.println("❌ Error en operación de lectura: " + e.getMessage());
         }
     }
@@ -251,17 +222,11 @@ public class Worker {
             sendOk();
             os.writeObject(result != null ? result : new ArrayList<>());
         } catch (Exception e) {
-            try {
-                sendError();
-                os.writeObject(new ArrayList<>());
-            } catch (IOException ignored) {}
+            try { sendError(); os.writeObject(new ArrayList<>()); } catch (IOException ignored) {}
             System.out.println("❌ Error en operación de lista: " + e.getMessage());
         }
     }
 
-    // ============================================================
-    // === Functional interfaces internas =========================
-    // ============================================================
     @FunctionalInterface private interface IOAction { void run() throws Exception; }
     @FunctionalInterface private interface IOSupplier<T> { T get() throws Exception; }
 }
