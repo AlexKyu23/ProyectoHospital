@@ -26,16 +26,21 @@ public class MedicoModel extends AbstractModel {
         super.addPropertyChangeListener(listener);
     }
 
-    public Medico getCurrent() { return current; }
-    public List<Medico> getList() { return list; }
+    public Medico getCurrent() {
+        return current;
+    }
+
+    public List<Medico> getList() {
+        return list != null ? list : new ArrayList<>();
+    }
 
     public void setCurrent(Medico medico) {
-        this.current = medico;
+        this.current = medico != null ? medico : new Medico();
         firePropertyChange(CURRENT);
     }
 
     public void setList(List<Medico> list) {
-        this.list = list;
+        this.list = list != null ? list : new ArrayList<>();
         firePropertyChange(LIST);
     }
 }

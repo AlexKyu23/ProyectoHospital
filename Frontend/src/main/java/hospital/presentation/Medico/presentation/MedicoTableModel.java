@@ -1,6 +1,5 @@
 package hospital.presentation.Medico.presentation;
 
-
 import hospital.presentation.AbstractTableModel;
 import logic.Medico;
 
@@ -25,11 +24,11 @@ public class MedicoTableModel extends AbstractTableModel<Medico> {
 
     @Override
     protected Object getPropetyAt(Medico m, int col) {
-        switch (cols[col]) {
-            case ID: return m.getId();
-            case NOMBRE: return m.getNombre();
-            case ESPECIALIDAD: return m.getEspecialidad();
-            default: return "";
-        }
+        return switch (cols[col]) {
+            case ID -> m.getId();
+            case NOMBRE -> m.getNombre();
+            case ESPECIALIDAD -> m.getEspecialidad();
+            default -> "";
+        };
     }
 }

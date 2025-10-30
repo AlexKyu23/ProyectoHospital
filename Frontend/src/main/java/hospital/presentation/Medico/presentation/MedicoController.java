@@ -209,8 +209,16 @@ public class MedicoController implements ThreadListener {
             @Override
             protected void done() {
                 try {
-                    model.setList(get());
-                    model.setCurrent(new Medico());
+                    List<Medico> lista = get();
+                    model.setList(lista);
+
+                    // Solo limpiar si los campos están vacíos
+                    if (view.getId().getText().isEmpty() &&
+                            view.getNombre().getText().isEmpty() &&
+                            view.getEspecialidad().getText().isEmpty()) {
+                        model.setCurrent(new Medico());
+                    }
+
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(view.getMainPanel(),
                             "Error al actualizar lista: " + e.getMessage());
@@ -220,6 +228,7 @@ public class MedicoController implements ThreadListener {
 
         worker.execute();
     }
+
 
     @Override
     public void refresh() {

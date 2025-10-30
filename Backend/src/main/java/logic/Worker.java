@@ -3,6 +3,7 @@ package logic;
 import java.io.*;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Worker {
@@ -48,157 +49,152 @@ public class Worker {
 
                 switch (method) {
 
-                    // 🔐 USUARIO
                     case Protocol.USUARIO_LOGIN -> {
-                        Usuario u = (Usuario) is.readObject();
-                        System.out.println("🔐 Login solicitado para ID: " + u.getId());
-                        boolean ok = service.verificarClaveUsuario(u.getId(), u.getClave());
-                        os.writeInt(ok ? Protocol.ERROR_NO_ERROR : Protocol.ERROR_ERROR);
+                        try {
+                            Usuario u = (Usuario) is.readObject();
+                            boolean ok = service.verificarClaveUsuario(u.getId(), u.getClave());
+                            os.writeInt(ok ? Protocol.ERROR_NO_ERROR : Protocol.ERROR_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en USUARIO_LOGIN: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.USUARIO_READ -> {
-                        String id = (String) is.readObject();
-                        System.out.println("🔍 USUARIO_READ solicitado para ID: " + id);
-                        Usuario u = service.readUsuarioById(id);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(u);
-                        System.out.println("📤 Usuario enviado: " + (u != null ? u.getNombre() : "null"));
+                        try {
+                            String id = (String) is.readObject();
+                            Usuario u = service.readUsuarioById(id);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(u);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(null);
+                            System.out.println("❌ Error en USUARIO_READ: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.USUARIO_CREATE -> {
-                        Usuario u = (Usuario) is.readObject();
-                        service.createUsuario(u);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        try {
+                            Usuario u = (Usuario) is.readObject();
+                            service.createUsuario(u);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en USUARIO_CREATE: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.USUARIO_UPDATE -> {
-                        Usuario u = (Usuario) is.readObject();
-                        service.updateUsuario(u);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        try {
+                            Usuario u = (Usuario) is.readObject();
+                            service.updateUsuario(u);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en USUARIO_UPDATE: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.USUARIO_DELETE -> {
-                        String id = (String) is.readObject();
-                        service.deleteUsuario(id);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        try {
+                            String id = (String) is.readObject();
+                            service.deleteUsuario(id);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en USUARIO_DELETE: " + e.getMessage());
+                        }
                     }
 
-                    // 👨‍⚕️ MÉDICO
                     case Protocol.MEDICO_CREATE -> {
-                        Medico m = (Medico) is.readObject();
-                        service.createMedico(m);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
+                        try {
+                            Medico m = (Medico) is.readObject();
+                            service.createMedico(m);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en MEDICO_CREATE: " + e.getMessage());
+                        }
+                    }
+
+                    case Protocol.MEDICO_UPDATE -> {
+                        try {
+                            Medico m = (Medico) is.readObject();
+                            service.updateMedico(m);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            System.out.println("❌ Error en MEDICO_UPDATE: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.MEDICO_READ -> {
-                        String id = (String) is.readObject();
-                        Medico m = service.readMedico(id);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(m);
+                        try {
+                            String id = (String) is.readObject();
+                            Medico m = service.readMedico(id);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(m);
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(null);
+                            System.out.println("❌ Error en MEDICO_READ: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.MEDICO_READ_ALL -> {
-                        System.out.println("📥 Solicitud recibida: MEDICO_READ_ALL");
-                        List<Medico> lista = service.findAllMedico();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
-                    }
-
-                    // 👩‍🔬 FARMACÉUTICO
-                    case Protocol.FARMACEUTA_READ_ALL -> {
-                        System.out.println("📥 Solicitud recibida: FARMACEUTA_READ_ALL");
-                        List<Farmaceuta> lista = service.findAllFarmaceuta();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
-                    }
-
-                    // 🧑‍💼 ADMIN
-                    case Protocol.ADMIN_READ_ALL -> {
-                        System.out.println("📥 Solicitud recibida: ADMIN_READ_ALL");
-                        List<Admin> lista = service.findAllAdmin();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
-                    }
-
-                    // 🧍 PACIENTE
-                    case Protocol.PACIENTE_CREATE -> {
-                        Paciente p = (Paciente) is.readObject();
-                        service.createPaciente(p);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                    }
-
-                    case Protocol.PACIENTE_READ -> {
-                        String id = (String) is.readObject();
-                        Paciente p = service.readPacienteById(id);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(p);
+                        try {
+                            List<Medico> lista = service.findAllMedico();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(lista != null ? lista : new ArrayList<>());
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(new ArrayList<>());
+                            System.out.println("❌ Error en MEDICO_READ_ALL: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.PACIENTE_READ_ALL -> {
-                        System.out.println("📥 Solicitud recibida: PACIENTE_READ_ALL");
-                        List<Paciente> lista = service.findAllPaciente();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
-                    }
-
-                    // 💊 MEDICAMENTO
-                    case Protocol.MEDICAMENTO_SEARCH -> {
-                        Medicamento filtro = (Medicamento) is.readObject();
-                        List<Medicamento> lista = service.findAllMedicamento(); // o searchMedicamento si lo agregás
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
+                        try {
+                            List<Paciente> lista = service.findAllPaciente();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(lista != null ? lista : new ArrayList<>());
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(new ArrayList<>());
+                            System.out.println("❌ Error en PACIENTE_READ_ALL: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.MEDICAMENTO_READ_ALL -> {
-                        System.out.println("📥 Solicitud recibida: MEDICAMENTO_READ_ALL");
-                        List<Medicamento> lista = service.findAllMedicamento();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(lista);
-                    }
-
-                    // 📄 RECETA
-                    case Protocol.RECETA_CREATE -> {
-                        Receta r = (Receta) is.readObject();
-                        service.createReceta(r);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                    }
-
-                    case Protocol.RECETA_READ -> {
-                        String id = (String) is.readObject();
-                        Receta r = service.readRecetaById(id);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(r);
-                    }
-
-                    case Protocol.RECETA_SEARCH -> {
-                        String pacienteId = (String) is.readObject();
-                        List<Receta> recetas = service.findRecetaByPaciente(pacienteId);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(recetas);
+                        try {
+                            List<Medicamento> lista = service.findAllMedicamento();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(lista != null ? lista : new ArrayList<>());
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(new ArrayList<>());
+                            System.out.println("❌ Error en MEDICAMENTO_READ_ALL: " + e.getMessage());
+                        }
                     }
 
                     case Protocol.RECETA_READ_ALL -> {
-                        List<Receta> recetas = service.findAllRecetas();
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(recetas);
+                        try {
+                            List<Receta> recetas = service.findAllRecetas();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(recetas != null ? recetas : new ArrayList<>());
+                        } catch (Exception e) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                            os.writeObject(new ArrayList<>());
+                            System.out.println("❌ Error en RECETA_READ_ALL: " + e.getMessage());
+                        }
                     }
 
-                    case Protocol.RECETA_SEARCH_BETWEEN -> {
-                        LocalDate start = (LocalDate) is.readObject();
-                        LocalDate end = (LocalDate) is.readObject();
-                        List<Receta> recetas = service.findRecetasBetween(start, end);
-                        os.writeInt(Protocol.ERROR_NO_ERROR);
-                        os.writeObject(recetas);
-                    }
-
-                    // 🔌 DESCONECTAR
                     case Protocol.DISCONNECT -> {
                         System.out.println("🔌 Cliente solicitó desconexión.");
                         stop();
                         server.remove(this);
                     }
 
-                    // ❌ DEFAULT
                     default -> {
                         System.out.println("⚠️ Código de operación no reconocido: " + method);
                         os.writeInt(Protocol.ERROR_ERROR);
@@ -208,10 +204,11 @@ public class Worker {
                 os.flush();
 
             } catch (Exception e) {
-                System.out.println("❌ Error en operación: " + e.getMessage());
+                System.out.println("❌ Error general en operación: " + e.getMessage());
                 e.printStackTrace();
                 stop();
             }
         }
     }
 }
+

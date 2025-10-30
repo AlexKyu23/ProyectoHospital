@@ -20,7 +20,7 @@ public class LineChart_AWT {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM");
 
         try {
-            var recetas = Service.instance().findRecetasBetween(start, end);
+            var recetas = Service.instance().searchRecetasBetween(start, end);
             var conteoPorMes = new TreeMap<String, Integer>();
 
             for (var r : recetas) {
