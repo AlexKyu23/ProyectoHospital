@@ -23,7 +23,7 @@ public class MedicamentoView implements PropertyChangeListener {
     private JTextField codigo;
     private JTextField nombre;
     private JTextField descripcion;
-    private JTextField nombreBuscar;
+    // ❌ REMOVIDO: private JTextField nombreBuscar;
     private JTextField descripcionBuscar;
     private JTextField codigoBuscar;
     private JButton guardarButton;
@@ -41,11 +41,11 @@ public class MedicamentoView implements PropertyChangeListener {
     }
 
     private void initListeners() {
-        // BUSCAR
+        // BUSCAR - Solo por descripción y código
         buscarButton.addActionListener(e -> {
             try {
                 Medicamento filter = new Medicamento();
-                filter.setNombre(nombreBuscar.getText());
+                // ❌ REMOVIDO: filter.setNombre(nombreBuscar.getText());
                 filter.setDescripcion(descripcionBuscar.getText());
                 try {
                     filter.setCodigo(Integer.parseInt(codigoBuscar.getText()));
@@ -127,7 +127,7 @@ public class MedicamentoView implements PropertyChangeListener {
             }
             case MedicamentoModel.FILTER -> {
                 Medicamento f = model.getFilter();
-                nombreBuscar.setText(f.getNombre());
+                // ❌ REMOVIDO: nombreBuscar.setText(f.getNombre());
                 descripcionBuscar.setText(f.getDescripcion());
                 codigoBuscar.setText(f.getCodigo() > 0 ? String.valueOf(f.getCodigo()) : "");
             }
@@ -179,15 +179,14 @@ public class MedicamentoView implements PropertyChangeListener {
         descripcion.setBorder(BORDER_NORMAL);
     }
 
-    // Getters (opcional)
+    // Getters
     public JTextField getCodigo() { return codigo; }
     public JTextField getNombre() { return nombre; }
     public JTextField getDescripcion() { return descripcion; }
-    public JTextField getNombreBuscar() { return nombreBuscar; }
+    // ❌ REMOVIDO: public JTextField getNombreBuscar() { return nombreBuscar; }
     public JTextField getDescripcionBuscar() { return descripcionBuscar; }
     public JTextField getCodigoBuscar() { return codigoBuscar; }
     public JTable getTablaMedicamentos() { return tablaMedicamentos; }
     public JPanel getListado() {return listado;}
-
     public JButton getBuscarButton() { return buscarButton; }
 }

@@ -92,6 +92,7 @@ public class MedicoDAO {
             while (rs.next()) {
                 resultado.add(from(rs, ""));
             }
+            System.out.println("🔍 Médicos encontrados: " + resultado.size());
         } catch (SQLException ex) {
             throw new Exception("Error al buscar Medico: " + ex.getMessage());
         }

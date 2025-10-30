@@ -1,16 +1,11 @@
 package hospital.presentation.Usuario.Presentation;
 
-
-
 import logic.Usuario;
 
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-/**
- * Vista del login. Muestra campos de entrada y botones.
- */
 public class LoginView extends JPanel implements PropertyChangeListener {
     private LoginController controller;
     private LoginModel model;

@@ -1,4 +1,3 @@
-// Frontend/src/main/java/presentation/Medicamento/presentation/MedicamentoController.java
 package hospital.presentation.Medicamento.presentation;
 
 import hospital.Application;
@@ -19,65 +18,159 @@ public class MedicamentoController implements ThreadListener {
         this.view = view;
         this.model = model;
 
+        System.out.println("📦 Iniciando MedicamentoController...");
+
         model.init();
-        model.setList(Service.instance().findAllMedicamentos());
+
+        // ✅ CARGA ASÍNCRONA
+        cargarDatosAsincrono();
 
         view.setController(this);
         view.setModel(model);
 
         refresher = new Refresher(this);
         refresher.start();
+        System.out.println("✅ MedicamentoController inicializado");
+    }
+
+    private void cargarDatosAsincrono() {
+        SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Medicamento> doInBackground() throws Exception {
+                System.out.println("🔄 Cargando medicamentos del backend...");
+                return Service.instance().findAllMedicamentos();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Medicamento> lista = get();
+                    System.out.println("📡 Medicamentos cargados: " + lista.size());
+                    model.setList(lista);
+                } catch (Exception e) {
+                    System.err.println("❌ Error al cargar medicamentos: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void search(Medicamento filter) {
-        try {
-            model.setFilter(filter);
-            List<Medicamento> rows = Service.instance().searchMedicamento(filter);
-            model.setMode(Application.MODE_CREATE);
-            model.setCurrent(new Medicamento());
-            model.setList(rows);
-        } catch (Exception e) {}
+        SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Medicamento> doInBackground() throws Exception {
+                return Service.instance().searchMedicamento(filter);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    model.setFilter(filter);
+                    model.setMode(Application.MODE_CREATE);
+                    model.setCurrent(new Medicamento());
+                    model.setList(get());
+                } catch (Exception e) {
+                    System.err.println("Error en búsqueda: " + e.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void save(Medicamento m) {
-        try {
-            switch (model.getMode()) {
-                case Application.MODE_CREATE -> Service.instance().createMedicamento(m);
-                case Application.MODE_EDIT -> Service.instance().updateMedicamento(m);
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                switch (model.getMode()) {
+                    case Application.MODE_CREATE -> Service.instance().createMedicamento(m);
+                    case Application.MODE_EDIT -> Service.instance().updateMedicamento(m);
+                }
+                return null;
             }
-            model.setFilter(new Medicamento());
-            search(model.getFilter());
-        } catch (Exception ex) {}
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    model.setFilter(new Medicamento());
+                    search(model.getFilter());
+                } catch (Exception ex) {
+                    System.err.println("Error al guardar: " + ex.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void edit(int row) {
         Medicamento m = model.getList().get(row);
-        try {
-            model.setMode(Application.MODE_EDIT);
-            model.setCurrent(Service.instance().readMedicamento(m.getCodigo()));
-        } catch (Exception ex) {}
+        SwingWorker<Medicamento, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Medicamento doInBackground() throws Exception {
+                return Service.instance().readMedicamento(m.getCodigo());
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    model.setMode(Application.MODE_EDIT);
+                    model.setCurrent(get());
+                } catch (Exception ex) {
+                    System.err.println("Error al editar: " + ex.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void delete() {
-        try {
-            Service.instance().deleteMedicamento(model.getCurrent().getCodigo());
-            search(model.getFilter());
-        } catch (Exception ex) {}
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Service.instance().deleteMedicamento(model.getCurrent().getCodigo());
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    search(model.getFilter());
+                } catch (Exception ex) {
+                    System.err.println("Error al eliminar: " + ex.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void clear() {
         model.setMode(Application.MODE_CREATE);
         model.setCurrent(new Medicamento());
-        view.getNombreBuscar().setText("");
+        // ❌ REMOVIDO: view.getNombreBuscar().setText("");
         view.getDescripcionBuscar().setText("");
         view.getCodigoBuscar().setText("");
     }
 
     @Override
     public void refresh() {
-        try {
-            model.setList(Service.instance().findAllMedicamentos());
-        } catch (Exception e) {}
+        SwingWorker<List<Medicamento>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Medicamento> doInBackground() throws Exception {
+                return Service.instance().findAllMedicamentos();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    model.setList(get());
+                } catch (Exception e) {
+                    System.err.println("Error al refrescar: " + e.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void reporte() {

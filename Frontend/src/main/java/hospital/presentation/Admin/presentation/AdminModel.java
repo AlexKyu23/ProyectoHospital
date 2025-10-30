@@ -10,8 +10,14 @@ public class AdminModel extends AbstractModel {
 
     public static final String CURRENT = "current";
 
+    public AdminModel() {
+        this.current = null;
+        System.out.println("🧩 AdminModel creado (vacío)");
+    }
+
     public AdminModel(String id, String nombre, String clave) {
         current = new Admin(id, nombre, clave);
+        System.out.println("🧩 AdminModel creado con admin: " + nombre);
     }
 
     @Override
@@ -25,8 +31,9 @@ public class AdminModel extends AbstractModel {
     }
 
     public void setCurrent(Admin admin) {
+        Admin old = this.current;
         this.current = admin;
         firePropertyChange(CURRENT);
+        System.out.println("🔄 Admin actualizado en modelo: " + (admin != null ? admin.getNombre() : "null"));
     }
 }
-

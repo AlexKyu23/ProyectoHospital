@@ -12,6 +12,7 @@ public class Server {
     private final List<Worker> workers = Collections.synchronizedList(new ArrayList<>());
 
     public Server() {
+
         try {
             serverSocket = new ServerSocket(Protocol.PORT);
             System.out.println("Servidor iniciado en puerto " + Protocol.PORT);
@@ -21,6 +22,11 @@ public class Server {
     }
 
     public void run() {
+        if (serverSocket == null) {
+            System.out.println("❌ El servidor no se pudo iniciar. Abortando ejecución.");
+            return;
+        }
+
         Service service = Service.instance();
         while (true) {
             try {
@@ -36,8 +42,20 @@ public class Server {
         }
     }
 
+
     public void remove(Worker w) {
         workers.remove(w);
         System.out.println("Clientes conectados: " + workers.size());
     }
+    public void stop() {
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+                System.out.println("🔌 ServerSocket cerrado correctamente.");
+            }
+        } catch (IOException e) {
+            System.out.println("⚠️ Error al cerrar ServerSocket: " + e.getMessage());
+        }
+    }
+
 }

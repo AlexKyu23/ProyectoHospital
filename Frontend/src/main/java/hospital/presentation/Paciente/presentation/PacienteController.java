@@ -2,24 +2,58 @@ package hospital.presentation.Paciente.presentation;
 
 import hospital.logic.Service;
 import hospital.presentation.Paciente.presentation.View.PacienteView;
+import hospital.presentation.Refresher;
+import hospital.presentation.ThreadListener;
 import logic.Paciente;
 
 import javax.swing.*;
 import java.time.LocalDate;
+import java.util.List;
 
-public class PacienteController {
+public class PacienteController implements ThreadListener {
     private final PacienteModel model;
     private final PacienteView view;
+    private Refresher refresher;
 
     public PacienteController(PacienteModel model, PacienteView view) throws Exception {
         this.model = model;
         this.view = view;
 
+        System.out.println("📦 Iniciando PacienteController...");
         view.setController(this);
         view.setModel(model);
 
         model.init();
-        model.setList(Service.instance().findAllPacientes());
+
+        // ✅ CARGA ASÍNCRONA
+        cargarDatosAsincrono();
+
+        refresher = new Refresher(this);
+        refresher.start();
+        System.out.println("✅ PacienteController inicializado");
+    }
+
+    private void cargarDatosAsincrono() {
+        SwingWorker<List<Paciente>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Paciente> doInBackground() throws Exception {
+                System.out.println("🔄 Cargando pacientes del backend...");
+                return Service.instance().findAllPacientes();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Paciente> lista = get();
+                    System.out.println("📡 Pacientes cargados: " + lista.size());
+                    model.setList(lista);
+                } catch (Exception e) {
+                    System.err.println("❌ Error al cargar pacientes: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void guardar() {
@@ -33,24 +67,41 @@ public class PacienteController {
             return;
         }
 
-        try {
-            Paciente existente = Service.instance().readPaciente(id);
-            existente.setNombre(nombre);
-            existente.setTelefono(telefono);
-            existente.setFechaNacimiento(fechaNacimiento);
-            Service.instance().updatePaciente(existente);
-            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente actualizado");
-        } catch (Exception e) {
-            try {
-                Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
-                Service.instance().createPaciente(nuevo);
-                JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente agregado");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage());
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+                    Paciente existente = Service.instance().readPaciente(id);
+                    existente.setNombre(nombre);
+                    existente.setTelefono(telefono);
+                    existente.setFechaNacimiento(fechaNacimiento);
+                    Service.instance().updatePaciente(existente);
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente actualizado")
+                    );
+                } catch (Exception e) {
+                    Paciente nuevo = new Paciente(id, nombre, telefono, fechaNacimiento);
+                    Service.instance().createPaciente(nuevo);
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente agregado")
+                    );
+                }
+                return null;
             }
-        }
 
-        actualizarLista();
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    actualizarLista();
+                } catch (Exception ex) {
+                    SwingUtilities.invokeLater(() ->
+                            JOptionPane.showMessageDialog(view.getMainPanel(), ex.getMessage())
+                    );
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void borrar() {
@@ -60,13 +111,25 @@ public class PacienteController {
             return;
         }
 
-        try {
-            Service.instance().deletePaciente(id);
-            JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente eliminado");
-            actualizarLista();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Service.instance().deletePaciente(id);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente eliminado");
+                    actualizarLista();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void buscar() {
@@ -76,17 +139,28 @@ public class PacienteController {
             return;
         }
 
-        try {
-            Paciente p = Service.instance().readPaciente(criterio);
-            if (p != null) {
-                model.setCurrent(p);
-                JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente encontrado");
-            } else {
-                JOptionPane.showMessageDialog(view.getMainPanel(), "No se encontró el paciente");
+        SwingWorker<Paciente, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Paciente doInBackground() throws Exception {
+                return Service.instance().readPaciente(criterio);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
-        }
+
+            @Override
+            protected void done() {
+                try {
+                    Paciente p = get();
+                    if (p != null) {
+                        model.setCurrent(p);
+                        JOptionPane.showMessageDialog(view.getMainPanel(), "Paciente encontrado");
+                    } else {
+                        JOptionPane.showMessageDialog(view.getMainPanel(), "No se encontró el paciente");
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(view.getMainPanel(), e.getMessage());
+                }
+            }
+        };
+        worker.execute();
     }
 
     public void limpiar() {
@@ -107,11 +181,34 @@ public class PacienteController {
     }
 
     private void actualizarLista() {
-        try {
-            model.setList(Service.instance().findAllPacientes());
-            model.setCurrent(new Paciente());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(view.getMainPanel(), "Error al actualizar lista: " + e.getMessage());
+        SwingWorker<List<Paciente>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<Paciente> doInBackground() throws Exception {
+                return Service.instance().findAllPacientes();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    model.setList(get());
+                    model.setCurrent(new Paciente());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(view.getMainPanel(),
+                            "Error al actualizar lista: " + e.getMessage());
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    @Override
+    public void refresh() {
+        actualizarLista();
+    }
+
+    public void stop() {
+        if (refresher != null) {
+            refresher.stop();
         }
     }
 }

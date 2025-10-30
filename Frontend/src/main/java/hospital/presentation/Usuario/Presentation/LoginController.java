@@ -33,18 +33,30 @@ public class LoginController {
         }
 
         try {
-            Usuario u = Service.instance().readUsuario(id);
-            if (u == null || !u.getClave().equals(clave)) {
-                JOptionPane.showMessageDialog(view.getPanel(), "Credenciales inválidas", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("🔐 Intentando login con ID: " + id + " y clave: " + clave);
+            Usuario u = Service.instance().readUsuario(id); // ← usa protocolo USUARIO_READ
+            System.out.println("📥 Usuario recibido: " + (u != null ? u.getNombre() : "null"));
+
+            if (u == null) {
+                JOptionPane.showMessageDialog(view.getPanel(), "Usuario no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!u.getClave().equals(clave)) {
+                JOptionPane.showMessageDialog(view.getPanel(), "Clave incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             Sesion.setUsuario(u);
             model.setCurrent(u);
             model.setAutenticado(true);
+            System.out.println("✅ Autenticación exitosa para: " + u.getNombre());
             loginFrame.setVisible(false);
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(view.getPanel(), "Error al autenticar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String msg = e.getMessage() != null ? e.getMessage() : "Error inesperado";
+            JOptionPane.showMessageDialog(view.getPanel(), "Error al autenticar: " + msg, "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
@@ -53,15 +65,27 @@ public class LoginController {
         view.getClave().setText("");
         model.setCurrent(new Usuario());
         model.setAutenticado(false);
+        System.out.println("🔄 Campos de login limpiados.");
     }
 
     public void cambiarClave() {
         String id = view.getId().getText().trim();
         String claveActual = new String(view.getClave().getPassword());
 
+        if (id.isEmpty() || claveActual.isEmpty()) {
+            JOptionPane.showMessageDialog(view.getPanel(), "Debe ingresar ID y clave actual", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
-            Usuario u = Service.instance().readUsuario(id);
-            if (u == null || !u.getClave().equals(claveActual)) {
+            System.out.println("🔐 Verificando clave actual para ID: " + id);
+            Usuario u = Service.instance().readUsuario(id); // ← usa protocolo USUARIO_READ
+            if (u == null) {
+                JOptionPane.showMessageDialog(view.getPanel(), "Usuario no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!u.getClave().equals(claveActual)) {
                 JOptionPane.showMessageDialog(view.getPanel(), "Clave actual incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -70,10 +94,14 @@ public class LoginController {
             if (nuevaClave != null && !nuevaClave.isEmpty()) {
                 u.setClave(nuevaClave);
                 Service.instance().updateUsuario(u);
-                JOptionPane.showMessageDialog(view.getPanel(), "Clave actualizada");
+                JOptionPane.showMessageDialog(view.getPanel(), "✅ Clave actualizada correctamente.");
+                System.out.println("🔑 Clave cambiada para usuario: " + u.getId());
             }
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(view.getPanel(), "Error al cambiar clave: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            String msg = e.getMessage() != null ? e.getMessage() : "Error inesperado";
+            JOptionPane.showMessageDialog(view.getPanel(), "Error al cambiar clave: " + msg, "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 }

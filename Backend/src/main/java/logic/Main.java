@@ -1,55 +1,72 @@
 package logic;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-
         try {
             Service service = Service.instance();
-            System.out.println("✅ Conectado al servicio");
+            System.out.println("✅ Conectado al servicio\n");
 
+            // 👨‍⚕️ Médicos
+            List<Medico> medicos = service.findAllMedico();
+            System.out.println("📋 Médicos (" + medicos.size() + "):");
+            for (Medico m : medicos) {
+                System.out.println("   - " + m.getId() + " | " + m.getNombre() + " | " + m.getEspecialidad());
+            }
 
-            service.resetDatosDePrueba();
+            // 🧍 Pacientes
+            List<Paciente> pacientes = service.findAllPaciente();
+            System.out.println("\n📋 Pacientes (" + pacientes.size() + "):");
+            for (Paciente p : pacientes) {
+                System.out.println("   - " + p.getId() + " | " + p.getNombre() + " | " + p.getTelefono() + " | " + p.getFechaNacimiento());
+            }
 
+            // 💊 Medicamentos
+            List<Medicamento> medicamentos = service.findAllMedicamento();
+            System.out.println("\n📋 Medicamentos (" + medicamentos.size() + "):");
+            for (Medicamento m : medicamentos) {
+                System.out.println("   - " + m.getCodigo() + " | " + m.getNombre() + " | " + m.getDescripcion());
+            }
 
-            // 👨‍⚕️ Médico
-            Medico medico = new Medico("M100", "Dr. House", "clave123", "Diagnóstico");
-            service.createMedico(medico);
+            // 📄 Recetas
+            List<Receta> recetas = service.findAllRecetas();
+            System.out.println("\n📋 Recetas (" + recetas.size() + "):");
+            for (Receta r : recetas) {
+                System.out.println("   - " + r.getId() + " | Médico: " + r.getMedicoId() + " | Paciente: " + r.getPacienteId() +
+                        " | Fecha: " + r.getFechaConfeccion() + " | Retiro: " + r.getFechaRetiro() + " | Estado: " + r.getEstado());
+            }
 
-            // 🧍 Paciente
-            Paciente paciente = new Paciente("P200", "Lisa Cuddy", "8888-8888", LocalDate.of(1980, 5, 20));
-            service.createPaciente(paciente);
+            // 📝 Items de receta
+            System.out.println("\n📋 Items de receta:");
+            for (Receta r : recetas) {
+                List<ItemReceta> items = service.findItemRecetaByReceta(r.getId());
+                System.out.println("   Receta " + r.getId() + " (" + items.size() + " items):");
+                for (ItemReceta ir : items) {
+                    System.out.println("     - " + ir.getItemRecetaId() + " | Medicamento: " + ir.getMedicamentoCodigo() +
+                            " | Cantidad: " + ir.getCantidad() + " | Indicaciones: " + ir.getIndicaciones());
+                }
+            }
 
-            // 💊 Medicamento
-            Medicamento medicamento = new Medicamento("Ibuprofeno", "Antiinflamatorio", 3001);
-            service.createMedicamento(medicamento);
+            // 🚚 Prescripciones
+            List<Prescripcion> prescripciones = service.findAllPrescripcion();
+            System.out.println("\n📋 Prescripciones (" + prescripciones.size() + "):");
+            for (Prescripcion p : prescripciones) {
+                System.out.println("   - #" + p.getNumero() + " | Médico: " + p.getMedico().getNombre() +
+                        " | Paciente: " + p.getPaciente().getNombre() + " | Estado: " + p.getEstado());
+            }
 
-            // 📄 Receta
-            Receta receta = new Receta("R500", "M100", "P200", LocalDate.now(), LocalDate.now().plusDays(3));
-            service.createReceta(receta);
+            // 🔐 Usuarios
+            List<Usuario> usuarios = service.findAllUsuario();
+            System.out.println("\n📋 Usuarios (" + usuarios.size() + "):");
+            for (Usuario u : usuarios) {
+                System.out.println("   - " + u.getId() + " | " + u.getNombre() + " | Rol: " + u.getRol());
+            }
 
-            // 📝 ItemReceta
-            ItemReceta item = new ItemReceta("IR600", "R500", 3001, "Tomar cada 8h", 10, "Con agua", 5);
-            service.createItemReceta(item);
-
-            // 🚚 Prescripción
-            Prescripcion prescripcion = new Prescripcion(0, paciente, medico, item, LocalDateTime.now(), LocalDateTime.now().plusDays(2), "CONFECCIONADA");
-            service.createPrescripcion(prescripcion);
-            System.out.println("✅ Prescripción creada con número: " + prescripcion.getNumero());
-
-            // 🔐 Usuario
-            Usuario usuario = new Usuario("U700", "UsuarioPrueba", "claveU", "MED");
-            service.createUsuario(usuario);
-            boolean loginOk = service.verificarClaveUsuario("U700", "claveU");
-            System.out.println("✅ Login exitoso: " + loginOk);
-
-            System.out.println("🎉 Prueba completada correctamente");
+            System.out.println("\n✅ Verificación completa de contenido en base de datos");
 
         } catch (Exception e) {
-            System.err.println("❌ Error durante la prueba: " + e.getMessage());
+            System.err.println("❌ Error durante la verificación: " + e.getMessage());
             e.printStackTrace();
         }
     }

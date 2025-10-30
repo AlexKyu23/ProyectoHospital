@@ -2,6 +2,7 @@ package logic;
 
 import data.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,8 @@ public class Service {
         adminDAO.borrar(id);
     }
 
+
+
     // Farmaceuta
     public void createFarmaceuta(Farmaceuta f) throws Exception {
         if (farmaceutaDAO.buscarPorId(f.getId()) != null)
@@ -82,9 +85,7 @@ public class Service {
         farmaceutaDAO.borrar(id);
     }
 
-    public List<Farmaceuta> findAllFarmaceuta() throws Exception {
-        return farmaceutaDAO.listar();
-    }
+
 
     // Medicamento
     public void createMedicamento(Medicamento m) throws Exception {
@@ -110,9 +111,6 @@ public class Service {
         medicamentoDAO.borrar(codigo);
     }
 
-    public List<Medicamento> findAllMedicamento() throws Exception {
-        return medicamentoDAO.listar();
-    }
 
     // Medico
     public void createMedico(Medico m) throws Exception {
@@ -138,9 +136,7 @@ public class Service {
         medicoDAO.borrar(id);
     }
 
-    public List<Medico> findAllMedico() throws Exception {
-        return medicoDAO.listar();
-    }
+
 
     // Paciente
     public void createPaciente(Paciente p) throws Exception {
@@ -166,9 +162,6 @@ public class Service {
         pacienteDAO.borrar(id);
     }
 
-    public List<Paciente> findAllPaciente() throws Exception {
-        return pacienteDAO.listar();
-    }
 
     // Receta
     public void createReceta(Receta r) throws Exception {
@@ -324,9 +317,7 @@ public class Service {
         }
         recetaDAO.borrar(recetaId);
     }
-    public List<Receta> findAllRecetas() throws Exception {
-        return recetaDAO.listar();
-    }
+
 
     public List<Receta> findRecetasBetween(LocalDate start, LocalDate end) throws Exception {
         return recetaDAO.listar().stream()
@@ -335,6 +326,35 @@ public class Service {
                     return fecha != null && !fecha.isBefore(start) && !fecha.isAfter(end);
                 })
                 .collect(Collectors.toList());
+    }
+    public List<Medico> findAllMedico() throws Exception {
+        List<Medico> lista = medicoDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
+    }
+
+    public List<Paciente> findAllPaciente() throws Exception {
+        List<Paciente> lista = pacienteDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
+    }
+
+    public List<Medicamento> findAllMedicamento() throws Exception {
+        List<Medicamento> lista = medicamentoDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
+    }
+
+    public List<Receta> findAllRecetas() throws Exception {
+        List<Receta> lista = recetaDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
+    }
+
+    public List<Farmaceuta> findAllFarmaceuta() throws Exception {
+        List<Farmaceuta> lista = farmaceutaDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
+    }
+
+    public List<Admin> findAllAdmin() throws Exception {
+        List<Admin> lista = adminDAO.listar();
+        return lista != null ? lista : new ArrayList<>();
     }
     public void resetDatosDePrueba() throws Exception {
         try {
@@ -367,6 +387,7 @@ public class Service {
         try {
             medicoDAO.borrar("M100");
         } catch (Exception ignored) {}
+
     }
 
 

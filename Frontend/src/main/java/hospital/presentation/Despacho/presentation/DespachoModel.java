@@ -1,6 +1,7 @@
 package hospital.presentation.Despacho.presentation;
 
 import hospital.presentation.AbstractModel;
+import logic.Farmaceuta;
 import logic.Receta;
 
 import java.beans.PropertyChangeListener;
@@ -62,5 +63,8 @@ public class DespachoModel extends AbstractModel {
     public void setMode(int mode) {
         this.mode = mode;
         firePropertyChange(MODE);
+    }
+
+    public void setFarmaceuta(Farmaceuta farm) {
     }
 }

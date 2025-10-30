@@ -2,7 +2,7 @@ package logic;
 
 public class Protocol {
     public static final String SERVER = "localhost";
-    public static final int PORT = 1234;
+    public static final int PORT = 1230;
 
     // 🔐 Usuario y Sesión (900–909)
     public static final int USUARIO_LOGIN = 900;
@@ -76,4 +76,19 @@ public class Protocol {
 
     // 🔌 Control de conexión
     public static final int DISCONNECT = 999;
+    // 👨‍⚕️ Medico
+    public static final int MEDICO_READ_ALL = 915;
+
+    // 👩‍🔬 Farmaceuta
+    public static final int FARMACEUTA_READ_ALL = 925;
+
+    // 🧑‍💼 Admin
+    public static final int ADMIN_READ_ALL = 935;
+
+    // 🧍 Paciente
+    public static final int PACIENTE_READ_ALL = 945;
+
+    // 💊 Medicamento
+    public static final int MEDICAMENTO_READ_ALL = 955;
+
 }

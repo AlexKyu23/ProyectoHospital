@@ -75,7 +75,14 @@ public class PrescripcionDAO {
     }
 
     public List<Prescripcion> listar() throws Exception {
-        return search(new Prescripcion());
+        List<Prescripcion> resultado = new ArrayList<>();
+        String sql = "SELECT * FROM Prescripcion";
+        PreparedStatement ps = db.prepareStatement(sql);
+        ResultSet rs = db.executeQuery(ps);
+        while (rs.next()) {
+            resultado.add(from(rs, ""));
+        }
+        return resultado;
     }
 
     public List<Prescripcion> search(Prescripcion e) throws Exception {

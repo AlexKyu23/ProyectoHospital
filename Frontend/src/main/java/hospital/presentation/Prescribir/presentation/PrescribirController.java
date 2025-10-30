@@ -79,19 +79,15 @@ public class PrescribirController {
         JFrame selectorFrame = new JFrame("Buscar Medicamento");
         selectorFrame.setSize(600, 400);
         selectorFrame.setLocationRelativeTo(view.getPanel());
-        selectorFrame.setContentPane(selectorView.getListado());
+        selectorFrame.setContentPane(selectorView.getMainPanel());
         selectorFrame.setVisible(true);
 
         selectorView.getBuscarButton().addActionListener(e -> {
-            String nombre = selectorView.getNombreBuscar().getText().toLowerCase();
-            String codigo = selectorView.getCodigoBuscar().getText();
+            String nombre = selectorView.getNombre().getText().toLowerCase();
             String descripcion = selectorView.getDescripcionBuscar().getText().toLowerCase();
-
             MedicamentoModel filtered = new MedicamentoModel();
             filtered.setList(medicamentoModel.getList().stream()
-                    .filter(m -> m.getNombre().toLowerCase().contains(nombre)
-                            && String.valueOf(m.getCodigo()).contains(codigo)
-                            && m.getDescripcion().toLowerCase().contains(descripcion))
+                    .filter(m -> m.getNombre().toLowerCase().contains(nombre) || m.getDescripcion().toLowerCase().contains(descripcion))
                     .toList());
             selectorView.setModel(filtered);
         });
@@ -100,10 +96,8 @@ public class PrescribirController {
             int fila = selectorView.getTablaMedicamentos().getSelectedRow();
             if (fila >= 0 && medicamentoModel.getList().size() > fila) {
                 Medicamento seleccionado = medicamentoModel.getList().get(fila);
-                selectorFrame.dispose();
-
                 try {
-                    int cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a prescribir:"));
+                    int cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad:"));
                     String indicaciones = JOptionPane.showInputDialog("Indicaciones:");
                     int duracion = Integer.parseInt(JOptionPane.showInputDialog("Duración en días:"));
 
@@ -120,6 +114,7 @@ public class PrescribirController {
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(view.getPanel(), "Datos inválidos: " + ex.getMessage());
                 }
+                selectorFrame.dispose();
             }
         });
     }

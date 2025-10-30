@@ -86,8 +86,19 @@ public class RecetaDAO {
     }
 
     public List<Receta> listar() throws Exception {
-        return search(new Receta());
+        List<Receta> resultado = new ArrayList<>();
+        String sql = "SELECT * FROM Receta";
+        PreparedStatement ps = db.prepareStatement(sql);
+        ResultSet rs = db.executeQuery(ps);
+        ItemRecetaDAO itemDAO = new ItemRecetaDAO();
+        while (rs.next()) {
+            Receta receta = from(rs, "");
+            receta.setMedicamentos(itemDAO.search(new ItemReceta(receta.getId(), "", 0, "", 0, "", 0)));
+            resultado.add(receta);
+        }
+        return resultado;
     }
+
 
     public List<Receta> search(Receta e) throws Exception {
         List<Receta> resultado = new ArrayList<>();

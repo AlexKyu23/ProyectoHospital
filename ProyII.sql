@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `Admin` (
 ENGINE = InnoDB;
 
 -- ----------------------------------------------------
--- 
+--
 -- ----------------------------------------------------
 
 INSERT INTO Paciente (id,nombre,fechaNacimiento,telefono) VALUES ('PAC-001','Laura','1990-05-12','8888-1111');
