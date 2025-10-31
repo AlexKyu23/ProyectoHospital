@@ -11,7 +11,6 @@ public class Protocol {
     public static final int USUARIO_CREATE = 903;
     public static final int USUARIO_UPDATE = 904;
     public static final int USUARIO_DELETE = 905;
-    public static final int USUARIO_SEARCH = 906;
 
     // 👨‍⚕️ Medico (910–919)
     public static final int MEDICO_CREATE = 910;
@@ -92,4 +91,12 @@ public class Protocol {
     // 💊 Medicamento
     public static final int MEDICAMENTO_READ_ALL = 955;
 
+    //(10-19)
+    public static final int SYNC=10;
+    public static final int ASYNC=11;
+
+    //Mensajes (890-899)
+    public static final int DELIVER_LOGIN = 890;
+    public static final int DELIVER_LOGOUT = 891;
+    public static final int DELIVER_MESSAGE = 892;
 }
